@@ -7,7 +7,8 @@
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
 body {
-  background: linear-gradient(120deg, #fce4ec, #e1bee7, #bbdefb);
+  background: url("assets/background-pattern.png") no-repeat center center fixed;
+  background-size: cover;
 }
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
@@ -28,7 +29,7 @@ body {
   100% { transform: translateY(0px); }
 }
 
-.empty-slot { width:60px; height:60px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; }
+.empty-slot { width:60px; height:60px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; position:relative; }
 
 button { padding:10px 20px; font-size:16px; border-radius:8px; cursor:pointer; margin:10px; transition: all 0.3s; }
 button:hover { opacity:0.9; transform: scale(1.05); }
@@ -37,6 +38,9 @@ button:hover { opacity:0.9; transform: scale(1.05); }
 
 #end { font-size:2em; color:#2e7d32; text-align:center; }
 canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
+
+.empty-slot img.ref-img { position:absolute; width:50%; height:50%; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0.3; }
+.empty-slot img.placed-img { position:absolute; width:100%; height:100%; top:0; left:0; }
 </style>
 </head>
 <body>
@@ -109,23 +113,29 @@ function initSlide(index){
   optionRow.innerHTML="";
   nextBtn.style.display='none';
 
-  // show pattern
+  // show pattern images and create empty slots
   p.row.forEach(item=>{
     const img = document.createElement('img');
     img.src=`assets/${item}.png`;
     patternRow.appendChild(img);
   });
 
-  // create empty slots
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
     emptyDiv.dataset.filled="false";
-    emptyDiv.dataset.index=i; // track position
+    emptyDiv.dataset.index=i;
+
+    // add reference image in box
+    const refImg = document.createElement('img');
+    refImg.src = `assets/${p.expected[i]}.png`;
+    refImg.classList.add('ref-img');
+    emptyDiv.appendChild(refImg);
+
     patternRow.appendChild(emptyDiv);
   }
 
-  // options
+  // options row
   p.options.forEach(opt=>{
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
@@ -136,8 +146,11 @@ function initSlide(index){
         if(slot.dataset.filled==="false" && !placed){
           const expectedIndex = parseInt(slot.dataset.index);
           if(opt === p.expected[expectedIndex]){
-            // Fill the slot with image
-            slot.innerHTML = `<img src="assets/${opt}.png" style="width:100%;height:100%;">`;
+            // place image in box
+            const placedImg = document.createElement('img');
+            placedImg.src=`assets/${opt}.png`;
+            placedImg.classList.add('placed-img');
+            slot.appendChild(placedImg);
             slot.dataset.filled="true";
             placed=true;
             audioCorrect();
@@ -146,6 +159,7 @@ function initSlide(index){
           }
         }
       });
+
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
@@ -155,8 +169,9 @@ function initSlide(index){
   clearBtn.addEventListener('click',()=>{
     const emptyDivs = patternRow.querySelectorAll('.empty-slot');
     emptyDivs.forEach(e=>{
-      e.innerHTML="";
       e.dataset.filled="false";
+      // remove placed images but keep reference images
+      e.querySelectorAll('.placed-img').forEach(img=>img.remove());
     });
     nextBtn.style.display='none';
   });
