@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Family Game</title>
+<style>
+body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; background:#f0f8ff; }
+.slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
+.active { display:flex; }
+#splash img { width:250px; height:auto; }
+
+.picture img { width:200px; height:auto; margin-bottom:20px; }
+.letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
+.letter-box { width:50px; height:50px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:#ffffff; }
+.letter-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; }
+.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; }
+.letter-buttons button:hover { background:#2e8b57; }
+#end { font-size:2em; color:#2e8b57; text-align:center; }
+canvas { position:absolute; top:0; left:0; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div class="slide active" id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game Slides -->
+<div id="game-slides">
+  <!-- Slides will be injected by JS -->
+</div>
+
+<!-- End Slide -->
+<div class="slide" id="end">
+  <h1>Good Job!</h1>
+  <canvas id="confetti"></canvas>
+</div>
+
+<audio id="audio-correct" src="assets/correct.mp3"></audio>
+<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+<audio id="audio-excellent" src="assets/excellent.mp3"></audio>
+
+<script>
+const words = [
+  {word:'hat', img:'assets/hat.png'},
+  {word:'leg', img:'assets/leg.png'},
+  {word:'mop', img:'assets/mop.png'},
+  {word:'bun', img:'assets/bun.png'},
+  {word:'zip', img:'assets/zip.png'},
+  {word:'jet', img:'assets/jet.png'},
+  {word:'cub', img:'assets/cub.png'},
+  {word:'jam', img:'assets/jam.png'},
+  {word:'dig', img:'assets/dig.png'},
+  {word:'log', img:'assets/log.png'}
+];
+
+const gameSlidesContainer = document.getElementById('game-slides');
+
+// Generate slides dynamically
+words.forEach((item, index)=>{
+  const slide = document.createElement('div');
+  slide.classList.add('slide');
+  slide.dataset.word = item.word;
+  slide.innerHTML = `
+    <div class="picture"><img src="${item.img}" alt="${item.word}"></div>
+    <div class="letter-boxes" id="boxes-${index}"></div>
+    <div class="letter-buttons" id="buttons-${index}"></div>
+  `;
+  gameSlidesContainer.appendChild(slide);
+});
+
+const slides = document.querySelectorAll('.slide');
+let currentSlide = 0;
+
+// Show a slide
+function showSlide(i){
+  slides.forEach(s=>s.classList.remove('active'));
+  slides[i].classList.add('active');
+}
+
+// Splash 5 seconds → first word
+setTimeout(()=>{ showSlide(1); initSlide(0); }, 5000);
+
+// Shuffle letters
+function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function initSlide(index){
+  const slide = slides[index+1]; // skip splash
+  const word = words[index].word;
+  const boxesContainer = slide.querySelector(`#boxes-${index}`);
+  const buttonsContainer = slide.querySelector(`#buttons-${index}`);
+  boxesContainer.innerHTML=''; buttonsContainer.innerHTML='';
+
+  // Letter boxes
+  for(let i=0;i<word.length;i++){
+    const box = document.createElement('div');
+    box.classList.add('letter-box');
+    boxesContainer.appendChild(box);
+  }
+
+  // Letter buttons
+  const letters = shuffleArray(word.split(''));
+  letters.forEach(l=>{
+    const btn = document.createElement('button');
+    btn.textContent = l;
+    btn.addEventListener('click', ()=>{
+      const emptyBox = Array.from(boxesContainer.children).find(b=>b.textContent==='');
+      if(emptyBox){
+        emptyBox.textContent=l;
+        const formedWord = Array.from(boxesContainer.children).map(b=>b.textContent).join('');
+        if(formedWord.length===word.length){
+          if(formedWord===word){
+            document.getElementById('audio-correct').play();
+            setTimeout(()=>{
+              if(index+1<words.length){
+                initSlide(index+1);
+                showSlide(index+2);
+              } else showEndSlide();
+            },500);
+          } else {
+            document.getElementById('audio-wrong').play();
+            Array.from(boxesContainer.children).forEach(b=>b.textContent='');
+          }
+        }
+      }
+    });
+    buttonsContainer.appendChild(btn);
+  });
+}
+
+// End Slide + confetti
+function showEndSlide(){
+  slides.forEach(s=>s.classList.remove('active'));
+  document.getElementById('end').classList.add('active');
+  document.getElementById('audio-excellent').play();
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const canvas=document.getElementById('confetti');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const confetti=[];
+  for(let i=0;i<150;i++){
+    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth=c.r;
+      ctx.strokeStyle=c.color;
+      ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
+      ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
+      ctx.stroke();
+      c.tilt+=c.tiltAngleIncrement;
+      c.y+=(Math.cos(c.d)+3+c.r/2)/2;
+      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
