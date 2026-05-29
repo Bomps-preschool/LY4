@@ -34,7 +34,6 @@ body {
 }
 
 .picture img { width:200px; height:auto; margin-bottom:20px; transform:translateY(-30px); 
-  /* soft floating animation */
   animation: floatImg 4s ease-in-out infinite;
   transition: transform 0.5s ease-in-out;
 }
@@ -78,7 +77,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Top instruction (only for game slides, not end slide) -->
+<!-- Top instruction (only for game slides) -->
 <div class="instruction-top" id="instruction-bar">
 Click the letters in the correct order to make the word that matches the picture below. Have fun learning word families!
 </div>
@@ -86,7 +85,7 @@ Click the letters in the correct order to make the word that matches the picture
 <!-- Game Slides -->
 <div id="game-slides"></div>
 
-<!-- End Slide (instruction removed) -->
+<!-- End Slide (instruction hidden on Good Job slide) -->
 <div class="slide" id="end">
   <h1>Good Job!</h1>
   <canvas id="confetti"></canvas>
@@ -202,6 +201,7 @@ function showEndSlide(){
   slides.forEach(s=>s.classList.remove('active'));
   document.getElementById('end').classList.add('active');
   document.getElementById('audio-excellent').play();
+  document.getElementById('instruction-bar').style.display='none'; // Hide instruction on Good Job slide
   launchConfetti();
 }
 
