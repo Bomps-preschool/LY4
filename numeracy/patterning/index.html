@@ -15,10 +15,10 @@ body {
 .active { display:flex; }
 #splash img { width:250px; height:auto; }
 
-.instruction-top { width:100%; text-align:center; font-size:1em; color:#2e7d32; font-weight:bold; padding:10px; display:none; }
+.instruction-top { width:100%; text-align:center; font-size:1.02em; color:#2e7d32; font-weight:bold; padding:10px; display:none; }
 
 .pattern-row { display:flex; justify-content:center; margin-bottom:20px; }
-.pattern-row img, .option-row img { width:60px; height:60px; margin:2px; animation: floatAnim 3s ease-in-out infinite; }
+.pattern-row img, .option-row img { width:90px; height:90px; margin:2px; animation: floatAnim 3s ease-in-out infinite; }
 .option-row { display:flex; justify-content:center; margin-top:10px; flex-wrap:wrap; }
 .option-row img { cursor:pointer; transition: all 0.3s; }
 .option-row img:hover { transform: scale(1.1); box-shadow:0px 0px 8px #666; }
@@ -29,7 +29,7 @@ body {
   100% { transform: translateY(0px); }
 }
 
-.empty-slot { width:60px; height:60px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; position:relative; }
+.empty-slot { width:90px; height:90px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; }
 
 button { padding:10px 20px; font-size:16px; border-radius:8px; cursor:pointer; margin:10px; transition: all 0.3s; }
 button:hover { opacity:0.9; transform: scale(1.05); }
@@ -38,9 +38,6 @@ button:hover { opacity:0.9; transform: scale(1.05); }
 
 #end { font-size:2em; color:#2e7d32; text-align:center; }
 canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
-
-.empty-slot img.ref-img { position:absolute; width:50%; height:50%; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0.3; }
-.empty-slot img.placed-img { position:absolute; width:100%; height:100%; top:0; left:0; }
 </style>
 </head>
 <body>
@@ -67,9 +64,9 @@ Tap the correct shape to complete the pattern!
 <script>
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]},
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]}, // Corrected
   {type:"AB", row:["balloon","car","balloon","car"], empty:2, expected:["balloon","car"], options:["balloon","car","umbrella"]},
-  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]}
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]} // Corrected
 ];
 
 const container = document.getElementById('game-slides');
@@ -113,29 +110,23 @@ function initSlide(index){
   optionRow.innerHTML="";
   nextBtn.style.display='none';
 
-  // show pattern images and create empty slots
+  // show pattern
   p.row.forEach(item=>{
     const img = document.createElement('img');
     img.src=`assets/${item}.png`;
     patternRow.appendChild(img);
   });
 
+  // create empty slots
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
     emptyDiv.dataset.filled="false";
-    emptyDiv.dataset.index=i;
-
-    // add reference image in box
-    const refImg = document.createElement('img');
-    refImg.src = `assets/${p.expected[i]}.png`;
-    refImg.classList.add('ref-img');
-    emptyDiv.appendChild(refImg);
-
+    emptyDiv.dataset.index=i; // track position
     patternRow.appendChild(emptyDiv);
   }
 
-  // options row
+  // options
   p.options.forEach(opt=>{
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
@@ -146,11 +137,7 @@ function initSlide(index){
         if(slot.dataset.filled==="false" && !placed){
           const expectedIndex = parseInt(slot.dataset.index);
           if(opt === p.expected[expectedIndex]){
-            // place image in box
-            const placedImg = document.createElement('img');
-            placedImg.src=`assets/${opt}.png`;
-            placedImg.classList.add('placed-img');
-            slot.appendChild(placedImg);
+            slot.innerHTML = `<img src="assets/${opt}.png">`;
             slot.dataset.filled="true";
             placed=true;
             audioCorrect();
@@ -159,7 +146,7 @@ function initSlide(index){
           }
         }
       });
-
+      // show next if all filled correctly
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
@@ -169,9 +156,8 @@ function initSlide(index){
   clearBtn.addEventListener('click',()=>{
     const emptyDivs = patternRow.querySelectorAll('.empty-slot');
     emptyDivs.forEach(e=>{
+      e.innerHTML="";
       e.dataset.filled="false";
-      // remove placed images but keep reference images
-      e.querySelectorAll('.placed-img').forEach(img=>img.remove());
     });
     nextBtn.style.display='none';
   });
