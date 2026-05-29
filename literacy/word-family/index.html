@@ -30,15 +30,32 @@ body {
   color:#2e8b57;
   font-weight:bold;
   padding:10px;
-  display:none;
+  display:none; /* hidden initially */
 }
 
-.picture img { width:200px; height:auto; margin-bottom:20px; }
+.picture img { width:200px; height:auto; margin-bottom:20px; transform:translateY(-30px); 
+  /* soft floating animation */
+  animation: floatImg 4s ease-in-out infinite;
+  transition: transform 0.5s ease-in-out;
+}
+
+@keyframes floatImg {
+  0%, 100% { transform: translateY(-30px); }
+  50% { transform: translateY(-25px); }
+}
+
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
 .letter-box { width:50px; height:50px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:#ffffff; }
 .letter-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; }
-.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; }
+/* Soft animation for buttons */
+.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; transition: transform 0.3s ease-in-out; animation: softBounce 2s infinite; }
 .letter-buttons button:hover { background:#2e8b57; }
+
+@keyframes softBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 #end { font-size:2em; color:#2e8b57; text-align:center; }
 canvas { position:absolute; top:0; left:0; pointer-events:none; }
 </style>
