@@ -71,14 +71,13 @@ Draw the number corresponding to the objects below!
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
 
 <script>
-// Correct number of images for each slide
+// Updated number of images per slide
 const numbers = [
-  {num:12, img:'assets/star.png'},        // 12 stars for first slide
-  {num:23, img:'assets/ball.png'},
-  {num:45, img:'assets/dolphin.png'},
-  {num:12, img:'assets/jet.png'},
-  {num:36, img:'assets/jet.png'},
-  {num:30, img:'assets/lamp.png'}
+  {num:23, img:'assets/ball.png'},       // 23 balls
+  {num:45, img:'assets/dolphin.png'},    // 45 dolphins
+  {num:12, img:'assets/star.png'},       // 12 stars
+  {num:36, img:'assets/jet.png'},        // 36 jets
+  {num:30, img:'assets/lamp.png'}        // 30 lamps
 ];
 
 const gameSlidesContainer = document.getElementById('game-slides');
@@ -122,7 +121,7 @@ function initSlide(index){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   nextBtn.style.display='none';
 
-  // Show the correct number of objects for each slide
+  // Show correct number of objects for each slide
   for(let i=0;i<numbers[index].num;i++){
     const obj = document.createElement('img');
     obj.src = numbers[index].img;
