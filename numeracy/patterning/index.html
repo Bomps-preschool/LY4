@@ -64,9 +64,9 @@ Tap the correct shape to complete the pattern!
 <script>
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["juice","grapes"], options:["balloon","juice","grapes"]},
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]}, // Corrected
   {type:"AB", row:["balloon","car","balloon","car"], empty:2, expected:["balloon","car"], options:["balloon","car","umbrella"]},
-  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","umbrella"], options:["flower","umbrella","juice"]}
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]} // Corrected
 ];
 
 const container = document.getElementById('game-slides');
