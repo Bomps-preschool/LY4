@@ -30,7 +30,7 @@ body {
   color:#2e8b57;
   font-weight:bold;
   padding:10px;
-  display:none;
+  display:none; /* hidden initially */
 }
 
 .picture img { width:200px; height:auto; margin-bottom:20px; transform:translateY(-30px); 
@@ -78,7 +78,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Top instruction -->
+<!-- Top instruction (only for game slides, not end slide) -->
 <div class="instruction-top" id="instruction-bar">
 Click the letters in the correct order to make the word that matches the picture below. Have fun learning word families!
 </div>
@@ -86,7 +86,7 @@ Click the letters in the correct order to make the word that matches the picture
 <!-- Game Slides -->
 <div id="game-slides"></div>
 
-<!-- End Slide -->
+<!-- End Slide (instruction removed) -->
 <div class="slide" id="end">
   <h1>Good Job!</h1>
   <canvas id="confetti"></canvas>
