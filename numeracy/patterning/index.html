@@ -6,9 +6,18 @@
 <title>Patterning Game</title>
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
+
+/* Eye-catching animated pastel gradient background */
 body {
-  background: url("assets/background-pattern.png") no-repeat center center fixed;
-  background-size: cover;
+  background: linear-gradient(135deg, #fce4ec, #e1bee7, #bbdefb);
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+}
+
+@keyframes gradientBG {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
@@ -64,9 +73,9 @@ Tap the correct shape to complete the pattern!
 <script>
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]}, // Corrected
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]},
   {type:"AB", row:["balloon","car","balloon","car"], empty:2, expected:["balloon","car"], options:["balloon","car","umbrella"]},
-  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]} // Corrected
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]}
 ];
 
 const container = document.getElementById('game-slides');
@@ -122,7 +131,7 @@ function initSlide(index){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
     emptyDiv.dataset.filled="false";
-    emptyDiv.dataset.index=i; // track position
+    emptyDiv.dataset.index=i;
     patternRow.appendChild(emptyDiv);
   }
 
@@ -146,7 +155,6 @@ function initSlide(index){
           }
         }
       });
-      // show next if all filled correctly
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
