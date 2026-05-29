@@ -62,12 +62,11 @@ Tap the correct shape to complete the pattern!
 <audio id="audio-excellent" src="assets/claps.mp3"></audio>
 
 <script>
-// Patterns for each slide
 const patterns = [
-  {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, options:["balloon","juice","grapes"]},
-  {type:"AB", row:["balloon","car","balloon","car"], empty:2, options:["balloon","car","umbrella"]}, // slide4 extra option
-  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, options:["flower","umbrella","juice"]} // slide5 extra option
+  {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["juice","grapes"], options:["balloon","juice","grapes"]},
+  {type:"AB", row:["balloon","car","balloon","car"], empty:2, expected:["balloon","car"], options:["balloon","car","umbrella"]},
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","umbrella"], options:["flower","umbrella","juice"]}
 ];
 
 const container = document.getElementById('game-slides');
@@ -111,42 +110,43 @@ function initSlide(index){
   optionRow.innerHTML="";
   nextBtn.style.display='none';
 
-  p.row.forEach((item)=>{
+  // show pattern
+  p.row.forEach(item=>{
     const img = document.createElement('img');
     img.src=`assets/${item}.png`;
     patternRow.appendChild(img);
   });
+
+  // create empty slots
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
     emptyDiv.dataset.filled="false";
-    emptyDiv.dataset.correct="true"; // mark empty as needing correct answer
+    emptyDiv.dataset.index=i; // track position
     patternRow.appendChild(emptyDiv);
   }
 
+  // options
   p.options.forEach(opt=>{
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
-    optImg.addEventListener('click',()=>{
+    optImg.addEventListener('click', ()=>{
       const emptyDivs = patternRow.querySelectorAll('.empty-slot');
       let placed=false;
       emptyDivs.forEach(slot=>{
         if(slot.dataset.filled==="false" && !placed){
-          slot.innerHTML = `<img src="assets/${opt}.png">`;
-          slot.dataset.filled="true";
-          placed=true;
-          // check correctness
-          const expected = p.row[p.row.length + Array.from(emptyDivs).indexOf(slot)];
-          if(opt === expected){
+          const expectedIndex = parseInt(slot.dataset.index);
+          if(opt === p.expected[expectedIndex]){
+            slot.innerHTML = `<img src="assets/${opt}.png">`;
+            slot.dataset.filled="true";
+            placed=true;
             audioCorrect();
           } else {
             audioWrong();
-            slot.innerHTML="";
-            slot.dataset.filled="false";
-            placed=false;
           }
         }
       });
+      // show next if all filled correctly
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
@@ -162,7 +162,7 @@ function initSlide(index){
     nextBtn.style.display='none';
   });
 
-  nextBtn.addEventListener('click',()=>{
+  nextBtn.addEventListener('click', ()=>{
     if(index+1 < patterns.length){
       showSlide(index+2);
       initSlide(index+1);
