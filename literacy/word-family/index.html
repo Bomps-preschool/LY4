@@ -84,13 +84,14 @@ setTimeout(()=>{ showSlide(1); initSlide(0); }, 5000);
 // Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-// Initialize a word slide
+// Initialize a word slide with selective shuffle
 function initSlide(index){
   const slide = slides[index+1]; // skip splash
   const word = words[index].word;
   const boxesContainer = slide.querySelector(`#boxes-${index}`);
   const buttonsContainer = slide.querySelector(`#buttons-${index}`);
-  boxesContainer.innerHTML=''; buttonsContainer.innerHTML='';
+  boxesContainer.innerHTML='';
+  buttonsContainer.innerHTML='';
 
   // Create letter boxes
   for(let i=0;i<word.length;i++){
@@ -99,9 +100,15 @@ function initSlide(index){
     boxesContainer.appendChild(box);
   }
 
-  // Shuffle letters
-  const letters = shuffleArray(word.split(''));
-  letters.forEach(l=>{
+  // Shuffle letters only for certain words
+  let lettersArray = word.split('');
+  const wordsToShuffle = ['leg','mop','zip','jet','dig'];
+  if(wordsToShuffle.includes(word)){
+    lettersArray = shuffleArray(lettersArray);
+  }
+
+  // Create letter buttons
+  lettersArray.forEach(l=>{
     const btn = document.createElement('button');
     btn.textContent = l;
     btn.addEventListener('click', ()=>{
