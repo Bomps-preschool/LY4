@@ -7,7 +7,7 @@
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
 body {
-  background: linear-gradient(135deg, #fce4ec, #f3e5f5, #e1f5fe);
+  background: linear-gradient(135deg, #fbe9e7, #f3e5f5, #e1f5fe);
   background-size: 400% 400%;
   animation: gradientBG 20s ease infinite;
 }
@@ -65,10 +65,9 @@ Tap the correct shape to complete the pattern!
 
 <audio id="audio-correct" src="assets/correct.mp3"></audio>
 <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
-<audio id="audio-excellent" src="assets/excellent.mp3"></audio>
+<audio id="audio-excellent" src="assets/claps.mp3"></audio>
 
 <script>
-// Define patterns for each slide
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, options:["car","umbrella","grapes"]},
   {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, options:["hot-air-balloon","juice","grapes"]},
@@ -76,7 +75,6 @@ const patterns = [
   {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, options:["flower","umbrella"]}
 ];
 
-// Create slides
 const container = document.getElementById('game-slides');
 patterns.forEach((p,index)=>{
   const slide = document.createElement('div');
@@ -118,7 +116,6 @@ function initSlide(index){
   optionRow.innerHTML="";
   nextBtn.style.display='none';
 
-  // Show pattern shapes and empty slots
   p.row.forEach((item)=>{
     const img = document.createElement('img');
     img.src=`assets/${item}.png`;
@@ -127,16 +124,14 @@ function initSlide(index){
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
-    emptyDiv.dataset.filled = "false"; // track each empty slot
+    emptyDiv.dataset.filled="false";
     patternRow.appendChild(emptyDiv);
   }
 
-  // Show options
   p.options.forEach(opt=>{
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
     optImg.addEventListener('click',()=>{
-      // Place in the first empty slot that is not filled
       const emptyDivs = patternRow.querySelectorAll('.empty-slot');
       let placed=false;
       emptyDivs.forEach(slot=>{
@@ -148,12 +143,8 @@ function initSlide(index){
         }
       });
       if(!placed) audioWrong();
-
-      // Show next button if all empty slots filled
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
-      if(remaining.length === 0){
-        nextBtn.style.display='inline-block';
-      }
+      if(remaining.length===0) nextBtn.style.display='inline-block';
     });
     optionRow.appendChild(optImg);
   });
