@@ -33,7 +33,7 @@ body {
   display:none; /* hidden initially */
 }
 
-.picture img { width:200px; height:auto; margin-bottom:20px; transform:translateY(-30px); 
+.picture img { width:200px; height:200; margin-bottom:20px; transform:translateY(-30px); 
   animation: floatImg 4s ease-in-out infinite;
   transition: transform 0.5s ease-in-out;
 }
@@ -45,7 +45,7 @@ body {
 
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
 /* Soft highlight effect for letter boxes */
-.letter-box { width:50px; height:50px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:#ffffff; 
+.letter-box { width:80px; height:80px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:#ffffff; 
   box-shadow: 0 0 5px #66ccff, 0 0 10px rgba(102, 204, 255, 0.3);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
@@ -54,7 +54,7 @@ body {
 
 .letter-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; }
 /* Soft highlight effect for letter buttons */
-.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; 
+.letter-buttons button { padding:10px 15px; font-size:40px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; 
   box-shadow: 0 0 5px #66ccff, 0 0 10px rgba(102, 204, 255, 0.3);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   animation: softBounce 2s infinite;
@@ -162,7 +162,7 @@ function initSlide(index){
 
   // Shuffle letters for certain words
   let lettersArray = word.split('');
-  const wordsToShuffle = ['leg','mop','zip','jet','dig'];
+  const wordsToShuffle = ['leg','mop','zip','jet','dig','hat','jam','log','bun,','cub'];
   if(wordsToShuffle.includes(word)){
     lettersArray = shuffleArray(lettersArray);
   }
