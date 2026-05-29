@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patterning Game</title>
+<style>
+body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
+body {
+  background: linear-gradient(135deg, #fce4ec, #f3e5f5, #e1f5fe);
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+}
+@keyframes gradientBG {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+.slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
+.active { display:flex; }
+#splash img { width:250px; height:auto; }
+
+.instruction-top { width:100%; text-align:center; font-size:1em; color:#2e7d32; font-weight:bold; padding:10px; display:none; }
+
+.pattern-row { display:flex; justify-content:center; margin-bottom:20px; }
+.pattern-row img { width:60px; height:60px; margin:2px; }
+
+.option-row { display:flex; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+.option-row img { width:60px; height:60px; margin:5px; cursor:pointer; transition: all 0.3s; }
+.option-row img:hover { transform: scale(1.1); box-shadow:0px 0px 8px #666; }
+
+.empty-slot { width:60px; height:60px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; }
+
+button { padding:10px 20px; font-size:16px; border-radius:8px; cursor:pointer; margin:10px; transition: all 0.3s; }
+button:hover { opacity:0.9; transform: scale(1.05); }
+#nextBtn { background:#4caf50; color:white; }
+#clearBtn { background:#ff5722; color:white; }
+
+#end { font-size:2em; color:#2e7d32; text-align:center; }
+canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div class="slide active" id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<div class="instruction-top" id="instruction-bar">
+Tap the correct shape to complete the pattern!
+</div>
+
+<div id="game-slides"></div>
+
+<div class="slide" id="end">
+  <h1>Well Done!</h1>
+  <canvas id="confetti"></canvas>
+</div>
+
+<audio id="audio-correct" src="assets/correct.mp3"></audio>
+<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+<audio id="audio-excellent" src="assets/excellent.mp3"></audio>
+
+<script>
+// Define patterns for each slide
+const patterns = [
+  {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, options:["car","umbrella","grapes"]},
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, options:["hot-air-balloon","juice","grapes"]},
+  {type:"AB", row:["hot-air-balloon","car","hot-air-balloon","car"], empty:2, options:["hot-air-balloon","car"]},
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, options:["flower","umbrella"]}
+];
+
+// Create slides
+const container = document.getElementById('game-slides');
+patterns.forEach((p,index)=>{
+  const slide = document.createElement('div');
+  slide.classList.add('slide');
+  slide.dataset.index = index;
+  slide.innerHTML = `
+    <div class="pattern-row" id="pattern-${index}"></div>
+    <div class="option-row" id="options-${index}"></div>
+    <div>
+      <button id="nextBtn-${index}">Next</button>
+      <button id="clearBtn-${index}">Clear</button>
+    </div>
+  `;
+  container.appendChild(slide);
+});
+
+const slides = document.querySelectorAll('.slide');
+
+function showSlide(i){
+  slides.forEach(s=>s.classList.remove('active'));
+  slides[i].classList.add('active');
+}
+
+setTimeout(()=>{
+  document.getElementById('instruction-bar').style.display='block';
+  showSlide(1);
+  initSlide(0);
+},5000);
+
+function initSlide(index){
+  const slide = slides[index+1];
+  const p = patterns[index];
+  const patternRow = slide.querySelector(`#pattern-${index}`);
+  const optionRow = slide.querySelector(`#options-${index}`);
+  const nextBtn = slide.querySelector(`#nextBtn-${index}`);
+  const clearBtn = slide.querySelector(`#clearBtn-${index}`);
+
+  patternRow.innerHTML="";
+  optionRow.innerHTML="";
+  nextBtn.style.display='none';
+
+  // Show pattern shapes and empty slots
+  p.row.forEach((item)=>{
+    const img = document.createElement('img');
+    img.src=`assets/${item}.png`;
+    patternRow.appendChild(img);
+  });
+  for(let i=0;i<p.empty;i++){
+    const emptyDiv = document.createElement('div');
+    emptyDiv.classList.add('empty-slot');
+    patternRow.appendChild(emptyDiv);
+  }
+
+  // Show options
+  p.options.forEach(opt=>{
+    const optImg = document.createElement('img');
+    optImg.src=`assets/${opt}.png`;
+    optImg.addEventListener('click',()=>{
+      const emptyDivs = patternRow.querySelectorAll('.empty-slot');
+      if(emptyDivs.length>0){
+        const target = emptyDivs[0];
+        target.innerHTML = `<img src="assets/${opt}.png">`;
+        audioCorrect();
+      } else {audioWrong();}
+      if(patternRow.querySelectorAll('.empty-slot').length===0){
+        nextBtn.style.display='inline-block';
+      }
+    });
+    optionRow.appendChild(optImg);
+  });
+
+  clearBtn.addEventListener('click',()=>{
+    const emptyDivs = patternRow.querySelectorAll('.empty-slot');
+    emptyDivs.forEach(e=>e.innerHTML="");
+    nextBtn.style.display='none';
+  });
+
+  nextBtn.addEventListener('click',()=>{
+    if(index+1 < patterns.length){
+      showSlide(index+2);
+      initSlide(index+1);
+    } else showEndSlide();
+  });
+}
+
+function showEndSlide(){
+  slides.forEach(s=>s.classList.remove('active'));
+  document.getElementById('end').classList.add('active');
+  document.getElementById('audio-excellent').play();
+  document.getElementById('instruction-bar').style.display='none';
+  launchConfetti();
+}
+
+function audioCorrect(){ document.getElementById('audio-correct').play(); }
+function audioWrong(){ document.getElementById('audio-wrong').play(); }
+
+function launchConfetti(){
+  const canvas=document.getElementById('confetti');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const confetti=[];
+  for(let i=0;i<150;i++){
+    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth=c.r;
+      ctx.strokeStyle=c.color;
+      ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
+      ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
+      ctx.stroke();
+      c.tilt+=c.tiltAngleIncrement;
+      c.y+=(Math.cos(c.d)+3+c.r/2)/2;
+      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
