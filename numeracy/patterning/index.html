@@ -24,11 +24,16 @@ body {
 .instruction-top { width:100%; text-align:center; font-size:1em; color:#2e7d32; font-weight:bold; padding:10px; display:none; }
 
 .pattern-row { display:flex; justify-content:center; margin-bottom:20px; }
-.pattern-row img { width:60px; height:60px; margin:2px; }
-
+.pattern-row img, .option-row img { width:60px; height:60px; margin:2px; animation: floatAnim 3s ease-in-out infinite; }
 .option-row { display:flex; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-.option-row img { width:60px; height:60px; margin:5px; cursor:pointer; transition: all 0.3s; }
+.option-row img { cursor:pointer; transition: all 0.3s; }
 .option-row img:hover { transform: scale(1.1); box-shadow:0px 0px 8px #666; }
+
+@keyframes floatAnim {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
 
 .empty-slot { width:60px; height:60px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; }
 
@@ -122,6 +127,7 @@ function initSlide(index){
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
+    emptyDiv.dataset.filled = "false"; // track each empty slot
     patternRow.appendChild(emptyDiv);
   }
 
@@ -130,13 +136,22 @@ function initSlide(index){
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
     optImg.addEventListener('click',()=>{
+      // Place in the first empty slot that is not filled
       const emptyDivs = patternRow.querySelectorAll('.empty-slot');
-      if(emptyDivs.length>0){
-        const target = emptyDivs[0];
-        target.innerHTML = `<img src="assets/${opt}.png">`;
-        audioCorrect();
-      } else {audioWrong();}
-      if(patternRow.querySelectorAll('.empty-slot').length===0){
+      let placed=false;
+      emptyDivs.forEach(slot=>{
+        if(slot.dataset.filled==="false" && !placed){
+          slot.innerHTML = `<img src="assets/${opt}.png">`;
+          slot.dataset.filled="true";
+          placed=true;
+          audioCorrect();
+        }
+      });
+      if(!placed) audioWrong();
+
+      // Show next button if all empty slots filled
+      const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
+      if(remaining.length === 0){
         nextBtn.style.display='inline-block';
       }
     });
@@ -145,7 +160,10 @@ function initSlide(index){
 
   clearBtn.addEventListener('click',()=>{
     const emptyDivs = patternRow.querySelectorAll('.empty-slot');
-    emptyDivs.forEach(e=>e.innerHTML="");
+    emptyDivs.forEach(e=>{
+      e.innerHTML="";
+      e.dataset.filled="false";
+    });
     nextBtn.style.display='none';
   });
 
