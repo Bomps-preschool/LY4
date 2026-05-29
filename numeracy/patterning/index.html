@@ -7,8 +7,7 @@
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
 body {
-  background: url("assets/background-pattern.png") no-repeat center center fixed;
-  background-size: cover;
+  background: linear-gradient(120deg, #fce4ec, #e1bee7, #bbdefb);
 }
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
@@ -64,9 +63,9 @@ Tap the correct shape to complete the pattern!
 <script>
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]}, // Corrected
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]},
   {type:"AB", row:["balloon","car","balloon","car"], empty:2, expected:["balloon","car"], options:["balloon","car","umbrella"]},
-  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]} // Corrected
+  {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, expected:["flower","flower"], options:["flower","umbrella","juice"]}
 ];
 
 const container = document.getElementById('game-slides');
@@ -137,7 +136,8 @@ function initSlide(index){
         if(slot.dataset.filled==="false" && !placed){
           const expectedIndex = parseInt(slot.dataset.index);
           if(opt === p.expected[expectedIndex]){
-            slot.innerHTML = `<img src="assets/${opt}.png">`;
+            // Fill the slot with image
+            slot.innerHTML = `<img src="assets/${opt}.png" style="width:100%;height:100%;">`;
             slot.dataset.filled="true";
             placed=true;
             audioCorrect();
@@ -146,7 +146,6 @@ function initSlide(index){
           }
         }
       });
-      // show next if all filled correctly
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
