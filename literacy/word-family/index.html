@@ -6,12 +6,19 @@
 <title>Word Family Game</title>
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; overflow:hidden; }
-.instruction-top { width:100%; text-align:center; font-size:1.8em; color:#fff; font-weight:bold; padding:15px; background:linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc); }
-.slide { width:100vw; height:calc(100vh - 60px); display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; transition: all 0.5s; margin-top:60px; }
-.active { display:flex; }
-#splash img, .picture img { width:250px; height:auto; transition: transform 1s ease-in-out; }
-#splash img:hover, .picture img:hover { transform: scale(1.1); }
 
+/* Top instruction bar for game slides */
+.instruction-top { width:100%; text-align:center; font-size:1.8em; color:#fff; font-weight:bold; padding:15px; background:linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc); }
+
+/* Slides */
+.slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; transition: all 0.5s; }
+.active { display:flex; }
+
+/* Splash logo */
+#splash img { width:250px; height:auto; transition: transform 1s ease-in-out; }
+#splash img:hover { transform: scale(1.1); }
+
+/* Pictures and letters */
 .picture img { width:200px; height:auto; margin-bottom:20px; }
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
 .letter-box { width:50px; height:50px; border:2px solid #fff; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:linear-gradient(135deg,#ffcccc,#ff9999); box-shadow:0 0 5px #ff6666; transition: all 0.3s; }
@@ -21,7 +28,7 @@ body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-seri
 .letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:linear-gradient(135deg,#ff6666,#ff4d4d); border:none; border-radius:8px; color:#fff; transition: all 0.3s; animation: bounce 2s infinite; }
 .letter-buttons button:hover { transform:scale(1.1); box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#ff8080,#ff3333); }
 
-#end { font-size:2em; color:#fff; text-align:center; margin-top:60px; }
+#end { font-size:2em; color:#fff; text-align:center; }
 canvas { position:absolute; top:0; left:0; pointer-events:none; }
 
 /* Background gradient with 3 shades of red/pink */
@@ -34,15 +41,13 @@ body { background: linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc); background-s
 </head>
 <body>
 
-<!-- Instruction on top -->
-<div class="instruction-top">
-Click the letters in the correct order to form the word that matches the picture below. Have fun learning word families!
-</div>
-
 <!-- Splash -->
 <div class="slide active" id="splash">
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
+
+<!-- Top instruction bar for game slides -->
+<div class="instruction-top" id="instruction-bar">Click the letters in the correct order to form the word that matches the picture below. Have fun learning word families!</div>
 
 <!-- Game Slides -->
 <div id="game-slides"></div>
@@ -53,6 +58,7 @@ Click the letters in the correct order to form the word that matches the picture
   <canvas id="confetti"></canvas>
 </div>
 
+<!-- Audio -->
 <audio id="audio-correct" src="assets/correct.mp3"></audio>
 <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
@@ -73,7 +79,7 @@ const words = [
   {word:'log', img:'assets/log.png'}
 ];
 
-// Generate slides
+// Generate game slides (without instruction in splash)
 const gameSlidesContainer = document.getElementById('game-slides');
 words.forEach((item,index)=>{
   const slide = document.createElement('div');
@@ -88,7 +94,6 @@ words.forEach((item,index)=>{
 });
 
 const slides = document.querySelectorAll('.slide');
-let currentSlide=0;
 
 // Show a slide
 function showSlide(i){
@@ -98,14 +103,15 @@ function showSlide(i){
 
 // Splash 5s → first word
 setTimeout(()=>{
-  showSlide(1); // Show first word slide
+  showSlide(1); // First game slide
+  document.getElementById('instruction-bar').style.display = 'block'; // show instruction bar
   initSlide(0);
 },5000);
 
 // Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-// Initialize a word slide with selective shuffle
+// Initialize a word slide with letters shuffled
 function initSlide(index){
   const slide = slides[index+1]; // skip splash
   const word = words[index].word;
@@ -114,18 +120,15 @@ function initSlide(index){
   boxesContainer.innerHTML='';
   buttonsContainer.innerHTML='';
 
-  // Create letter boxes
   for(let i=0;i<word.length;i++){
     const box=document.createElement('div');
     box.classList.add('letter-box');
     boxesContainer.appendChild(box);
   }
 
-  // Shuffle letters for all words
   let lettersArray=word.split('');
   lettersArray=shuffleArray(lettersArray);
 
-  // Create letter buttons
   lettersArray.forEach(l=>{
     const btn=document.createElement('button');
     btn.textContent=l;
