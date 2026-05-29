@@ -100,9 +100,9 @@ function initSlide(index){
     boxesContainer.appendChild(box);
   }
 
-  // Shuffle letters only for certain words
+  // Shuffle letters only for the selected words
   let lettersArray = word.split('');
-  const wordsToShuffle = ['leg','mop','zip','jet','dig'];
+  const wordsToShuffle = ['hat','bun','zip','cub','jam','log'];
   if(wordsToShuffle.includes(word)){
     lettersArray = shuffleArray(lettersArray);
   }
