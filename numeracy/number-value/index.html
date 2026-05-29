@@ -6,36 +6,23 @@
 <title>Number Value Game</title>
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; }
-
-/* Melodic animated background */
-body { 
-  background: linear-gradient(135deg, #ffcccc, #ffb3ff, #ccffff); 
-  background-size: 400% 400%; 
-  animation: bgAnimate 15s ease infinite; 
-}
+body { background: linear-gradient(135deg, #ffcccc, #ffb3ff, #ccffff); background-size:400% 400%; animation:bgAnimate 15s ease infinite; }
 @keyframes bgAnimate { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
 .active { display:flex; }
 #splash img { width:250px; height:auto; }
 
-.instruction-top {
-  width:100%;
-  text-align:center;
-  font-size:1em;
-  color:#2e8b57;
-  font-weight:bold;
-  padding:10px;
-  display:none;
-}
+.instruction-top { width:100%; text-align:center; font-size:1em; color:#2e8b57; font-weight:bold; padding:10px; display:none; }
 
-.picture img { width:150px; height:auto; margin-bottom:20px; animation: floatImg 4s ease-in-out infinite; transition: transform 0.5s ease-in-out; }
-@keyframes floatImg { 0%,100%{transform:translateY(-10px);} 50%{transform:translateY(-5px);} }
+.objects-container { display:flex; flex-wrap:wrap; justify-content:center; max-width:90vw; margin-bottom:20px; }
 
-input[type=number] { font-size:24px; width:100px; text-align:center; padding:5px; margin-bottom:15px; border-radius:5px; border:2px solid #2e8b57; box-shadow:0 0 5px #66ccff; transition:all 0.3s; }
+.objects-container img { width:50px; height:50px; margin:2px; }
+
+input[type=number] { font-size:24px; width:100px; text-align:center; padding:5px; margin-bottom:15px; border-radius:5px; border:2px solid #2e8b57; box-shadow:0 0 5px #66ccff; transition: all 0.3s; }
 input[type=number]:focus { box-shadow:0 0 10px #66ccff; }
 
-button#nextBtn { padding:10px 20px; font-size:18px; cursor:pointer; border:none; border-radius:5px; background:#66ccff; color:#fff; display:none; margin-top:10px; transition:all 0.3s; }
+button#nextBtn { padding:10px 20px; font-size:18px; cursor:pointer; border:none; border-radius:5px; background:#66ccff; color:#fff; display:none; margin-top:10px; transition: all 0.3s; }
 button#nextBtn:hover { background:#2e8b57; }
 
 #end { font-size:2em; color:#2e8b57; text-align:center; }
@@ -85,7 +72,7 @@ numbers.forEach((item,index)=>{
   slide.classList.add('slide');
   slide.dataset.num = item.num;
   slide.innerHTML = `
-    <div class="picture"><img src="${item.img}" alt="objects"></div>
+    <div class="objects-container" id="objects-${index}"></div>
     <input type="number" id="input-${index}" placeholder="Enter number">
     <button id="nextBtn-${index}">Next</button>
   `;
@@ -93,7 +80,6 @@ numbers.forEach((item,index)=>{
 });
 
 const slides = document.querySelectorAll('.slide');
-let currentSlide=0;
 
 // Show slide
 function showSlide(i){
@@ -111,8 +97,18 @@ setTimeout(()=>{
 // Initialize slide
 function initSlide(index){
   const slide = slides[index+1];
+  const objectsContainer = slide.querySelector(`#objects-${index}`);
   const inputBox = slide.querySelector(`#input-${index}`);
   const nextBtn = slide.querySelector(`#nextBtn-${index}`);
+
+  // Clear previous objects
+  objectsContainer.innerHTML='';
+  for(let i=0;i<numbers[index].num;i++){
+    const obj = document.createElement('img');
+    obj.src = numbers[index].img;
+    obj.alt='object';
+    objectsContainer.appendChild(obj);
+  }
 
   nextBtn.style.display='none';
   inputBox.value='';
