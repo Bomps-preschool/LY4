@@ -16,17 +16,15 @@ body { background: linear-gradient(135deg, #ffcccc, #ffb3ff, #ccffff); backgroun
 .instruction-top { width:100%; text-align:center; font-size:1em; color:#2e8b57; font-weight:bold; padding:10px; display:none; }
 
 .objects-container { display:flex; flex-wrap:wrap; justify-content:center; max-width:90vw; margin-bottom:20px; }
-
 .objects-container img { width:50px; height:50px; margin:2px; }
 
-input[type=number] { font-size:24px; width:100px; text-align:center; padding:5px; margin-bottom:15px; border-radius:5px; border:2px solid #2e8b57; box-shadow:0 0 5px #66ccff; transition: all 0.3s; }
-input[type=number]:focus { box-shadow:0 0 10px #66ccff; }
+canvas.draw-canvas { border:2px solid #2e8b57; background:#fff; touch-action: none; }
 
 button#nextBtn { padding:10px 20px; font-size:18px; cursor:pointer; border:none; border-radius:5px; background:#66ccff; color:#fff; display:none; margin-top:10px; transition: all 0.3s; }
 button#nextBtn:hover { background:#2e8b57; }
 
 #end { font-size:2em; color:#2e8b57; text-align:center; }
-canvas { position:absolute; top:0; left:0; pointer-events:none; }
+canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -38,7 +36,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
 
 <!-- Instruction -->
 <div class="instruction-top" id="instruction-bar">
-Count the objects and type the correct number in the box below!
+Draw the number corresponding to the objects below!
 </div>
 
 <!-- Game Slides -->
@@ -73,7 +71,7 @@ numbers.forEach((item,index)=>{
   slide.dataset.num = item.num;
   slide.innerHTML = `
     <div class="objects-container" id="objects-${index}"></div>
-    <input type="number" id="input-${index}" placeholder="Enter number">
+    <canvas class="draw-canvas" id="canvas-${index}" width="300" height="100"></canvas>
     <button id="nextBtn-${index}">Next</button>
   `;
   gameSlidesContainer.appendChild(slide);
@@ -94,15 +92,20 @@ setTimeout(()=>{
   initSlide(0);
 },5000);
 
-// Initialize slide
+// Initialize slide with drawing canvas
 function initSlide(index){
   const slide = slides[index+1];
   const objectsContainer = slide.querySelector(`#objects-${index}`);
-  const inputBox = slide.querySelector(`#input-${index}`);
+  const canvas = slide.querySelector(`#canvas-${index}`);
+  const ctx = canvas.getContext('2d');
   const nextBtn = slide.querySelector(`#nextBtn-${index}`);
 
-  // Clear previous objects
+  // Clear objects and canvas
   objectsContainer.innerHTML='';
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  nextBtn.style.display='none';
+
+  // Draw objects
   for(let i=0;i<numbers[index].num;i++){
     const obj = document.createElement('img');
     obj.src = numbers[index].img;
@@ -110,31 +113,21 @@ function initSlide(index){
     objectsContainer.appendChild(obj);
   }
 
-  nextBtn.style.display='none';
-  inputBox.value='';
-  inputBox.style.borderColor='#2e8b57';
-
-  inputBox.addEventListener('input',()=>{
-    if(inputBox.value !== '') nextBtn.style.display='inline-block';
-    else nextBtn.style.display='none';
-  });
-
-  nextBtn.addEventListener('click',()=>{
-    if(Number(inputBox.value) === numbers[index].num){
-      document.getElementById('audio-correct').play();
-      inputBox.style.borderColor='green';
-      setTimeout(()=>{
-        if(index+1 < numbers.length){
-          showSlide(index+2);
-          initSlide(index+1);
-        } else showEndSlide();
-      },500);
-    } else {
-      document.getElementById('audio-wrong').play();
-      inputBox.style.borderColor='red';
-      inputBox.value='';
-      nextBtn.style.display='none';
-    }
+  // Drawing logic
+  let drawing=false;
+  canvas.addEventListener('pointerdown',()=>{ drawing=true; ctx.beginPath(); });
+  canvas.addEventListener('pointerup',()=>{ drawing=false; nextBtn.style.display='inline-block'; });
+  canvas.addEventListener('pointerleave',()=>{ drawing=false; });
+  canvas.addEventListener('pointermove',(e)=>{
+    if(!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineWidth=4;
+    ctx.lineCap='round';
+    ctx.strokeStyle='#2e8b57';
+    ctx.lineTo(e.clientX-rect.left, e.clientY-rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX-rect.left, e.clientY-rect.top);
   });
 }
 
