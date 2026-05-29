@@ -5,7 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Family Game</title>
 <style>
-body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; background:#f0f8ff; }
+body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; }
+
+/* Melodic, eye-catching animated background */
+body { 
+  background: linear-gradient(135deg, #ffcccc, #ffb3ff, #ccffff, #ffdd99); 
+  background-size: 400% 400%; 
+  animation: bgAnimate 15s ease infinite; 
+}
+@keyframes bgAnimate { 
+  0%{background-position:0% 50%;} 
+  50%{background-position:100% 50%;} 
+  100%{background-position:0% 50%;} 
+}
+
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
 .active { display:flex; }
 #splash img { width:250px; height:auto; }
@@ -17,7 +30,7 @@ body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-seri
   color:#2e8b57;
   font-weight:bold;
   padding:10px;
-  display:none; /* hidden initially */
+  display:none;
 }
 
 .picture img { width:200px; height:auto; margin-bottom:20px; }
@@ -96,15 +109,15 @@ function showSlide(i){
 
 // Splash 5s → first word
 setTimeout(()=>{ 
-  document.getElementById('instruction-bar').style.display = 'block'; // show instruction when game starts
-  showSlide(1); 
-  initSlide(0); 
+  document.getElementById('instruction-bar').style.display = 'block';
+  showSlide(1);
+  initSlide(0);
 }, 5000);
 
 // Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-// Initialize a word slide with selective shuffle
+// Initialize a word slide
 function initSlide(index){
   const slide = slides[index+1]; // skip splash
   const word = words[index].word;
