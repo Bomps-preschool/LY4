@@ -5,33 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Family Game</title>
 <style>
-body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; background:#f0f8ff; overflow:hidden; }
+body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; overflow:hidden; }
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; transition: all 0.5s; }
 .active { display:flex; }
 #splash img, .picture img { width:250px; height:auto; transition: transform 1s ease-in-out; }
 #splash img:hover, .picture img:hover { transform: scale(1.1); }
 
-.instruction { font-size:1.8em; color:#2e8b57; text-align:center; max-width:80vw; animation: fadein 2s ease-in-out infinite alternate; }
-
-@keyframes fadein{ 0%{opacity:0.7;} 100%{opacity:1;} }
+.instruction { font-size:1.8em; color:#fff; text-align:center; max-width:90vw; margin-bottom:10px; font-weight:bold; }
 
 .picture img { width:200px; height:auto; margin-bottom:20px; }
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
-.letter-box { width:50px; height:50px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:linear-gradient(135deg,#ffffff,#ccf2ff); box-shadow:0 0 5px #66ccff; transition: all 0.3s; }
-.letter-box.correct { box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#ccffcc,#99ff99); }
+.letter-box { width:50px; height:50px; border:2px solid #fff; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:linear-gradient(135deg,#ffcccc,#ff9999); box-shadow:0 0 5px #ff6666; transition: all 0.3s; }
+.letter-box.correct { box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#ffb3b3,#ff8080); }
 
 .letter-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; }
-.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:linear-gradient(135deg,#66ccff,#3399ff); border:none; border-radius:8px; color:#fff; transition: all 0.3s; animation: bounce 2s infinite; }
-.letter-buttons button:hover { transform:scale(1.1); box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#33ccff,#3399ff); }
+.letter-buttons button { padding:10px 15px; font-size:20px; cursor:pointer; background:linear-gradient(135deg,#ff6666,#ff4d4d); border:none; border-radius:8px; color:#fff; transition: all 0.3s; animation: bounce 2s infinite; }
+.letter-buttons button:hover { transform:scale(1.1); box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#ff8080,#ff3333); }
 
-@keyframes bounce{ 0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);} }
-
-#end { font-size:2em; color:#2e8b57; text-align:center; }
+#end { font-size:2em; color:#fff; text-align:center; }
 canvas { position:absolute; top:0; left:0; pointer-events:none; }
 
-/* Background gradient animation */
-body { background: linear-gradient(-45deg,#f0f8ff,#ccf2ff,#99eeff,#cceeff); background-size:400% 400%; animation:bgAnimate 15s ease infinite; }
+/* Background gradient with 3 shades of red/pink */
+body { background: linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc); background-size:400% 400%; animation:bgAnimate 15s ease infinite; }
 @keyframes bgAnimate{ 0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;} }
+
+/* Animations */
+@keyframes bounce{ 0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);} }
 </style>
 </head>
 <body>
@@ -39,15 +38,6 @@ body { background: linear-gradient(-45deg,#f0f8ff,#ccf2ff,#99eeff,#cceeff); back
 <!-- Splash -->
 <div class="slide active" id="splash">
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
-</div>
-
-<!-- Instruction Slide -->
-<div class="slide" id="instruction">
-  <div class="instruction">
-    Welcome!<br>
-    Click the letters in the correct order to make the word that matches the picture below.<br>
-    Have fun learning word families!
-  </div>
 </div>
 
 <!-- Game Slides -->
@@ -59,7 +49,6 @@ body { background: linear-gradient(-45deg,#f0f8ff,#ccf2ff,#99eeff,#cceeff); back
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- Audio -->
 <audio id="audio-correct" src="assets/correct.mp3"></audio>
 <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
@@ -87,6 +76,7 @@ words.forEach((item,index)=>{
   slide.classList.add('slide');
   slide.dataset.word=item.word;
   slide.innerHTML=`
+    <div class="instruction">Click the letters to form the word matching the picture</div>
     <div class="picture"><img src="${item.img}" alt="${item.word}"></div>
     <div class="letter-boxes" id="boxes-${index}"></div>
     <div class="letter-buttons" id="buttons-${index}"></div>
@@ -103,13 +93,10 @@ function showSlide(i){
   slides[i].classList.add('active');
 }
 
-// Splash 5s → instruction
+// Splash 5s → first word
 setTimeout(()=>{
-  showSlide(1);
-  setTimeout(()=>{
-    showSlide(2);
-    initSlide(0);
-  },4000);
+  showSlide(1); // Show first word slide
+  initSlide(0);
 },5000);
 
 // Shuffle helper
@@ -117,11 +104,12 @@ function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
 // Initialize a word slide with selective shuffle
 function initSlide(index){
-  const slide = slides[index+2]; // skip splash + instruction
+  const slide = slides[index+1]; // skip splash
   const word = words[index].word;
   const boxesContainer = slide.querySelector(`#boxes-${index}`);
   const buttonsContainer = slide.querySelector(`#buttons-${index}`);
-  boxesContainer.innerHTML=''; buttonsContainer.innerHTML='';
+  boxesContainer.innerHTML='';
+  buttonsContainer.innerHTML='';
 
   // Create letter boxes
   for(let i=0;i<word.length;i++){
@@ -130,7 +118,7 @@ function initSlide(index){
     boxesContainer.appendChild(box);
   }
 
-  // Shuffle letters for all words (eye-catching)
+  // Shuffle letters for all words
   let lettersArray=word.split('');
   lettersArray=shuffleArray(lettersArray);
 
@@ -150,7 +138,7 @@ function initSlide(index){
             setTimeout(()=>{
               if(index+1<words.length){
                 initSlide(index+1);
-                showSlide(index+3+index);
+                showSlide(index+2+index);
               }else showEndSlide();
             },700);
           }else{
@@ -180,7 +168,7 @@ function launchConfetti(){
   canvas.height=window.innerHeight;
   const confetti=[];
   for(let i=0;i<150;i++){
-    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcccc','#ff9999'][Math.floor(Math.random()*3)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
   }
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
