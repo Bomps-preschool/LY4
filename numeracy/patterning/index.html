@@ -7,14 +7,8 @@
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
 body {
-  background: linear-gradient(135deg, #fbe9e7, #f3e5f5, #e1f5fe);
-  background-size: 400% 400%;
-  animation: gradientBG 20s ease infinite;
-}
-@keyframes gradientBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+  background: url("assets/background-pattern.png") no-repeat center center fixed;
+  background-size: cover;
 }
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
@@ -70,8 +64,8 @@ Tap the correct shape to complete the pattern!
 <script>
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, options:["car","umbrella","grapes"]},
-  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, options:["hot-air-balloon","juice","grapes"]},
-  {type:"AB", row:["hot-air-balloon","car","hot-air-balloon","car"], empty:2, options:["hot-air-balloon","car"]},
+  {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, options:["balloon","juice","grapes"]},
+  {type:"AB", row:["balloon","car","balloon","car"], empty:2, options:["balloon","car"]},
   {type:"AABB", row:["flower","flower","umbrella","umbrella"], empty:2, options:["flower","umbrella"]}
 ];
 
