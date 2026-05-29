@@ -8,18 +8,28 @@
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; overflow:hidden; }
 
 /* Top instruction bar for game slides */
-.instruction-top { width:100%; text-align:center; font-size:1.8em; color:#fff; font-weight:bold; padding:15px; background:linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc); }
+.instruction-top {
+  width:100%;
+  text-align:center;
+  font-size:1.2em; /* smaller font size */
+  color:#fff;
+  font-weight:bold;
+  padding:15px;
+  background:linear-gradient(135deg,#ff9999,#ff4d4d,#ffcccc);
+  display:none;
+}
 
 /* Slides */
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; transition: all 0.5s; }
 .active { display:flex; }
 
-/* Splash logo */
+/* Splash slide */
+#splash { background:transparent; }
 #splash img { width:250px; height:auto; transition: transform 1s ease-in-out; }
 #splash img:hover { transform: scale(1.1); }
 
 /* Pictures and letters */
-.picture img { width:200px; height:auto; margin-bottom:20px; }
+.picture img { width:200px; height:auto; margin-bottom:20px; transform:translateY(-30px); /* move picture up */ }
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
 .letter-box { width:50px; height:50px; border:2px solid #fff; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:linear-gradient(135deg,#ffcccc,#ff9999); box-shadow:0 0 5px #ff6666; transition: all 0.3s; }
 .letter-box.correct { box-shadow:0 0 10px #2e8b57; background:linear-gradient(135deg,#ffb3b3,#ff8080); }
@@ -79,7 +89,7 @@ const words = [
   {word:'log', img:'assets/log.png'}
 ];
 
-// Generate game slides (without instruction in splash)
+// Generate game slides
 const gameSlidesContainer = document.getElementById('game-slides');
 words.forEach((item,index)=>{
   const slide = document.createElement('div');
@@ -101,17 +111,17 @@ function showSlide(i){
   slides[i].classList.add('active');
 }
 
-// Splash 5s → first word
+// Splash 5s → first game slide
 setTimeout(()=>{
-  showSlide(1); // First game slide
-  document.getElementById('instruction-bar').style.display = 'block'; // show instruction bar
+  document.getElementById('instruction-bar').style.display='block';
+  showSlide(1); 
   initSlide(0);
 },5000);
 
 // Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-// Initialize a word slide with letters shuffled
+// Initialize word slides
 function initSlide(index){
   const slide = slides[index+1]; // skip splash
   const word = words[index].word;
