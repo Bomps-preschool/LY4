@@ -28,9 +28,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
 </div>
 
 <!-- Game Slides -->
-<div id="game-slides">
-  <!-- Slides will be injected by JS -->
-</div>
+<div id="game-slides"></div>
 
 <!-- End Slide -->
 <div class="slide" id="end">
@@ -43,6 +41,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
 
 <script>
+// Word data
 const words = [
   {word:'hat', img:'assets/hat.png'},
   {word:'leg', img:'assets/leg.png'},
@@ -56,9 +55,8 @@ const words = [
   {word:'log', img:'assets/log.png'}
 ];
 
+// Generate slides
 const gameSlidesContainer = document.getElementById('game-slides');
-
-// Generate slides dynamically
 words.forEach((item, index)=>{
   const slide = document.createElement('div');
   slide.classList.add('slide');
@@ -80,12 +78,13 @@ function showSlide(i){
   slides[i].classList.add('active');
 }
 
-// Splash 5 seconds → first word
+// Splash 5s → first word
 setTimeout(()=>{ showSlide(1); initSlide(0); }, 5000);
 
-// Shuffle letters
+// Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
+// Initialize a word slide
 function initSlide(index){
   const slide = slides[index+1]; // skip splash
   const word = words[index].word;
@@ -93,14 +92,14 @@ function initSlide(index){
   const buttonsContainer = slide.querySelector(`#buttons-${index}`);
   boxesContainer.innerHTML=''; buttonsContainer.innerHTML='';
 
-  // Letter boxes
+  // Create letter boxes
   for(let i=0;i<word.length;i++){
     const box = document.createElement('div');
     box.classList.add('letter-box');
     boxesContainer.appendChild(box);
   }
 
-  // Letter buttons
+  // Shuffle letters
   const letters = shuffleArray(word.split(''));
   letters.forEach(l=>{
     const btn = document.createElement('button');
@@ -130,7 +129,7 @@ function initSlide(index){
   });
 }
 
-// End Slide + confetti
+// End Slide + Confetti
 function showEndSlide(){
   slides.forEach(s=>s.classList.remove('active'));
   document.getElementById('end').classList.add('active');
@@ -138,6 +137,7 @@ function showEndSlide(){
   launchConfetti();
 }
 
+// Confetti animation
 function launchConfetti(){
   const canvas=document.getElementById('confetti');
   const ctx=canvas.getContext('2d');
