@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Dinosaur Match Game</title>
+<title>Dinosaur Matching Game</title>
 <style>
     body, html {
         margin: 0;
@@ -31,7 +31,7 @@
     }
     .visible { display: flex; }
     #slide1 img {
-        width: 250px;
+        width: 200px;
     }
     #instruction {
         position: absolute;
@@ -46,25 +46,27 @@
         position: absolute;
         width: 120px;
         cursor: pointer;
-        transition: transform 0.8s ease-in, opacity 0.8s;
+        transition: transform 1s ease-in, opacity 0.5s ease-in;
     }
     #goodjob {
         font-size: 4vw;
         color: #39FF14;
         text-align: center;
+        position: relative;
     }
+    /* Confetti animation */
     .confetti {
         position: absolute;
-        width: 15px;
-        height: 15px;
+        width: 10px;
+        height: 10px;
         background-color: red;
+        animation: fall 2s linear infinite;
         opacity: 0.8;
         border-radius: 50%;
-        animation: fall 2s linear infinite;
     }
     @keyframes fall {
-        0% {transform: translateY(0) rotate(0deg);}
-        100% {transform: translateY(600px) rotate(360deg);}
+        0% { transform: translateY(0) rotate(0deg);}
+        100% { transform: translateY(600px) rotate(360deg);}
     }
 </style>
 </head>
@@ -77,8 +79,8 @@
 
     <!-- Slide 2: Game -->
     <div id="slide2" class="slide">
-        <div id="instruction">Match the dinosaur to its name!</div>
-        <!-- Dinosaur images and names will be added by JS -->
+        <div id="instruction">Match the dinosaurs with their names!</div>
+        <!-- Dinosaurs and names will be inserted by JS -->
     </div>
 
     <!-- Slide 3: Good Job -->
@@ -91,63 +93,71 @@
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-// Dinosaur assets
 const dinosaurs = [
-    {img:'diplodocus.png', name:'diplodocus-name.png'},
-    {img:'triceratops.png', name:'triceratops-name.png'},
-    {img:'tyrannosaurus-rex.png', name:'tyrannosaurus-rex-name.png'},
-    {img:'iguanodon.png', name:'iguanodon-name.png'},
-    {img:'stegosaurus.png', name:'stegosaurus-name.png'},
-    {img:'brachiosaurus.png', name:'brachiosaurus-name.png'}
+    {img:"assets/diplodocus.png", name:"assets/diplodocus-name.png"},
+    {img:"assets/triceratops.png", name:"assets/triceratops-name.png"},
+    {img:"assets/tyrannosaurus-rex.png", name:"assets/tyrannosaurus-rex-name.png"},
+    {img:"assets/iguanodon.png", name:"assets/iguanodon-name.png"},
+    {img:"assets/stegosaurus.png", name:"assets/stegosaurus-name.png"},
+    {img:"assets/brachiosaurus.png", name:"assets/brachiosaurus-name.png"}
 ];
 
-let correctIndex = Math.floor(Math.random() * dinosaurs.length);
+let matchedCount = 0;
 
-function createDinos() {
+function createDinosaurs() {
     const slide2 = document.getElementById('slide2');
+    const positions = [
+        {x:10, y:20},{x:25, y:20},{x:40, y:20},{x:55, y:20},{x:70, y:20},{x:85, y:20},
+        {x:15, y:50},{x:30, y:50},{x:45, y:50},{x:60, y:50},{x:75, y:50},{x:90, y:50}
+    ];
+
     dinosaurs.forEach((dino, idx) => {
+        // Dinosaur Image
         const dinoImg = document.createElement('img');
-        dinoImg.src = `assets/${dino.img}`;
+        dinoImg.src = dino.img;
         dinoImg.classList.add('dino');
-        dinoImg.style.left = (15 + idx*14) + '%';
-        dinoImg.style.top = '50%';
-        dinoImg.dataset.idx = idx;
-        dinoImg.addEventListener('click', handleClick);
+        dinoImg.style.left = positions[idx].x + '%';
+        dinoImg.style.top = positions[idx].y + '%';
+        dinoImg.dataset.name = dino.name;
+        dinoImg.addEventListener('click', handleDinoClick);
         slide2.appendChild(dinoImg);
 
+        // Name Image
         const nameImg = document.createElement('img');
-        nameImg.src = `assets/${dino.name}`;
-        nameImg.style.position = 'absolute';
-        nameImg.style.top = '75%';
-        nameImg.style.left = (15 + idx*14) + '%';
-        nameImg.style.width = '100px';
+        nameImg.src = dino.name;
+        nameImg.classList.add('dino-name');
+        nameImg.style.left = positions[idx].x + '%';
+        nameImg.style.top = (positions[idx].y + 15) + '%';
         slide2.appendChild(nameImg);
     });
 }
 
-function handleClick(e) {
-    const clickedIdx = parseInt(this.dataset.idx);
-    if (clickedIdx === correctIndex) {
-        document.getElementById('correctSound').play();
-        this.style.transform = 'translateY(-800px)';
-        this.style.opacity = '0';
-        setTimeout(() => {
-            showSlide(3);
-            createConfetti();
-        }, 800);
-    } else {
+function handleDinoClick(e) {
+    const clicked = this;
+    const correctName = clicked.dataset.name;
+    const nameImgs = document.querySelectorAll('.dino-name');
+    let matchFound = false;
+    nameImgs.forEach(nameImg => {
+        if(nameImg.src.includes(correctName.split('/').pop())) {
+            matchFound = true;
+            clicked.style.transform = 'translateY(-1000px)';
+            clicked.style.opacity = '0';
+            clicked.style.pointerEvents = 'none';
+            nameImg.style.opacity = '0';
+            matchedCount++;
+            document.getElementById('correctSound').play();
+        }
+    });
+
+    if(!matchFound) {
         document.getElementById('wrongSound').play();
     }
-}
 
-function createConfetti() {
-    const slide3 = document.getElementById('slide3');
-    for(let i=0;i<50;i++){
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        confetti.style.left = Math.random()*100+'%';
-        confetti.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 50%)`;
-        slide3.appendChild(confetti);
+    if(matchedCount >= dinosaurs.length) {
+        setTimeout(() => {
+            showSlide(3);
+            triggerConfetti();
+        }, 800);
     }
 }
 
@@ -156,12 +166,24 @@ function showSlide(slideNum) {
     document.getElementById('slide' + slideNum).classList.add('visible');
 }
 
+function triggerConfetti() {
+    const slide3 = document.getElementById('slide3');
+    for(let i=0;i<50;i++){
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random()*100 + '%';
+        confetti.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 50%)`;
+        slide3.appendChild(confetti);
+    }
+}
+
 function startGame() {
     showSlide(1);
     setTimeout(() => {
         document.getElementById('slide1').classList.remove('visible');
         document.getElementById('slide2').classList.add('visible');
-        createDinos();
+        document.getElementById('slide2').style.backgroundImage = "url('assets/background-prehistoric.png')";
+        createDinosaurs();
     }, 3000);
 }
 
