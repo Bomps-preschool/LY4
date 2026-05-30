@@ -3,189 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backward Counting Rocket Game</title>
+<title>Backward Counting Rockets</title>
 <style>
-body, html {
-  margin:0;
-  padding:0;
-  font-family: 'Arial', sans-serif;
-  overflow:hidden;
-}
-/* Background animation */
-body {
-  background: url('assets/background-space.png') no-repeat center center fixed;
-  background-size: cover;
-}
-
-#logoSlide, #gameSlide, #endSlide {
-  position: absolute; top:0; left:0; right:0; bottom:0;
-  width: 100%; height: 100%;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-#logoSlide img {
-  width:300px;
-  height:auto;
-}
-
-#gameSlide { display:flex; flex-direction:column; }
-#numbers-container { position: relative; width: 100%; height: 100%; }
-
-.rocket {
-  position: absolute;
-  width: 70px;
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-
-.rocket:hover { transform: scale(1.1); }
-
-#flame {
-  position:absolute;
-  width:50px;
-  display:none;
-  pointer-events:none;
-}
-
-#endSlide { display:flex; justify-content:center; align-items:center; flex-direction:column; background:linear-gradient(135deg,#ffddff,#ffe6cc);}
-#confettiCanvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
-
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Comic Sans MS', sans-serif;
+        background: url('assets/background-space.png') no-repeat center center;
+        background-size: cover;
+    }
+    #gameCanvas {
+        display: block;
+        margin: 0 auto;
+        background: transparent;
+    }
+    #instruction {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: #00cc66;
+        font-size: 22px;
+        font-weight: bold;
+        text-shadow: 1px 1px #fff;
+        z-index: 10;
+    }
 </style>
 </head>
 <body>
 
-<div id="logoSlide" style="display:flex;">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo">
-</div>
-
-<div id="gameSlide">
-  <div id="numbers-container"></div>
-  <img id="flame" src="assets/flame.png" alt="Flame">
-</div>
-
-<div id="endSlide">
-  <canvas id="confettiCanvas"></canvas>
-  <h1>🚀 Blast Off! Well Done! 🎉</h1>
-  <button onclick="restartGame()" style="font-size:24px;padding:15px 25px;">Play Again</button>
-</div>
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/claps.mp3"></audio>
+<div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
+<canvas id="gameCanvas" width="1200" height="700"></canvas>
 
 <script>
-const logoSlide = document.getElementById('logoSlide');
-const gameSlide = document.getElementById('gameSlide');
-const numbersContainer = document.getElementById('numbers-container');
-const flame = document.getElementById('flame');
-const endSlide = document.getElementById('endSlide');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
+const rocketImg = new Image();
+rocketImg.src = 'assets/rocket.png';
 
-let currentNumber = 20;
+const flameImg = new Image();
+flameImg.src = 'assets/flame.png';
 
-function showLogo(){
-  logoSlide.style.display='flex';
-  setTimeout(()=> {
-    logoSlide.style.display='none';
-    startGame();
-  },5000);
+const correctSound = new Audio('assets/correct.mp3');
+const wrongSound = new Audio('assets/wrong.mp3');
+
+const rocketCount = 20;
+let rockets = [];
+let clickedIndex = 0;
+
+// Utility: Random integer
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function startGame(){
-  gameSlide.style.display='flex';
-  generateRockets();
-}
-
-function generateRockets(){
-  numbersContainer.innerHTML='';
-  currentNumber = 20;
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight - 100;
-
-  for(let i=20;i>=1;i--){
-    const rocket = document.createElement('div');
-    rocket.className='rocket';
-    rocket.dataset.number=i;
-    rocket.style.left = Math.random()*(screenWidth-80)+'px';
-    rocket.style.top = Math.random()*(screenHeight-80)+'px';
-    rocket.innerHTML=`<img src="assets/rocket.png" style="width:70px;"><span style="position:absolute;top:10px;left:15px;font-weight:bold;color:white;font-size:18px;">${i}</span>`;
-    rocket.addEventListener('click', ()=>checkRocket(rocket));
-    numbersContainer.appendChild(rocket);
-  }
-}
-
-function checkRocket(rocket){
-  const num = parseInt(rocket.dataset.number);
-  if(num === currentNumber){
-    correctSound.play();
-    animateFlame(rocket);
-    rocket.style.transform='scale(0)';
-    currentNumber--;
-    if(currentNumber === 0){
-      setTimeout(showEndSlide,800);
+// Create rockets with non-overlapping positions
+function createRockets() {
+    rockets = [];
+    let attempts = 0;
+    while (rockets.length < rocketCount && attempts < 1000) {
+        const x = randInt(50, canvas.width - 100);
+        const y = randInt(100, canvas.height - 150);
+        const size = 70;
+        let overlap = rockets.some(r => Math.hypot(r.x - x, r.y - y) < 80);
+        if (!overlap) {
+            rockets.push({x, y, size, number: 20 - rockets.length, clicked: false});
+        }
+        attempts++;
     }
-  } else {
-    wrongSound.play();
-    rocket.style.transform='scale(1.1)';
-    setTimeout(()=>{rocket.style.transform='scale(1)';},300);
-  }
 }
 
-function animateFlame(rocket){
-  const rect = rocket.getBoundingClientRect();
-  flame.style.left = rect.left + rect.width/2 - 25 + 'px';
-  flame.style.top = rect.top + rect.height - 20 + 'px';
-  flame.style.display='block';
-  setTimeout(()=>{flame.style.display='none';},400);
-}
-
-function showEndSlide(){
-  gameSlide.style.display='none';
-  endSlide.style.display='flex';
-  clapSound.play();
-  launchConfetti();
-}
-
-function restartGame(){
-  endSlide.style.display='none';
-  startGame();
-}
-
-/* Confetti */
-function launchConfetti(){
-  const canvas=document.getElementById('confettiCanvas');
-  const ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-  const confetti=[];
-  for(let i=0;i<150;i++){
-    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:`hsl(${Math.random()*360},100%,50%)`, tilt:Math.random()*10-10});
-  }
-  function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    confetti.forEach(c=>{
-      ctx.beginPath();
-      ctx.lineWidth=c.r;
-      ctx.strokeStyle=c.color;
-      ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
-      ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
-      ctx.stroke();
-      c.tilt+=0.05;
-      c.y+=(Math.cos(c.d)+3+c.r/2)/2;
-      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+// Draw rockets with flame and number
+function drawRockets() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    rockets.forEach(r => {
+        if (!r.clicked) {
+            ctx.drawImage(rocketImg, r.x, r.y, r.size, r.size);
+            // flame animation
+            ctx.drawImage(flameImg, r.x + r.size/4, r.y + r.size, r.size/2, r.size/2);
+            // number
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 22px Comic Sans MS';
+            ctx.textAlign = 'center';
+            ctx.fillText(r.number, r.x + r.size/2, r.y + r.size/2 + 8);
+        }
     });
-    requestAnimationFrame(draw);
-  }
-  draw();
 }
 
-window.onload=showLogo;
+// Handle canvas clicks
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    rockets.forEach(r => {
+        if (!r.clicked && mouseX >= r.x && mouseX <= r.x + r.size &&
+            mouseY >= r.y && mouseY <= r.y + r.size) {
+            if (r.number === 20 - clickedIndex) {
+                r.clicked = true;
+                correctSound.currentTime = 0;
+                correctSound.play();
+                clickedIndex++;
+                if (clickedIndex === rocketCount) {
+                    setTimeout(() => alert("🎉 Good Job! You counted backward correctly!"), 200);
+                }
+            } else {
+                wrongSound.currentTime = 0;
+                wrongSound.play();
+            }
+        }
+    });
+});
+
+function animate() {
+    drawRockets();
+    requestAnimationFrame(animate);
+}
+
+// Initialize
+createRockets();
+animate();
+
 </script>
 </body>
 </html>
