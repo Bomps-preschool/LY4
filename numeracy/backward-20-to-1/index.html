@@ -3,128 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backward Counting Rockets</title>
+<title>Backward Counting 20 to 1</title>
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: 'Comic Sans MS', sans-serif;
-        background: url('assets/background-space.png') no-repeat center center;
-        background-size: cover;
-    }
-    #gameCanvas {
-        display: block;
-        margin: 0 auto;
-        background: transparent;
-    }
-    #instruction {
-        position: absolute;
-        top: 10px;
-        width: 100%;
-        text-align: center;
-        color: #00cc66;
-        font-size: 22px;
-        font-weight: bold;
-        text-shadow: 1px 1px #fff;
-        z-index: 10;
-    }
+  body, html {
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  #gameContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: url('assets/background-space.png') no-repeat center center/cover;
+  }
+  .rocket {
+    position: absolute;
+    width: 80px;
+    height: 120px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .rocket:hover {
+    transform: scale(1.1);
+  }
+  #instruction {
+    position: absolute;
+    top:10px;
+    width:100%;
+    text-align:center;
+    font-size: 24px;
+    color: #00ff00;
+    font-weight: bold;
+    text-shadow: 1px 1px #000;
+  }
+  #message {
+    position:absolute;
+    bottom: 20px;
+    width:100%;
+    text-align:center;
+    font-size: 32px;
+    color: yellow;
+    font-weight:bold;
+    text-shadow: 1px 1px #000;
+  }
 </style>
 </head>
 <body>
-
-<div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
-<canvas id="gameCanvas" width="1200" height="700"></canvas>
+<div id="gameContainer">
+  <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
+  <div id="message"></div>
+</div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const rocketsData = [
+  {number:20, img:'assets/rocket-number-20.png'},
+  {number:19, img:'assets/rocket-number-19.png'},
+  {number:18, img:'assets/rocket-number-18.png'},
+  {number:17, img:'assets/rocket-number-17.png'},
+  {number:16, img:'assets/rocket-number-16.png'},
+  {number:15, img:'assets/rocket-number-15.png'},
+  {number:14, img:'assets/rocket-number-14.png'},
+  {number:13, img:'assets/rocket-number-13.png'},
+  {number:12, img:'assets/rocket-number-12.png'},
+  {number:11, img:'assets/rocket-number-11.png'},
+  {number:10, img:'assets/rocket-number-10.png'},
+  {number:9, img:'assets/rocket-number-9.png'},
+  {number:8, img:'assets/rocket-number-8.png'},
+  {number:7, img:'assets/rocket-number-7.png'},
+  {number:6, img:'assets/rocket-number-6.png'},
+  {number:5, img:'assets/rocket-number-5.png'},
+  {number:4, img:'assets/rocket-number-4.png'},
+  {number:3, img:'assets/rocket-number-3.png'},
+  {number:2, img:'assets/rocket-number-2.png'},
+  {number:1, img:'assets/rocket-number-1.png'}
+];
 
-const rocketImg = new Image();
-rocketImg.src = 'assets/rocket.png';
+let nextNumber = 20;
+const gameContainer = document.getElementById('gameContainer');
+const message = document.getElementById('message');
 
-const flameImg = new Image();
-flameImg.src = 'assets/flame.png';
-
-const correctSound = new Audio('assets/correct.mp3');
-const wrongSound = new Audio('assets/wrong.mp3');
-
-const rocketCount = 20;
-let rockets = [];
-let clickedIndex = 0;
-
-// Utility: Random integer
-function randInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Create rockets with non-overlapping positions
 function createRockets() {
-    rockets = [];
-    let attempts = 0;
-    while (rockets.length < rocketCount && attempts < 1000) {
-        const x = randInt(50, canvas.width - 100);
-        const y = randInt(100, canvas.height - 150);
-        const size = 70;
-        let overlap = rockets.some(r => Math.hypot(r.x - x, r.y - y) < 80);
-        if (!overlap) {
-            rockets.push({x, y, size, number: 20 - rockets.length, clicked: false});
-        }
-        attempts++;
+  rocketsData.forEach(rocket => {
+    const rocketEl = document.createElement('img');
+    rocketEl.src = rocket.img;
+    rocketEl.className = 'rocket';
+    rocketEl.dataset.number = rocket.number;
+    rocketEl.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+    rocketEl.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+    rocketEl.addEventListener('click', () => checkRocket(rocketEl));
+    gameContainer.appendChild(rocketEl);
+  });
+}
+
+function checkRocket(rocketEl){
+  const number = parseInt(rocketEl.dataset.number);
+  if(number === nextNumber){
+    rocketEl.style.display = 'none';
+    message.textContent = 'Good job!';
+    const correctSound = new Audio('assets/correct.mp3');
+    correctSound.play();
+    nextNumber--;
+    if(nextNumber === 0){
+      setTimeout(()=>{message.textContent = 'Congratulations! You did it!';}, 500);
     }
+  } else {
+    message.textContent = 'Try again!';
+    const wrongSound = new Audio('assets/wrong.mp3');
+    wrongSound.play();
+  }
 }
 
-// Draw rockets with flame and number
-function drawRockets() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    rockets.forEach(r => {
-        if (!r.clicked) {
-            ctx.drawImage(rocketImg, r.x, r.y, r.size, r.size);
-            // flame animation
-            ctx.drawImage(flameImg, r.x + r.size/4, r.y + r.size, r.size/2, r.size/2);
-            // number
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 22px Comic Sans MS';
-            ctx.textAlign = 'center';
-            ctx.fillText(r.number, r.x + r.size/2, r.y + r.size/2 + 8);
-        }
-    });
-}
-
-// Handle canvas clicks
-canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    rockets.forEach(r => {
-        if (!r.clicked && mouseX >= r.x && mouseX <= r.x + r.size &&
-            mouseY >= r.y && mouseY <= r.y + r.size) {
-            if (r.number === 20 - clickedIndex) {
-                r.clicked = true;
-                correctSound.currentTime = 0;
-                correctSound.play();
-                clickedIndex++;
-                if (clickedIndex === rocketCount) {
-                    setTimeout(() => alert("🎉 Good Job! You counted backward correctly!"), 200);
-                }
-            } else {
-                wrongSound.currentTime = 0;
-                wrongSound.play();
-            }
-        }
-    });
-});
-
-function animate() {
-    drawRockets();
-    requestAnimationFrame(animate);
-}
-
-// Initialize
 createRockets();
-animate();
-
 </script>
 </body>
 </html>
