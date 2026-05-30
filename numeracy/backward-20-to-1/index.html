@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backward Counting Rocket Game</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+  }
+  #logoSlide, #gameSlide, #endSlide {
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    width: 100%; height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  #logoSlide img {
+    width: 300px;
+    height: auto;
+  }
+  #gameSlide {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: url('assets/background-space.png') no-repeat center center;
+    background-size: cover;
+    padding-top: 50px;
+  }
+  #instruction {
+    font-size: 20px;
+    color: #0b6623;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #rocketContainer {
+    position: relative;
+    width: 150px;
+    height: 300px;
+    margin-bottom: 50px;
+  }
+  #rocketContainer img {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+  #flame {
+    width: 50px;
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+  }
+  #numbers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  .numBtn {
+    background: #fff;
+    border: 2px solid #444;
+    border-radius: 10px;
+    padding: 20px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .numBtn:active {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #ff0;
+  }
+  #endSlide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ffddff, #ffe6cc);
+  }
+  #confettiCanvas {
+    position: absolute;
+    top:0; left:0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  #rocketContainer img.rocket {
+    z-index: 2;
+  }
+  #rocketContainer img.flame {
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- Logo Slide -->
+<div id="logoSlide" style="display:flex;">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game Slide -->
+<div id="gameSlide">
+  <div id="instruction">Tap the numbers in backward order from 20 to 1!</div>
+  <div id="rocketContainer">
+    <img id="rocket" class="rocket" src="assets/rocket.png" alt="Rocket">
+    <img id="flame" class="flame" src="assets/flame.png" alt="Flame">
+  </div>
+  <div id="numbers"></div>
+</div>
+
+<!-- End Slide -->
+<div id="endSlide">
+  <canvas id="confettiCanvas"></canvas>
+  <h1>🚀 Blast Off! Well Done! 🎉</h1>
+  <button onclick="restartGame()" style="font-size: 24px; padding: 15px 25px;">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/claps.mp3"></audio>
+
+<script>
+const numbers = Array.from({length: 20}, (_, i) => 20 - i);
+let currentIndex = 0;
+
+const logoSlide = document.getElementById('logoSlide');
+const gameSlide = document.getElementById('gameSlide');
+const numbersDiv = document.getElementById('numbers');
+const rocket = document.getElementById('rocket');
+const flame = document.getElementById('flame');
+const endSlide = document.getElementById('endSlide');
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+
+function showLogo() {
+  logoSlide.style.display = 'flex';
+  setTimeout(() => {
+    logoSlide.style.display = 'none';
+    startGame();
+  }, 5000);
+}
+
+function startGame() {
+  gameSlide.style.display = 'flex';
+  displayNumbers();
+}
+
+function displayNumbers() {
+  numbersDiv.innerHTML = '';
+  numbers.forEach((num, idx) => {
+    const btn = document.createElement('div');
+    btn.className = 'numBtn';
+    btn.innerText = num;
+    btn.addEventListener('click', () => checkNumber(num, idx));
+    numbersDiv.appendChild(btn);
+  });
+}
+
+function checkNumber(num, idx) {
+  if(idx === currentIndex) {
+    correctSound.play();
+    currentIndex++;
+    animateRocket();
+    if(currentIndex === numbers.length) {
+      setTimeout(showEndSlide, 800);
+    }
+  } else {
+    wrongSound.play();
+  }
+}
+
+function animateRocket() {
+  flame.style.display = 'block';
+  setTimeout(() => {
+    flame.style.display = 'none';
+  }, 300);
+}
+
+function showEndSlide() {
+  gameSlide.style.display = 'none';
+  endSlide.style.display = 'flex';
+  startConfetti();
+}
+
+function restartGame() {
+  currentIndex = 0;
+  endSlide.style.display = 'none';
+  startGame();
+}
+
+/* Confetti Animation */
+function startConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const confettiCount = 150;
+  const confetti = [];
+
+  for(let i=0; i<confettiCount; i++) {
+    confetti.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*6+4,
+      d: Math.random()*confettiCount,
+      color: `hsl(${Math.random()*360}, 100%, 50%)`,
+      tilt: Math.random()*10-10
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    confetti.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.r);
+      ctx.stroke();
+    });
+    update();
+  }
+
+  let angle = 0;
+  function update() {
+    angle += 0.01;
+    confetti.forEach(c=>{
+      c.y += (Math.cos(angle + c.d) + 3 + c.r/2)/2;
+      c.x += Math.sin(angle);
+      if(c.y > canvas.height) c.y = -10;
+      if(c.x > canvas.width) c.x = 0;
+      if(c.x < 0) c.x = canvas.width;
+    });
+  }
+
+  setInterval(draw, 20);
+}
+
+window.onload = showLogo;
+</script>
+
+</body>
+</html>
