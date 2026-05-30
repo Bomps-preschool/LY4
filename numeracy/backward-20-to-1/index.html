@@ -6,133 +6,147 @@
 <title>Backward Counting Rockets</title>
 <style>
 body, html {
-    margin:0; padding:0; width:100%; height:100%;
-    overflow:hidden;
-    font-family:'Comic Sans MS', cursive, sans-serif;
-}
-#game-container {
-    position: relative;
-    width:100%;
-    height:100%;
-    background-image: url('assets/background-space.png');
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Comic Sans MS', sans-serif;
+    background: url('assets/background-space.png') no-repeat center center fixed;
     background-size: cover;
-    background-position: center;
 }
+
+#logoSlide {
+    position: absolute; width: 100%; height: 100%;
+    background: white; display: flex;
+    justify-content: center; align-items: center;
+}
+
+#logoSlide img {
+    width: 200px;
+}
+
+#gameScreen {
+    display: none;
+    width: 100%; height: 100%;
+    position: relative;
+}
+
+#instruction {
+    text-align: center;
+    font-size: 28px;
+    color: #0f9d58;
+    text-shadow: 1px 1px 2px #fff;
+    margin-top: 10px;
+}
+
 .rocket {
     position: absolute;
-    width: 80px;
+    width: 80px; height: 120px;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: transform 1s ease-out;
 }
-.rocket:hover { transform: scale(1.1); }
-#instruction {
-    position:absolute;
-    top:10px; width:100%;
-    text-align:center;
-    font-size:24px;
-    color:#00ff99;
-    font-weight:bold;
-    text-shadow:1px 1px #000;
-    z-index:1000;
+
+button {
+    position: absolute;
+    bottom: 20px;
+    padding: 12px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+#nextBtn { right: 150px; background-color: #4285f4; color: white; }
+#clearBtn { right: 20px; background-color: #db4437; color: white; }
+
+#goodJob {
+    display: none; position: absolute;
+    width: 100%; height: 100%;
+    justify-content: center; align-items: center;
+    font-size: 48px;
+    color: #f4b400;
+    text-shadow: 2px 2px 5px #fff;
+    display: flex;
+    flex-direction: column;
 }
 </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
+<!-- Logo Slide -->
+<div id="logoSlide">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<audio id="correct-sound" src="assets/correct.mp3"></audio>
-<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
-<audio id="clap-sound" src="assets/claps.mp3"></audio>
+<!-- Game Screen -->
+<div id="gameScreen">
+    <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
+    <!-- Rockets will be inserted here dynamically -->
+    <button id="nextBtn">Next</button>
+    <button id="clearBtn">Clear</button>
+</div>
+
+<!-- Good Job Screen -->
+<div id="goodJob">🎉 Good Job! 🎉</div>
+
+<audio id="correctAudio" src="assets/correct.mp3"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3"></audio>
 
 <script>
-// Data for rockets
-const rocketsData = [
-    {number: 20, img:'assets/rocket-number-20.png'},
-    {number: 19, img:'assets/rocket-number-19.png'},
-    {number: 18, img:'assets/rocket-number-18.png'},
-    {number: 17, img:'assets/rocket-number-17.png'},
-    {number: 16, img:'assets/rocket-number-16.png'},
-    {number: 15, img:'assets/rocket-number-15.png'},
-    {number: 14, img:'assets/rocket-number-14.png'},
-    {number: 13, img:'assets/rocket-number-13.png'},
-    {number: 12, img:'assets/rocket-number-12.png'},
-    {number: 11, img:'assets/rocket-number-11.png'},
-    {number: 10, img:'assets/rocket-number-10.png'},
-    {number: 9, img:'assets/rocket-number-9.png'},
-    {number: 8, img:'assets/rocket-number-8.png'},
-    {number: 7, img:'assets/rocket-number-7.png'},
-    {number: 6, img:'assets/rocket-number-6.png'},
-    {number: 5, img:'assets/rocket-number-5.png'},
-    {number: 4, img:'assets/rocket-number-4.png'},
-    {number: 3, img:'assets/rocket-number-3.png'},
-    {number: 2, img:'assets/rocket-number-2.png'},
-    {number: 1, img:'assets/rocket-number-1.png'}
+// Custom horizontal layout as requested
+const rocketLayout = [
+  {num:18, x:5, y:20}, {num:12, x:15, y:20}, {num:3, x:25, y:20},
+  {num:5, x:35, y:20}, {num:20, x:45, y:20}, {num:7, x:55, y:20},
+  {num:1, x:65, y:20}, {num:14, x:75, y:20}, {num:4, x:85, y:20},
+  {num:15, x:10, y:45}, {num:2, x:20, y:45}, {num:6, x:30, y:45},
+  {num:19, x:40, y:45}, {num:11, x:50, y:45}, {num:10, x:60, y:45}, {num:8, x:70, y:45},
+  {num:13, x:20, y:70}, {num:16, x:40, y:70}, {num:9, x:60, y:70}, {num:17, x:80, y:70}
 ];
 
-let nextNumber = 20;
-const container = document.getElementById('game-container');
-const correctSound = document.getElementById('correct-sound');
-const wrongSound = document.getElementById('wrong-sound');
-const clapSound = document.getElementById('clap-sound');
+const correctOrder = [20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
 
-// Shuffle rockets randomly
-function shuffleArray(array){
-    for(let i=array.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+let nextIndex = 0;
 
-// Create rockets on screen
-function createRockets(){
-    shuffleArray(rocketsData);
-    rocketsData.forEach(rocket => {
-        const el = document.createElement('img');
-        el.src = rocket.img;
-        el.className = 'rocket';
-        el.dataset.number = rocket.number;
+function showGame() {
+    document.getElementById('logoSlide').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'block';
 
-        // Random position within screen bounds
-        el.style.left = Math.random()*(window.innerWidth-100) + 'px';
-        el.style.top = Math.random()*(window.innerHeight-200)+ 'px';
-
-        el.addEventListener('click', ()=> checkRocket(el));
-        container.appendChild(el);
+    const gameScreen = document.getElementById('gameScreen');
+    rocketLayout.forEach(rocket => {
+        const img = document.createElement('img');
+        img.src = `assets/rocket-number-${rocket.num}.png`;
+        img.classList.add('rocket');
+        img.style.left = rocket.x + '%';
+        img.style.top = rocket.y + '%';
+        img.dataset.num = rocket.num;
+        img.addEventListener('click', rocketClick);
+        gameScreen.appendChild(img);
     });
 }
 
-// Rocket click handler
-function checkRocket(el){
-    const number = parseInt(el.dataset.number);
-    if(number === nextNumber){
-        correctSound.currentTime = 0;
-        correctSound.play();
-        // Animate rocket going up
-        let pos = parseFloat(el.style.top);
-        const interval = setInterval(()=>{
-            pos -= 5;
-            el.style.top = pos + 'px';
-            if(pos < -100){
-                clearInterval(interval);
-                el.remove();
-            }
-        },20);
-        nextNumber--;
-        if(nextNumber===0){
-            setTimeout(()=>{clapSound.play(); alert("🎉 Congratulations! You counted backward!");},500);
+function rocketClick(e) {
+    const rocketNum = parseInt(this.dataset.num);
+    if (rocketNum === correctOrder[nextIndex]) {
+        document.getElementById('correctAudio').play();
+        // Animate rocket upward
+        this.style.transform = 'translateY(-1500px)';
+        nextIndex++;
+        if (nextIndex >= correctOrder.length) {
+            setTimeout(showGoodJob, 1000);
         }
     } else {
-        wrongSound.currentTime = 0;
-        wrongSound.play();
+        document.getElementById('wrongAudio').play();
     }
 }
 
-window.addEventListener('load', ()=>{
-    createRockets();
-});
+function showGoodJob() {
+    document.getElementById('gameScreen').style.display = 'none';
+    document.getElementById('goodJob').style.display = 'flex';
+}
+
+// Logo splash for 5s
+setTimeout(showGame, 5000);
+
 </script>
 </body>
 </html>
