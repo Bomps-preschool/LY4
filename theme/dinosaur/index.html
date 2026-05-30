@@ -152,15 +152,22 @@ function dragOver(e) {
 }
 
 function dropDino(e) {
-    if (draggedDino.dataset.id === this.dataset.id) {
+    const targetBox = this;
+    if (draggedDino.dataset.id === targetBox.dataset.id) {
         document.getElementById('correctSound').play();
         matchesDone++;
 
-        // Move the dinosaur into the name box
-        draggedDino.style.left = this.offsetLeft + 'px';
-        draggedDino.style.top = this.offsetTop + 'px';
-        draggedDino.style.position = 'absolute';
-        draggedDino.style.pointerEvents = 'none';
+        // Animate sliding down into the box
+        const boxTop = targetBox.offsetTop;
+        draggedDino.style.transition = 'top 0.5s ease, left 0.5s ease, opacity 0.5s ease';
+        draggedDino.style.top = boxTop + 'px';
+        draggedDino.style.left = targetBox.offsetLeft + 'px';
+
+        // After animation ends, hide both dinosaur and name
+        setTimeout(() => {
+            draggedDino.style.display = 'none';
+            targetBox.style.display = 'none';
+        }, 600);
 
         if (matchesDone === dinosaurs.length) {
             setTimeout(() => showSlide(3), 800);
