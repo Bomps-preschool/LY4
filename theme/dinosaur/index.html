@@ -70,18 +70,14 @@
 </head>
 <body>
 <div id="game-container">
-    <!-- Slide 1: Logo -->
     <div id="slide1" class="slide visible">
         <img src="assets/innovine-logo.png" alt="Innovine Logo">
     </div>
 
-    <!-- Slide 2: Game -->
     <div id="slide2" class="slide">
         <div id="instruction">Match the dinosaurs with their names!</div>
-        <!-- Dinosaurs and Name Boxes will be inserted by JS -->
     </div>
 
-    <!-- Slide 3: Good Job -->
     <div id="slide3" class="slide">
         <div id="goodjob">Good Job! 🎉</div>
     </div>
@@ -91,7 +87,6 @@
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-// Dinosaur images and names
 const dinosaurs = [
     {id: 'diplodocus', img: 'assets/diplodocus.png', nameImg: 'assets/diplodocus-name.png'},
     {id: 'triceratops', img: 'assets/triceratops.png', nameImg: 'assets/triceratops-name.png'},
@@ -108,15 +103,12 @@ function createGame() {
     slide2.style.backgroundImage = "url('assets/background-prehistoric.png')";
     slide2.style.backgroundSize = "cover";
 
-    // Dinosaurs row positions
     const topPositions = [10, 25, 40, 55, 70, 85];
-    const dinoY = 20; // top row Y
-    const nameY = 70; // name box Y
+    const dinoY = 20;
+    const nameY = 70;
 
-    // Shuffle dinosaurs
     const shuffledDinos = dinosaurs.sort(() => Math.random() - 0.5);
 
-    // Create dinosaur images
     shuffledDinos.forEach((dino, idx) => {
         const img = document.createElement('img');
         img.src = dino.img;
@@ -130,7 +122,6 @@ function createGame() {
         slide2.appendChild(img);
     });
 
-    // Create name boxes
     shuffledDinos.forEach((dino, idx) => {
         const box = document.createElement('div');
         box.classList.add('name-box');
@@ -150,7 +141,6 @@ function createGame() {
     });
 }
 
-// Drag & Drop Handlers
 let draggedDino = null;
 
 function dragStart(e) {
@@ -163,9 +153,15 @@ function dragOver(e) {
 
 function dropDino(e) {
     if (draggedDino.dataset.id === this.dataset.id) {
-        // Correct match - dinosaur stays in place now
         document.getElementById('correctSound').play();
         matchesDone++;
+
+        // Move the dinosaur into the name box
+        draggedDino.style.left = this.offsetLeft + 'px';
+        draggedDino.style.top = this.offsetTop + 'px';
+        draggedDino.style.position = 'absolute';
+        draggedDino.style.pointerEvents = 'none';
+
         if (matchesDone === dinosaurs.length) {
             setTimeout(() => showSlide(3), 800);
         }
@@ -174,7 +170,6 @@ function dropDino(e) {
     }
 }
 
-// Slide controls
 function showSlide(slideNum) {
     document.querySelectorAll('.slide').forEach(s => s.classList.remove('visible'));
     document.getElementById('slide' + slideNum).classList.add('visible');
