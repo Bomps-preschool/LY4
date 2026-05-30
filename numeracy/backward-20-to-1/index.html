@@ -2,43 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Backward Counting Rockets 20-1</title>
 <style>
-    html, body {
-        margin:0; padding:0; width:100%; height:100%; overflow:hidden;
-        font-family:'Arial', sans-serif;
-        user-select:none;
-    }
-    .slide {
-        position:absolute; top:0; left:0; width:100%; height:100%;
-        display:flex; justify-content:center; align-items:center; flex-direction:column;
-        display:none;
-    }
-    .visible { display:flex; }
-    #slide1 img { width: 250px; }
-    #slide2 { background:url('assets/background-space.png') no-repeat center center/cover; }
-    #instruction { position:absolute; top:20px; width:100%; text-align:center; font-size:2vw; color:#39FF14; text-shadow:1px 1px 2px black; }
-    .rocket { width:70px; cursor:pointer; position:absolute; transition: transform 0.7s ease-in, filter 1s; filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); animation: float 2s ease-in-out infinite alternate; }
-    @keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
-    #slide3 { font-size:4vw; color:#39FF14; text-align:center; justify-content:center; align-items:center; flex-direction:column; }
-    .confetti {
-        position:absolute; width:10px; height:10px;
-        background-color: hsl(0,100%,50%);
-        animation: confettiFall linear infinite;
-    }
-    @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(600px) rotate(720deg); opacity:0; } }
+body, html {
+    margin: 0; padding: 0; width:100%; height:100%; overflow:hidden;
+    font-family:'Arial', sans-serif; user-select:none;
+}
+.slide { position:absolute; top:0; left:0; width:100%; height:100%; display:none; justify-content:center; align-items:center; flex-direction:column; }
+.visible { display:flex; }
+#slide1 img { width:200px; }
+#slide2 { background:url('assets/background-space.png') no-repeat center center/cover; }
+#instruction { position:absolute; top:20px; width:100%; text-align:center; font-size:2vw; color:#39FF14; text-shadow:1px 1px 2px black; }
+.rocket { position:absolute; width:70px; cursor:pointer; transition: transform 0.7s ease-in, filter 1s; filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); animation: float 2s ease-in-out infinite alternate; }
+@keyframes float { 0%{ transform: translateY(0); } 100% { transform: translateY(-8px); } }
+#goodjob { font-size:4vw; color:#39FF14; text-align:center; position:relative; }
+.confetti { position:absolute; width:10px; height:10px; animation: confettiFall linear infinite; }
+@keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(600px) rotate(720deg); opacity:0; } }
 </style>
 </head>
 <body>
-
 <div id="slide1" class="slide visible"><img src="assets/innovine-logo.png" alt="Innovine Logo"></div>
 <div id="slide2" class="slide">
     <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
 </div>
-<div id="slide3" class="slide">
-    <div>🎉 Good Job! 🎉</div>
-</div>
+<div id="slide3" class="slide"><div id="goodjob">Good Job! 🎉</div></div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
@@ -47,75 +35,72 @@
 <script>
 const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17];
 const rocketPositions = [
-    {x:5, y:15},{x:15,y:15},{x:25,y:15},{x:35,y:15},{x:45,y:15},{x:55,y:15},{x:65,y:15},{x:75,y:15},{x:85,y:15},
-    {x:10,y:35},{x:20,y:35},{x:30,y:35},{x:40,y:35},{x:50,y:35},{x:60,y:35},{x:70,y:35},
-    {x:20,y:55},{x:40,y:55},{x:60,y:55},{x:80,y:55}
+  {x:5, y:15},{x:15,y:15},{x:25,y:15},{x:35,y:15},{x:45,y:15},{x:55,y:15},{x:65,y:15},{x:75,y:15},{x:85,y:15},
+  {x:10,y:35},{x:20,y:35},{x:30,y:35},{x:40,y:35},{x:50,y:35},{x:60,y:35},{x:70,y:35},
+  {x:20,y:55},{x:40,y:55},{x:60,y:55},{x:80,y:55}
 ];
 const backwardSequence = [...Array(20)].map((_,i)=>20-i);
 let currentIndex = 0;
-
 const slide2 = document.getElementById('slide2');
 
 function createRockets(){
-    rocketOrder.forEach((num,idx)=>{
-        const rocket = document.createElement('img');
-        rocket.src = `assets/rocket-number-${num}.png`;
-        rocket.classList.add('rocket');
-        rocket.style.left = rocketPositions[idx].x+'%';
-        rocket.style.top = rocketPositions[idx].y+'%';
-        rocket.dataset.num = num;
-        rocket.addEventListener('click', ()=>checkRocket(rocket));
-        slide2.appendChild(rocket);
-    });
+  rocketOrder.forEach((num,idx)=>{
+    const rocket = document.createElement('img');
+    rocket.src = `assets/rocket-number-${num}.png`;
+    rocket.classList.add('rocket');
+    rocket.style.left = rocketPositions[idx].x+'%';
+    rocket.style.top = rocketPositions[idx].y+'%';
+    rocket.dataset.num = num;
+    rocket.addEventListener('click', ()=>checkRocket(rocket));
+    slide2.appendChild(rocket);
+  });
 }
 
 function checkRocket(el){
-    const num = parseInt(el.dataset.num);
-    if(num === backwardSequence[currentIndex]){
-        document.getElementById('correctSound').play();
-        el.style.transform = 'translateY(-1000px) rotate(15deg)';
-        el.style.pointerEvents = 'none';
-        currentIndex++;
-        if(currentIndex>=backwardSequence.length){
-            setTimeout(showGoodJob,700);
-        }
-    } else {
-        document.getElementById('wrongSound').play();
+  const num = parseInt(el.dataset.number);
+  if(num === backwardSequence[currentIndex]){
+    document.getElementById('correctSound').play();
+    el.style.transform = 'translateY(-1000px) rotate(15deg)';
+    el.style.pointerEvents = 'none';
+    currentIndex++;
+    if(currentIndex>=backwardSequence.length){
+      setTimeout(()=>{ showSlide(3); launchConfetti(); },700);
     }
+  } else {
+    document.getElementById('wrongSound').play();
+  }
 }
 
-function showGoodJob(){
-    document.getElementById('slide2').classList.remove('visible');
-    const slide3 = document.getElementById('slide3');
-    slide3.classList.add('visible');
-    document.getElementById('clapSound').play();
-    launchConfetti();
+function showSlide(slideNum){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('slide'+slideNum).classList.add('visible');
 }
 
 function launchConfetti(){
-    const slide3 = document.getElementById('slide3');
-    for(let i=0;i<50;i++){
-        const conf = document.createElement('div');
-        conf.classList.add('confetti');
-        conf.style.left = Math.random()*window.innerWidth+'px';
-        conf.style.top = Math.random()*-100+'px';
-        conf.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
-        conf.style.width = conf.style.height = (5+Math.random()*5)+'px';
-        slide3.appendChild(conf);
-        setTimeout(()=>conf.remove(),3000+Math.random()*2000);
-    }
+  const slide3 = document.getElementById('slide3');
+  for(let i=0;i<50;i++){
+    const conf = document.createElement('div');
+    conf.classList.add('confetti');
+    conf.style.left = Math.random()*window.innerWidth+'px';
+    conf.style.top = Math.random()*-100+'px';
+    conf.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
+    conf.style.width = conf.style.height = (5+Math.random()*5)+'px';
+    slide3.appendChild(conf);
+    setTimeout(()=>conf.remove(),3000+Math.random()*2000);
+  }
+  document.getElementById('clapSound').play();
 }
 
 function startGame(){
-    setTimeout(()=>{
-        document.getElementById('slide1').classList.remove('visible');
-        document.getElementById('slide2').classList.add('visible');
-    },3000);
+  setTimeout(()=>{
+    document.getElementById('slide1').classList.remove('visible');
+    document.getElementById('slide2').classList.add('visible');
+  },3000);
 }
 
 window.onload = ()=>{
-    createRockets();
-    startGame();
+  createRockets();
+  startGame();
 };
 </script>
 </body>
