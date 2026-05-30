@@ -5,67 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Dinosaur Matching Game</title>
 <style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: 'Arial', sans-serif;
-        background: #fff;
-    }
-    #game-container {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-    }
-    .slide {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-    }
-    .visible { display: flex; }
-    #slide1 img {
-        width: 200px;
-    }
-    #instruction {
-        position: absolute;
-        top: 20px;
-        width: 100%;
-        text-align: center;
-        font-size: 2vw;
-        color: #39FF14;
-        text-shadow: 1px 1px 2px black;
-    }
-    .dino {
-        width: 150px;
-        cursor: grab;
-        transition: transform 0.5s ease;
-        position: absolute;
-    }
-    .name-box {
-        width: 150px;
-        height: 100px;
-        border: 1px dashed #555;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 10px;
-        font-size: 2.0vw;
-        font-weight: bold;
-        color: #222;
-        position: absolute;
-    }
-    #goodjob {
-        font-size: 4vw;
-        color: #39FF14;
-        text-align: center;
-        position: relative;
-    }
+body, html {
+    margin:0; padding:0; overflow:hidden; font-family:'Arial', sans-serif; background:#fff;
+}
+#game-container { width:100vw; height:100vh; position:relative; }
+.slide { width:100%; height:100%; position:absolute; top:0; left:0; display:none; justify-content:center; align-items:center; flex-direction:column; }
+.visible { display:flex; }
+#slide1 img { width:200px; }
+#instruction { position:absolute; top:20px; width:100%; text-align:center; font-size:2vw; color:#39FF14; text-shadow:1px 1px 2px black; }
+.dino { width:150px; cursor:grab; transition: transform 0.5s ease; position:absolute; }
+.name-box { width:150px; height:100px; border:2px dashed #555; display:flex; justify-content:center; align-items:center; margin:10px; font-size:1.5vw; font-weight:bold; color:#222; position:absolute; }
+#goodjob { font-size:4vw; color:#39FF14; text-align:center; position:relative; }
 </style>
 </head>
 <body>
@@ -88,15 +38,17 @@
 
 <script>
 const dinosaurs = [
-    {id: 'diplodocus', img: 'assets/tyrannosaurus-rex.png', nameImg: 'assets/diplodocus-name.png'},
-    {id: 'triceratops', img: 'assets/diplodocus.png', nameImg: 'assets/triceratops-name.png'},
-    {id: 'tyrannosaurus-rex', img: 'assets/brachiosaurus.png', nameImg: 'assets/tyrannosaurus-rex-name.png'},
-    {id: 'iguanodon', img: 'assets/stegosaurus.png', nameImg: 'assets/iguanodon-name.png'},
-    {id: 'stegosaurus', img: 'assets/triceratops.png', nameImg: 'assets/stegosaurus-name.png'},
-    {id: 'brachiosaurus', img: 'assets/iguanodon.png', nameImg: 'assets/brachiosaurus-name.png'}
+    {id: 'diplodocus', img: 'assets/diplodocus.png', nameImg: 'assets/diplodocus-name.png'},
+    {id: 'triceratops', img: 'assets/triceratops.png', nameImg: 'assets/triceratops-name.png'},
+    {id: 'tyrannosaurus-rex', img: 'assets/tyrannosaurus-rex.png', nameImg: 'assets/tyrannosaurus-rex-name.png'},
+    {id: 'iguanodon', img: 'assets/iguanodon.png', nameImg: 'assets/iguanodon-name.png'},
+    {id: 'stegosaurus', img: 'assets/stegosaurus.png', nameImg: 'assets/stegosaurus-name.png'},
+    {id: 'brachiosaurus', img: 'assets/brachiosaurus.png', nameImg: 'assets/brachiosaurus-name.png'}
 ];
 
 let matchesDone = 0;
+
+function shuffleArray(arr) { return arr.sort(()=>Math.random()-0.5); }
 
 function createGame() {
     const slide2 = document.getElementById('slide2');
@@ -104,10 +56,11 @@ function createGame() {
     slide2.style.backgroundSize = "cover";
 
     const topPositions = [10, 25, 40, 55, 70, 85];
-    const dinoY = 20;
-    const nameY = 70;
+    const dinoY = 20; // top row
+    const nameY = 70; // bottom row
 
-    const shuffledDinos = dinosaurs.sort(() => Math.random() - 0.5);
+    const shuffledDinos = shuffleArray([...dinosaurs]);
+    const shuffledNames = shuffleArray([...dinosaurs]);
 
     shuffledDinos.forEach((dino, idx) => {
         const img = document.createElement('img');
@@ -117,12 +70,11 @@ function createGame() {
         img.style.top = dinoY + '%';
         img.dataset.id = dino.id;
         img.draggable = true;
-
         img.addEventListener('dragstart', dragStart);
         slide2.appendChild(img);
     });
 
-    shuffledDinos.forEach((dino, idx) => {
+    shuffledNames.forEach((dino, idx) => {
         const box = document.createElement('div');
         box.classList.add('name-box');
         box.style.left = topPositions[idx] + '%';
@@ -136,59 +88,53 @@ function createGame() {
 
         box.addEventListener('dragover', dragOver);
         box.addEventListener('drop', dropDino);
-
         slide2.appendChild(box);
     });
 }
 
 let draggedDino = null;
 
-function dragStart(e) {
-    draggedDino = this;
-}
+function dragStart(e) { draggedDino = this; }
 
-function dragOver(e) {
-    e.preventDefault();
-}
+function dragOver(e) { e.preventDefault(); }
 
 function dropDino(e) {
     const targetBox = this;
-    if (draggedDino.dataset.id === targetBox.dataset.id) {
+    if(draggedDino.dataset.id === targetBox.dataset.id){
         document.getElementById('correctSound').play();
         matchesDone++;
 
-        // Animate sliding down into the box
-        const boxTop = targetBox.offsetTop;
+        // Slide down animation
         draggedDino.style.transition = 'top 0.5s ease, left 0.5s ease, opacity 0.5s ease';
-        draggedDino.style.top = boxTop + 'px';
         draggedDino.style.left = targetBox.offsetLeft + 'px';
+        draggedDino.style.top = targetBox.offsetTop + 'px';
 
-        // After animation ends, hide both dinosaur and name
-        setTimeout(() => {
-            draggedDino.style.display = 'none';
-            targetBox.style.display = 'none';
-        }, 600);
+        // After sliding down, remove both
+        setTimeout(()=>{
+            draggedDino.style.display='none';
+            targetBox.style.display='none';
+        },600);
 
-        if (matchesDone === dinosaurs.length) {
-            setTimeout(() => showSlide(3), 800);
+        if(matchesDone === dinosaurs.length){
+            setTimeout(()=>showSlide(3),800);
         }
     } else {
         document.getElementById('wrongSound').play();
     }
 }
 
-function showSlide(slideNum) {
-    document.querySelectorAll('.slide').forEach(s => s.classList.remove('visible'));
-    document.getElementById('slide' + slideNum).classList.add('visible');
+function showSlide(slideNum){
+    document.querySelectorAll('.slide').forEach(s=>s.classList.remove('visible'));
+    document.getElementById('slide'+slideNum).classList.add('visible');
 }
 
-function startGame() {
+function startGame(){
     showSlide(1);
-    setTimeout(() => {
+    setTimeout(()=>{
         document.getElementById('slide1').classList.remove('visible');
         document.getElementById('slide2').classList.add('visible');
         createGame();
-    }, 3000);
+    },3000);
 }
 
 window.onload = startGame;
