@@ -78,17 +78,15 @@
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17];
+const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17]; // Initial placement sequence
 const rocketPositions = [
-    // Line 1
     {x:5, y:15},{x:15,y:15},{x:25,y:15},{x:35,y:15},{x:45,y:15},{x:55,y:15},{x:65,y:15},{x:75,y:15},{x:85,y:15},
-    // Line 2
     {x:10,y:35},{x:20,y:35},{x:30,y:35},{x:40,y:35},{x:50,y:35},{x:60,y:35},{x:70,y:35},
-    // Line 3
     {x:20,y:55},{x:40,y:55},{x:60,y:55},{x:80,y:55}
 ];
 
-let currentNumberIndex = 0;
+let backwardSequence = [...Array(20)].map((_,i)=>20-i); // 20 → 1
+let currentIndex = 0;
 
 function createRockets() {
     const slide2 = document.getElementById('slide2');
@@ -106,15 +104,14 @@ function createRockets() {
 
 function handleRocketClick(e) {
     const clickedNum = parseInt(this.dataset.number);
-    if (clickedNum === rocketOrder[currentNumberIndex]) {
+    // Check against backward sequence
+    if (clickedNum === backwardSequence[currentIndex]) {
         document.getElementById('correctSound').play();
         this.style.transform = 'translateY(-1000px)';
         this.style.pointerEvents = 'none';
-        currentNumberIndex++;
-        if (currentNumberIndex >= rocketOrder.length) {
-            setTimeout(() => {
-                showSlide(3);
-            }, 700);
+        currentIndex++;
+        if (currentIndex >= backwardSequence.length) {
+            setTimeout(() => { showSlide(3); }, 700);
         }
     } else {
         document.getElementById('wrongSound').play();
