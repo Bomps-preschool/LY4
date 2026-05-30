@@ -163,9 +163,7 @@ function dragOver(e) {
 
 function dropDino(e) {
     if (draggedDino.dataset.id === this.dataset.id) {
-        // Correct match
-        draggedDino.style.transform = 'translateY(-1000px)';
-        draggedDino.style.pointerEvents = 'none';
+        // Correct match - dinosaur stays in place now
         document.getElementById('correctSound').play();
         matchesDone++;
         if (matchesDone === dinosaurs.length) {
