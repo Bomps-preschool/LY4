@@ -46,12 +46,30 @@
         position: absolute;
         width: 70px;
         cursor: pointer;
-        transition: transform 0.7s ease-in;
+        transition: transform 0.7s ease-in, filter 1s ease-in-out;
+        filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+        animation: float 2s ease-in-out infinite alternate;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        100% { transform: translateY(-10px); }
     }
     #goodjob {
         font-size: 4vw;
         color: #39FF14;
         text-align: center;
+        position: relative;
+    }
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #ff0, #0ff, #f0f, #f00;
+        animation: confettiFall linear infinite;
+    }
+    @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
     }
 </style>
 </head>
@@ -65,7 +83,6 @@
     <!-- Slide 2: Game -->
     <div id="slide2" class="slide">
         <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
-        <!-- Rockets will be inserted by JS -->
     </div>
 
     <!-- Slide 3: Good Job -->
@@ -78,13 +95,12 @@
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17]; // Initial placement sequence
+const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17]; 
 const rocketPositions = [
     {x:5, y:15},{x:15,y:15},{x:25,y:15},{x:35,y:15},{x:45,y:15},{x:55,y:15},{x:65,y:15},{x:75,y:15},{x:85,y:15},
     {x:10,y:35},{x:20,y:35},{x:30,y:35},{x:40,y:35},{x:50,y:35},{x:60,y:35},{x:70,y:35},
     {x:20,y:55},{x:40,y:55},{x:60,y:55},{x:80,y:55}
 ];
-
 let backwardSequence = [...Array(20)].map((_,i)=>20-i); // 20 → 1
 let currentIndex = 0;
 
@@ -104,14 +120,15 @@ function createRockets() {
 
 function handleRocketClick(e) {
     const clickedNum = parseInt(this.dataset.number);
-    // Check against backward sequence
     if (clickedNum === backwardSequence[currentIndex]) {
         document.getElementById('correctSound').play();
-        this.style.transform = 'translateY(-1000px)';
+        // Rocket animation upward
+        this.style.transition = 'transform 1s ease-in-out';
+        this.style.transform = 'translateY(-1000px) rotate(10deg)';
         this.style.pointerEvents = 'none';
         currentIndex++;
         if (currentIndex >= backwardSequence.length) {
-            setTimeout(() => { showSlide(3); }, 700);
+            setTimeout(() => { showSlide(3); launchConfetti(); }, 1000);
         }
     } else {
         document.getElementById('wrongSound').play();
@@ -128,7 +145,21 @@ function startGame() {
     setTimeout(() => {
         document.getElementById('slide1').classList.remove('visible');
         document.getElementById('slide2').classList.add('visible');
-    }, 3000); // Show logo for 3 seconds
+    }, 3000);
+}
+
+function launchConfetti() {
+    const slide3 = document.getElementById('slide3');
+    for(let i=0;i<50;i++){
+        const conf = document.createElement('div');
+        conf.classList.add('confetti');
+        conf.style.left = Math.random()*window.innerWidth + 'px';
+        conf.style.top = Math.random()*-100 + 'px';
+        conf.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
+        conf.style.width = conf.style.height = (5+Math.random()*5)+'px';
+        slide3.appendChild(conf);
+        setTimeout(()=> conf.remove(),3000 + Math.random()*2000);
+    }
 }
 
 window.onload = () => {
