@@ -2,177 +2,143 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backward Counting Rockets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Backward Counting Rockets 20-1</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    user-select: none;
-  }
-  #logoSlide, #gameSlide, #endSlide {
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    top:0; left:0;
-    display: none;
-    justify-content: center;
-    align-items: center;
-  }
-  #logoSlide img {
-    width: 250px;
-  }
-  #gameSlide {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background: url('assets/background-space.png') no-repeat center center/cover;
-  }
-  #instructions {
-    color: #32CD32;
-    font-size: 2em;
-    margin-top: 10px;
-    text-align: center;
-    text-shadow: 1px 1px 2px #000;
-  }
-  .row {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  .rocket {
-    width: 80px;
-    margin: 10px;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.5s ease;
-  }
-  .flame {
-    position: absolute;
-    width: 50px;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: -1;
-  }
-  #endSlide {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 4em;
-    color: #32CD32;
-    background: url('assets/background-space.png') no-repeat center center/cover;
-  }
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Arial', sans-serif;
+    }
+    #game-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background-size: cover;
+        background-position: center;
+    }
+    .slide {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .visible { display: flex; }
+    #slide1 img {
+        width: 200px;
+    }
+    #instruction {
+        position: absolute;
+        top: 20px;
+        width: 100%;
+        text-align: center;
+        font-size: 2vw;
+        color: #39FF14;
+        text-shadow: 1px 1px 2px black;
+    }
+    .rocket {
+        position: absolute;
+        width: 70px;
+        cursor: pointer;
+        transition: transform 0.7s ease-in;
+    }
+    #goodjob {
+        font-size: 4vw;
+        color: #39FF14;
+        text-align: center;
+    }
 </style>
 </head>
 <body>
+<div id="game-container">
+    <!-- Slide 1: Logo -->
+    <div id="slide1" class="slide visible">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    </div>
 
-<!-- Logo Slide -->
-<div id="logoSlide">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo">
-</div>
+    <!-- Slide 2: Game -->
+    <div id="slide2" class="slide">
+        <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
+        <!-- Rockets will be inserted by JS -->
+    </div>
 
-<!-- Game Slide -->
-<div id="gameSlide">
-  <div id="instructions">Tap the rockets in backward order from 20 to 1!</div>
-  <div class="row" id="row1"></div>
-  <div class="row" id="row2"></div>
-  <div class="row" id="row3"></div>
-</div>
-
-<!-- End Slide -->
-<div id="endSlide">
-  🎉 Good Job! 🎉
+    <!-- Slide 3: Good Job -->
+    <div id="slide3" class="slide">
+        <div id="goodjob">Good Job! 🎉</div>
+    </div>
 </div>
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
 <audio id="wrongSound" src="assets/wrong.mp3"></audio>
-<audio id="clapSound" src="assets/claps.mp3"></audio>
 
 <script>
-const rocketsData = [
-  'rocket-number-18.png','rocket-number-12.png','rocket-number-3.png','rocket-number-5.png','rocket-number-20.png',
-  'rocket-number-7.png','rocket-number-1.png','rocket-number-14.png','rocket-number-4.png',
-  'rocket-number-15.png','rocket-number-2.png','rocket-number-6.png','rocket-number-19.png','rocket-number-11.png','rocket-number-10.png','rocket-number-8.png',
-  'rocket-number-13.png','rocket-number-16.png','rocket-number-9.png','rocket-number-17.png'
+const rocketOrder = [18,12,3,5,20,7,1,14,4,15,2,6,19,11,10,8,13,16,9,17];
+const rocketPositions = [
+    // Line 1
+    {x:5, y:15},{x:15,y:15},{x:25,y:15},{x:35,y:15},{x:45,y:15},{x:55,y:15},{x:65,y:15},{x:75,y:15},{x:85,y:15},
+    // Line 2
+    {x:10,y:35},{x:20,y:35},{x:30,y:35},{x:40,y:35},{x:50,y:35},{x:60,y:35},{x:70,y:35},
+    // Line 3
+    {x:20,y:55},{x:40,y:55},{x:60,y:55},{x:80,y:55}
 ];
 
-const correctOrder = [
-  'rocket-number-20.png','rocket-number-19.png','rocket-number-18.png','rocket-number-17.png','rocket-number-16.png',
-  'rocket-number-15.png','rocket-number-14.png','rocket-number-13.png','rocket-number-12.png','rocket-number-11.png',
-  'rocket-number-10.png','rocket-number-9.png','rocket-number-8.png','rocket-number-7.png','rocket-number-6.png',
-  'rocket-number-5.png','rocket-number-4.png','rocket-number-3.png','rocket-number-2.png','rocket-number-1.png'
-];
+let currentNumberIndex = 0;
 
-let currentIndex = 0;
-
-const rows = [
-  document.getElementById('row1'),
-  document.getElementById('row2'),
-  document.getElementById('row3')
-];
-
-// Split rockets into rows: first 9, next 7, last 4
-const rowSplits = [9,7,4];
-let rocketIndex = 0;
-
-rowSplits.forEach((count,rowNum) => {
-  for(let i=0; i<count; i++){
-    const rocketDiv = document.createElement('div');
-    rocketDiv.classList.add('rocket');
-    rocketDiv.dataset.src = rocketsData[rocketIndex];
-    
-    const img = document.createElement('img');
-    img.src = 'assets/' + rocketsData[rocketIndex];
-    rocketDiv.appendChild(img);
-    
-    const flame = document.createElement('img');
-    flame.src = 'assets/flame.png';
-    flame.classList.add('flame');
-    rocketDiv.appendChild(flame);
-    
-    rocketDiv.addEventListener('click', () => checkRocket(rocketDiv));
-    
-    rows[rowNum].appendChild(rocketDiv);
-    rocketIndex++;
-  }
-});
-
-function checkRocket(rocketDiv){
-  const correctSrc = correctOrder[currentIndex];
-  if(rocketDiv.dataset.src === correctSrc){
-    document.getElementById('correctSound').play();
-    rocketDiv.style.transform = 'translateY(-1200px)'; // fly up animation
-    currentIndex++;
-    if(currentIndex === correctOrder.length){
-      setTimeout(() => showEndSlide(), 700);
-    }
-  } else {
-    document.getElementById('wrongSound').play();
-  }
+function createRockets() {
+    const slide2 = document.getElementById('slide2');
+    rocketOrder.forEach((num, idx) => {
+        const rocket = document.createElement('img');
+        rocket.src = `assets/rocket-number-${num}.png`;
+        rocket.classList.add('rocket');
+        rocket.style.left = rocketPositions[idx].x + '%';
+        rocket.style.top = rocketPositions[idx].y + '%';
+        rocket.dataset.number = num;
+        rocket.addEventListener('click', handleRocketClick);
+        slide2.appendChild(rocket);
+    });
 }
 
-// Slides handling
-const logoSlide = document.getElementById('logoSlide');
-const gameSlide = document.getElementById('gameSlide');
-const endSlide = document.getElementById('endSlide');
+function handleRocketClick(e) {
+    const clickedNum = parseInt(this.dataset.number);
+    if (clickedNum === rocketOrder[currentNumberIndex]) {
+        document.getElementById('correctSound').play();
+        this.style.transform = 'translateY(-1000px)';
+        this.style.pointerEvents = 'none';
+        currentNumberIndex++;
+        if (currentNumberIndex >= rocketOrder.length) {
+            setTimeout(() => {
+                showSlide(3);
+            }, 700);
+        }
+    } else {
+        document.getElementById('wrongSound').play();
+    }
+}
 
-logoSlide.style.display = 'flex';
-setTimeout(() => {
-  logoSlide.style.display = 'none';
-  gameSlide.style.display = 'flex';
-}, 3000);
+function showSlide(slideNum) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('visible'));
+    document.getElementById('slide' + slideNum).classList.add('visible');
+}
 
-function showEndSlide(){
-  gameSlide.style.display = 'none';
-  endSlide.style.display = 'flex';
-  document.getElementById('clapSound').play();
+function startGame() {
+    showSlide(1);
+    setTimeout(() => {
+        document.getElementById('slide1').classList.remove('visible');
+        document.getElementById('slide2').classList.add('visible');
+    }, 3000); // Show logo for 3 seconds
+}
+
+window.onload = () => {
+    document.getElementById('slide2').style.backgroundImage = "url('assets/background-space.png')";
+    createRockets();
+    startGame();
 }
 </script>
-
 </body>
 </html>
