@@ -3,120 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backward Counting 20 to 1</title>
+<title>Backward Counting 20-1 Rockets</title>
 <style>
-  body, html {
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-  }
-  #gameContainer {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: url('assets/background-space.png') no-repeat center center/cover;
-  }
-  .rocket {
-    position: absolute;
-    width: 80px;
-    height: 120px;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .rocket:hover {
-    transform: scale(1.1);
-  }
-  #instruction {
-    position: absolute;
-    top:10px;
-    width:100%;
-    text-align:center;
-    font-size: 24px;
-    color: #00ff00;
-    font-weight: bold;
-    text-shadow: 1px 1px #000;
-  }
-  #message {
-    position:absolute;
-    bottom: 20px;
-    width:100%;
-    text-align:center;
-    font-size: 32px;
-    color: yellow;
-    font-weight:bold;
-    text-shadow: 1px 1px #000;
-  }
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* No scroll */
+        height: 100%;
+        width: 100%;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+    }
+
+    #game-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-image: url('assets/background-space.png');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .rocket {
+        position: absolute;
+        width: 60px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .rocket:hover {
+        transform: scale(1.1);
+    }
+
+    #instruction {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        font-size: 24px;
+        color: #00ff99;
+        text-shadow: 1px 1px 2px #000;
+        z-index: 1000;
+    }
+
 </style>
 </head>
 <body>
-<div id="gameContainer">
-  <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
-  <div id="message"></div>
+
+<div id="game-container">
+    <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
 </div>
 
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
+
 <script>
+const gameContainer = document.getElementById('game-container');
+const correctSound = document.getElementById('correct-sound');
+const wrongSound = document.getElementById('wrong-sound');
+
 const rocketsData = [
-  {number:20, img:'assets/rocket-number-20.png'},
-  {number:19, img:'assets/rocket-number-19.png'},
-  {number:18, img:'assets/rocket-number-18.png'},
-  {number:17, img:'assets/rocket-number-17.png'},
-  {number:16, img:'assets/rocket-number-16.png'},
-  {number:15, img:'assets/rocket-number-15.png'},
-  {number:14, img:'assets/rocket-number-14.png'},
-  {number:13, img:'assets/rocket-number-13.png'},
-  {number:12, img:'assets/rocket-number-12.png'},
-  {number:11, img:'assets/rocket-number-11.png'},
-  {number:10, img:'assets/rocket-number-10.png'},
-  {number:9, img:'assets/rocket-number-9.png'},
-  {number:8, img:'assets/rocket-number-8.png'},
-  {number:7, img:'assets/rocket-number-7.png'},
-  {number:6, img:'assets/rocket-number-6.png'},
-  {number:5, img:'assets/rocket-number-5.png'},
-  {number:4, img:'assets/rocket-number-4.png'},
-  {number:3, img:'assets/rocket-number-3.png'},
-  {number:2, img:'assets/rocket-number-2.png'},
-  {number:1, img:'assets/rocket-number-1.png'}
+    {number: 20, img: 'assets/rocket-number-20.png'},
+    {number: 19, img: 'assets/rocket-number-19.png'},
+    {number: 18, img: 'assets/rocket-number-18.png'},
+    {number: 17, img: 'assets/rocket-number-17.png'},
+    {number: 16, img: 'assets/rocket-number-16.png'},
+    {number: 15, img: 'assets/rocket-number-15.png'},
+    {number: 14, img: 'assets/rocket-number-14.png'},
+    {number: 13, img: 'assets/rocket-number-13.png'},
+    {number: 12, img: 'assets/rocket-number-12.png'},
+    {number: 11, img: 'assets/rocket-number-11.png'},
+    {number: 10, img: 'assets/rocket-number-10.png'},
+    {number: 9, img: 'assets/rocket-number-9.png'},
+    {number: 8, img: 'assets/rocket-number-8.png'},
+    {number: 7, img: 'assets/rocket-number-7.png'},
+    {number: 6, img: 'assets/rocket-number-6.png'},
+    {number: 5, img: 'assets/rocket-number-5.png'},
+    {number: 4, img: 'assets/rocket-number-4.png'},
+    {number: 3, img: 'assets/rocket-number-3.png'},
+    {number: 2, img: 'assets/rocket-number-2.png'},
+    {number: 1, img: 'assets/rocket-number-1.png'},
 ];
 
-let nextNumber = 20;
-const gameContainer = document.getElementById('gameContainer');
-const message = document.getElementById('message');
+let currentNumber = 20;
 
 function createRockets() {
-  rocketsData.forEach(rocket => {
-    const rocketEl = document.createElement('img');
-    rocketEl.src = rocket.img;
-    rocketEl.className = 'rocket';
-    rocketEl.dataset.number = rocket.number;
-    rocketEl.style.top = Math.random() * (window.innerHeight - 150) + 'px';
-    rocketEl.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-    rocketEl.addEventListener('click', () => checkRocket(rocketEl));
-    gameContainer.appendChild(rocketEl);
-  });
+    const rows = 3; // number of horizontal lines
+    const rocketsPerRow = Math.ceil(rocketsData.length / rows);
+
+    rocketsData.forEach((rocket, index) => {
+        const rocketEl = document.createElement('img');
+        rocketEl.src = rocket.img;
+        rocketEl.className = 'rocket';
+        rocketEl.dataset.number = rocket.number;
+
+        const rowIndex = Math.floor(index / rocketsPerRow);
+        const colIndex = index % rocketsPerRow;
+
+        const topSpacing = window.innerHeight / (rows + 1);
+        const leftSpacing = window.innerWidth / (rocketsPerRow + 1);
+
+        rocketEl.style.top = topSpacing * (rowIndex + 1) + 'px';
+        rocketEl.style.left = leftSpacing * (colIndex + 1) + 'px';
+
+        rocketEl.addEventListener('click', () => checkRocket(rocketEl));
+
+        gameContainer.appendChild(rocketEl);
+    });
 }
 
-function checkRocket(rocketEl){
-  const number = parseInt(rocketEl.dataset.number);
-  if(number === nextNumber){
-    rocketEl.style.display = 'none';
-    message.textContent = 'Good job!';
-    const correctSound = new Audio('assets/correct.mp3');
-    correctSound.play();
-    nextNumber--;
-    if(nextNumber === 0){
-      setTimeout(()=>{message.textContent = 'Congratulations! You did it!';}, 500);
+function checkRocket(el) {
+    if (parseInt(el.dataset.number) === currentNumber) {
+        el.style.display = 'none';
+        correctSound.currentTime = 0;
+        correctSound.play();
+        currentNumber--;
+        if (currentNumber === 0) {
+            alert('🎉 Congratulations! You tapped all rockets in backward order!');
+        }
+    } else {
+        wrongSound.currentTime = 0;
+        wrongSound.play();
     }
-  } else {
-    message.textContent = 'Try again!';
-    const wrongSound = new Audio('assets/wrong.mp3');
-    wrongSound.play();
-  }
 }
 
-createRockets();
+window.addEventListener('load', () => {
+    createRockets();
+});
 </script>
+
 </body>
 </html>
