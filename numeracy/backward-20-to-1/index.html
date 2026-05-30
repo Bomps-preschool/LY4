@@ -5,147 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Backward Counting Rockets</title>
 <style>
-body, html {
-    margin: 0; padding: 0;
-    width: 100%; height: 100%;
+  body {
+    margin: 0;
+    padding: 0;
     overflow: hidden;
-    font-family: 'Comic Sans MS', sans-serif;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     background: url('assets/background-space.png') no-repeat center center fixed;
     background-size: cover;
-}
+  }
 
-#logoSlide {
-    position: absolute; width: 100%; height: 100%;
-    background: white; display: flex;
-    justify-content: center; align-items: center;
-}
-
-#logoSlide img {
-    width: 200px;
-}
-
-#gameScreen {
+  #splash, #game, #end {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     display: none;
-    width: 100%; height: 100%;
-    position: relative;
-}
+    justify-content: center;
+    align-items: center;
+  }
 
-#instruction {
-    text-align: center;
-    font-size: 28px;
-    color: #0f9d58;
-    text-shadow: 1px 1px 2px #fff;
-    margin-top: 10px;
-}
+  #splash {
+    display: flex;
+    background: #fff;
+  }
 
-.rocket {
-    position: absolute;
-    width: 80px; height: 120px;
-    cursor: pointer;
-    transition: transform 1s ease-out;
-}
+  #splash img {
+    width: 200px;
+    height: auto;
+  }
 
-button {
-    position: absolute;
-    bottom: 20px;
-    padding: 12px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-#nextBtn { right: 150px; background-color: #4285f4; color: white; }
-#clearBtn { right: 20px; background-color: #db4437; color: white; }
-
-#goodJob {
-    display: none; position: absolute;
-    width: 100%; height: 100%;
-    justify-content: center; align-items: center;
-    font-size: 48px;
-    color: #f4b400;
-    text-shadow: 2px 2px 5px #fff;
+  #game {
     display: flex;
     flex-direction: column;
-}
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 50px;
+  }
+
+  #instruction {
+    font-size: 2em;
+    color: #00ff00;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    margin-bottom: 20px;
+  }
+
+  .rocket {
+    position: absolute;
+    width: 80px;
+    cursor: pointer;
+    transition: transform 1s ease-out;
+  }
+
+  #end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    color: #00ff00;
+    text-shadow: 2px 2px 3px #000;
+  }
 </style>
 </head>
 <body>
 
-<!-- Logo Slide -->
-<div id="logoSlide">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+<div id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Game Screen -->
-<div id="gameScreen">
-    <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
-    <!-- Rockets will be inserted here dynamically -->
-    <button id="nextBtn">Next</button>
-    <button id="clearBtn">Clear</button>
+<div id="game">
+  <div id="instruction">Tap the rockets in backward order from 20 to 1!</div>
 </div>
 
-<!-- Good Job Screen -->
-<div id="goodJob">🎉 Good Job! 🎉</div>
-
-<audio id="correctAudio" src="assets/correct.mp3"></audio>
-<audio id="wrongAudio" src="assets/wrong.mp3"></audio>
+<div id="end">
+  <div>🎉 Good Job! 🎉</div>
+</div>
 
 <script>
-// Custom horizontal layout as requested
-const rocketLayout = [
-  {num:18, x:5, y:20}, {num:12, x:15, y:20}, {num:3, x:25, y:20},
-  {num:5, x:35, y:20}, {num:20, x:45, y:20}, {num:7, x:55, y:20},
-  {num:1, x:65, y:20}, {num:14, x:75, y:20}, {num:4, x:85, y:20},
-  {num:15, x:10, y:45}, {num:2, x:20, y:45}, {num:6, x:30, y:45},
-  {num:19, x:40, y:45}, {num:11, x:50, y:45}, {num:10, x:60, y:45}, {num:8, x:70, y:45},
-  {num:13, x:20, y:70}, {num:16, x:40, y:70}, {num:9, x:60, y:70}, {num:17, x:80, y:70}
+const rocketsData = [
+  {num: 18, src:'assets/rocket-number-18.png'},
+  {num: 12, src:'assets/rocket-number-12.png'},
+  {num: 3, src:'assets/rocket-number-3.png'},
+  {num: 5, src:'assets/rocket-number-5.png'},
+  {num: 20, src:'assets/rocket-number-20.png'},
+  {num: 7, src:'assets/rocket-number-7.png'},
+  {num: 1, src:'assets/rocket-number-1.png'},
+  {num: 14, src:'assets/rocket-number-14.png'},
+  {num: 4, src:'assets/rocket-number-4.png'},
+  {num: 15, src:'assets/rocket-number-15.png'},
+  {num: 2, src:'assets/rocket-number-2.png'},
+  {num: 6, src:'assets/rocket-number-6.png'},
+  {num: 19, src:'assets/rocket-number-19.png'},
+  {num: 11, src:'assets/rocket-number-11.png'},
+  {num: 10, src:'assets/rocket-number-10.png'},
+  {num: 8, src:'assets/rocket-number-8.png'},
+  {num: 13, src:'assets/rocket-number-13.png'},
+  {num: 16, src:'assets/rocket-number-16.png'},
+  {num: 9, src:'assets/rocket-number-9.png'},
+  {num: 17, src:'assets/rocket-number-17.png'}
 ];
 
-const correctOrder = [20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+let nextNumber = 20;
 
-let nextIndex = 0;
+const gameDiv = document.getElementById('game');
 
-function showGame() {
-    document.getElementById('logoSlide').style.display = 'none';
-    document.getElementById('gameScreen').style.display = 'block';
-
-    const gameScreen = document.getElementById('gameScreen');
-    rocketLayout.forEach(rocket => {
-        const img = document.createElement('img');
-        img.src = `assets/rocket-number-${rocket.num}.png`;
-        img.classList.add('rocket');
-        img.style.left = rocket.x + '%';
-        img.style.top = rocket.y + '%';
-        img.dataset.num = rocket.num;
-        img.addEventListener('click', rocketClick);
-        gameScreen.appendChild(img);
-    });
-}
-
-function rocketClick(e) {
-    const rocketNum = parseInt(this.dataset.num);
-    if (rocketNum === correctOrder[nextIndex]) {
-        document.getElementById('correctAudio').play();
-        // Animate rocket upward
-        this.style.transform = 'translateY(-1500px)';
-        nextIndex++;
-        if (nextIndex >= correctOrder.length) {
-            setTimeout(showGoodJob, 1000);
-        }
+function createRockets() {
+  rocketsData.forEach((rocket,i) => {
+    const rocketEl = document.createElement('img');
+    rocketEl.src = rocket.src;
+    rocketEl.classList.add('rocket');
+    rocketEl.dataset.num = rocket.num;
+    
+    // Place rockets in roughly 3 horizontal lines
+    if(i < 9) {
+      rocketEl.style.top = '100px';
+      rocketEl.style.left = `${50 + i*100}px`;
+    } else if(i < 16) {
+      rocketEl.style.top = '250px';
+      rocketEl.style.left = `${50 + (i-9)*100}px`;
     } else {
-        document.getElementById('wrongAudio').play();
+      rocketEl.style.top = '400px';
+      rocketEl.style.left = `${50 + (i-16)*100}px`;
     }
+    
+    rocketEl.addEventListener('click', () => handleRocketClick(rocketEl));
+    
+    gameDiv.appendChild(rocketEl);
+  });
 }
 
-function showGoodJob() {
-    document.getElementById('gameScreen').style.display = 'none';
-    document.getElementById('goodJob').style.display = 'flex';
+function handleRocketClick(el) {
+  if(Number(el.dataset.num) === nextNumber) {
+    el.style.transform = 'translateY(-1500px)'; // rocket flies up
+    nextNumber--;
+    const audio = new Audio('assets/correct.mp3');
+    audio.play();
+    if(nextNumber === 0) {
+      setTimeout(showEndScreen, 1200);
+    }
+  } else {
+    const audio = new Audio('assets/wrong.mp3');
+    audio.play();
+  }
 }
 
-// Logo splash for 5s
-setTimeout(showGame, 5000);
+function showEndScreen() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('end').style.display = 'flex';
+}
+
+// Splash screen
+const splash = document.getElementById('splash');
+setTimeout(() => {
+  splash.style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+  createRockets();
+}, 3000);
 
 </script>
 </body>
