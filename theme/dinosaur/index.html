@@ -2,122 +2,170 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dino Match Adventure</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dinosaur Match Game</title>
 <style>
-body, html {
-    margin:0; padding:0; width:100%; height:100%; overflow:hidden;
-    font-family:'Arial', sans-serif; user-select:none;
-}
-.slide { position:absolute; top:0; left:0; width:100%; height:100%; display:none; justify-content:center; align-items:center; flex-direction:column; }
-.visible { display:flex; }
-#slide1 img { width:200px; }
-#slide2 { background:url('assets/background-prehistoric.png') no-repeat center center/cover; }
-#instruction { position:absolute; top:20px; width:100%; text-align:center; font-size:2vw; color:#39FF14; text-shadow:1px 1px 2px black; }
-.dino { width:120px; cursor:pointer; margin:10px; transition: transform 0.5s ease, filter 1s; filter: drop-shadow(0 0 8px rgba(255,255,255,0.5)); animation: float 2s ease-in-out infinite alternate; }
-@keyframes float { 0%{ transform: translateY(0); } 100%{ transform: translateY(-8px); } }
-#name-options { display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; }
-.name-btn { background-color:#ffcc00; border:none; padding:10px 20px; margin:5px; font-size:1.5vw; cursor:pointer; border-radius:10px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.name-btn:hover { transform: scale(1.1); box-shadow:0 0 10px #fff;}
-#slide3 { font-size:4vw; color:#39FF14; text-align:center; justify-content:center; align-items:center; flex-direction:column; }
-.confetti { position:absolute; width:10px; height:10px; animation: confettiFall linear infinite; }
-@keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(600px) rotate(720deg); opacity:0; } }
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Arial', sans-serif;
+    }
+    #game-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background-size: cover;
+        background-position: center;
+    }
+    .slide {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .visible { display: flex; }
+    #slide1 img {
+        width: 250px;
+    }
+    #instruction {
+        position: absolute;
+        top: 20px;
+        width: 100%;
+        text-align: center;
+        font-size: 2vw;
+        color: #39FF14;
+        text-shadow: 1px 1px 2px black;
+    }
+    .dino {
+        position: absolute;
+        width: 120px;
+        cursor: pointer;
+        transition: transform 0.8s ease-in, opacity 0.8s;
+    }
+    #goodjob {
+        font-size: 4vw;
+        color: #39FF14;
+        text-align: center;
+    }
+    .confetti {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background-color: red;
+        opacity: 0.8;
+        border-radius: 50%;
+        animation: fall 2s linear infinite;
+    }
+    @keyframes fall {
+        0% {transform: translateY(0) rotate(0deg);}
+        100% {transform: translateY(600px) rotate(360deg);}
+    }
 </style>
 </head>
 <body>
+<div id="game-container">
+    <!-- Slide 1: Logo -->
+    <div id="slide1" class="slide visible">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    </div>
 
-<div id="slide1" class="slide visible">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    <!-- Slide 2: Game -->
+    <div id="slide2" class="slide">
+        <div id="instruction">Match the dinosaur to its name!</div>
+        <!-- Dinosaur images and names will be added by JS -->
+    </div>
+
+    <!-- Slide 3: Good Job -->
+    <div id="slide3" class="slide">
+        <div id="goodjob">Good Job! 🎉</div>
+    </div>
 </div>
 
-<div id="slide2" class="slide">
-    <div id="instruction">Match the dinosaur with its correct name!</div>
-    <div id="dino-grid"></div>
-    <div id="name-options"></div>
-</div>
-
-<div id="slide3" class="slide">
-    <div id="goodjob">Good Job! 🎉</div>
-</div>
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
 
 <script>
-const dinos = [
-    {name:'diplodocus', img:'assets/diplodocus.png'},
-    {name:'triceratops', img:'assets/triceratops.png'},
-    {name:'tyrannosaurus-rex', img:'assets/tyrannosaurus-rex.png'},
-    {name:'iguanodon', img:'assets/iguanodon.png'},
-    {name:'stegosaurus', img:'assets/stegosaurus.png'},
-    {name:'brachiosaurus', img:'assets/brachiosaurus.png'}
+// Dinosaur assets
+const dinosaurs = [
+    {img:'diplodocus.png', name:'diplodocus-name.png'},
+    {img:'triceratops.png', name:'triceratops-name.png'},
+    {img:'tyrannosaurus-rex.png', name:'tyrannosaurus-rex-name.png'},
+    {img:'iguanodon.png', name:'iguanodon-name.png'},
+    {img:'stegosaurus.png', name:'stegosaurus-name.png'},
+    {img:'brachiosaurus.png', name:'brachiosaurus-name.png'}
 ];
 
-let selectedDino = null;
+let correctIndex = Math.floor(Math.random() * dinosaurs.length);
 
-function shuffleArray(arr) { return arr.sort(()=>Math.random()-0.5); }
+function createDinos() {
+    const slide2 = document.getElementById('slide2');
+    dinosaurs.forEach((dino, idx) => {
+        const dinoImg = document.createElement('img');
+        dinoImg.src = `assets/${dino.img}`;
+        dinoImg.classList.add('dino');
+        dinoImg.style.left = (15 + idx*14) + '%';
+        dinoImg.style.top = '50%';
+        dinoImg.dataset.idx = idx;
+        dinoImg.addEventListener('click', handleClick);
+        slide2.appendChild(dinoImg);
 
-function createGame() {
-    const dinoGrid = document.getElementById('dino-grid');
-    dinos.forEach(d => {
-        const img = document.createElement('img');
-        img.src = d.img;
-        img.classList.add('dino');
-        img.dataset.name = d.name;
-        img.addEventListener('click', ()=>{ selectedDino=d; });
-        dinoGrid.appendChild(img);
-    });
-
-    const nameOptions = document.getElementById('name-options');
-    shuffleArray(dinos).forEach(d => {
-        const btn = document.createElement('button');
-        btn.classList.add('name-btn');
-        btn.textContent = d.name;
-        btn.addEventListener('click', ()=>{
-            if(selectedDino && selectedDino.name === d.name){
-                document.querySelector(`img[data-name="${d.name}"]`).style.transform='translateY(-1000px)';
-                selectedDino=null;
-                btn.disabled=true;
-                checkAllMatched();
-            }
-        });
-        nameOptions.appendChild(btn);
+        const nameImg = document.createElement('img');
+        nameImg.src = `assets/${dino.name}`;
+        nameImg.style.position = 'absolute';
+        nameImg.style.top = '75%';
+        nameImg.style.left = (15 + idx*14) + '%';
+        nameImg.style.width = '100px';
+        slide2.appendChild(nameImg);
     });
 }
 
-function checkAllMatched(){
-    if([...document.querySelectorAll('.dino')].every(img=>img.style.transform==='translateY(-1000px)')){
-        showSlide(3);
-        launchConfetti();
+function handleClick(e) {
+    const clickedIdx = parseInt(this.dataset.idx);
+    if (clickedIdx === correctIndex) {
+        document.getElementById('correctSound').play();
+        this.style.transform = 'translateY(-800px)';
+        this.style.opacity = '0';
+        setTimeout(() => {
+            showSlide(3);
+            createConfetti();
+        }, 800);
+    } else {
+        document.getElementById('wrongSound').play();
     }
 }
 
-function launchConfetti(){
+function createConfetti() {
     const slide3 = document.getElementById('slide3');
     for(let i=0;i<50;i++){
-        const conf = document.createElement('div');
-        conf.classList.add('confetti');
-        conf.style.left = Math.random()*window.innerWidth+'px';
-        conf.style.top = Math.random()*-100+'px';
-        conf.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
-        conf.style.width = conf.style.height = (5+Math.random()*5)+'px';
-        slide3.appendChild(conf);
-        setTimeout(()=>conf.remove(),3000+Math.random()*2000);
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random()*100+'%';
+        confetti.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 50%)`;
+        slide3.appendChild(confetti);
     }
 }
 
-function showSlide(slideNum){
-    document.querySelectorAll('.slide').forEach(s=>s.classList.remove('visible'));
-    document.getElementById('slide'+slideNum).classList.add('visible');
+function showSlide(slideNum) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('visible'));
+    document.getElementById('slide' + slideNum).classList.add('visible');
 }
 
-function startGame(){
-    setTimeout(()=>{
+function startGame() {
+    showSlide(1);
+    setTimeout(() => {
         document.getElementById('slide1').classList.remove('visible');
         document.getElementById('slide2').classList.add('visible');
-        createGame();
-    },3000);
+        createDinos();
+    }, 3000);
 }
 
-window.onload=startGame;
+window.onload = startGame;
 </script>
-
 </body>
 </html>
