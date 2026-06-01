@@ -5,283 +5,177 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Naming Words Game</title>
 <style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    overflow-x: hidden;
-  }
-  .slide {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    background: #ffd9e8; /* soft pastel */
-    position: relative;
-    text-align: center;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', cursive, sans-serif; }
+  body { background: #ffd6e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  #game-container { width: 100%; max-width: 720px; text-align: center; position: relative; }
+  .slide { display: none; width: 100%; }
   .active { display: block; }
-  #logo-slide img {
-    width: 250px;
-    margin-top: 20%;
-  }
-  .instruction {
-    font-size: 1.8em;
-    font-weight: bold;
-    margin-top: 20px;
-  }
-  .voice-icon {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 80px;
-    cursor: pointer;
-  }
-  .picture-container img {
-    width: 250px;
-    margin-top: 50px;
-    border-radius: 10px;
-  }
-  .options {
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-  }
-  .options button {
-    padding: 15px 30px;
-    font-size: 1.5em;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  #good-job-slide {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    background: #fff2a1;
-    text-align: center;
-    position: relative;
-  }
-  #good-job-slide h1 {
-    font-size: 3em;
-    margin-top: 20%;
-  }
-  #play-again {
-    margin-top: 30px;
-    padding: 15px 40px;
-    font-size: 1.8em;
-    border-radius: 12px;
-    cursor: pointer;
-  }
-  /* Confetti container */
-  .confetti {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .confetti-piece {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    opacity: 0.8;
-    transform: rotate(45deg);
-    animation: fall 3s linear infinite;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-20px) rotate(45deg);}
-    100% { transform: translateY(100vh) rotate(405deg);}
-  }
-  @media screen and (max-width: 768px) {
-    .picture-container img { width: 180px; }
-    .options button { font-size: 1.2em; padding: 10px 20px; }
-  }
+  img.noun-img { max-width: 80%; height: auto; margin: 20px 0; border-radius: 15px; }
+  #instruction { font-size: 1.4rem; margin: 15px 0; }
+  .options { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
+  .option-btn { padding: 15px 25px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #333; cursor: pointer; background: #fff; transition: 0.2s; }
+  .option-btn:hover { background: #ffe0e6; }
+  #voice-icon { width: 60px; height: 60px; position: absolute; left: -70px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+  #logo-slide img { width: 300px; margin-top: 20%; }
+  #well-done { font-size: 2rem; margin-bottom: 20px; }
+  #play-again { padding: 15px 25px; font-size: 1.5rem; border-radius: 15px; cursor: pointer; background: #ffeb3b; border: 2px solid #333; }
+  canvas { position: absolute; top: 0; left: 0; pointer-events: none; }
 </style>
 </head>
 <body>
+<div id="game-container">
 
-<!-- Slide 1: Logo -->
-<div class="slide active" id="logo-slide">
-  <img src="assets/innovine-logo.png" alt="Innovine Logo">
-</div>
-
-<!-- Slides 2-9: Questions -->
-<div class="slide" id="slide1">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice1" alt="Voice">
-  <div class="picture-container"><img src="assets/girl.png" id="pic1" alt="Girl"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
+  <!-- Slide 1: Innovine Logo -->
+  <div class="slide active" id="logo-slide">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
   </div>
-</div>
 
-<div class="slide" id="slide2">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice2" alt="Voice">
-  <div class="picture-container"><img src="assets/cat.png" id="pic2" alt="Cat"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
+  <!-- Slides 2-9: Nouns -->
+  <div class="slide" id="slide-noun">
+    <div id="instruction">Look at the picture and choose the correct type</div>
+    <img id="noun-img" class="noun-img" src="" alt="noun">
+    <img id="voice-icon" src="assets/voice-icon.png" alt="voice">
+    <div class="options">
+      <button class="option-btn" data-value="person">Person</button>
+      <button class="option-btn" data-value="place">Place</button>
+      <button class="option-btn" data-value="thing">Thing</button>
+      <button class="option-btn" data-value="animal">Animal</button>
+    </div>
   </div>
-</div>
 
-<div class="slide" id="slide3">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice3" alt="Voice">
-  <div class="picture-container"><img src="assets/mall.png" id="pic3" alt="Mall"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
+  <!-- Slide 10: Well Done -->
+  <div class="slide" id="slide-well-done">
+    <div id="well-done">🎉 Well Done! 🎉</div>
+    <button id="play-again">Play Again</button>
+    <canvas id="confetti-canvas"></canvas>
   </div>
+
 </div>
 
-<div class="slide" id="slide4">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice4" alt="Voice">
-  <div class="picture-container"><img src="assets/river.png" id="pic4" alt="River"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
-  </div>
-</div>
-
-<div class="slide" id="slide5">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice5" alt="Voice">
-  <div class="picture-container"><img src="assets/doctor.png" id="pic5" alt="Doctor"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
-  </div>
-</div>
-
-<div class="slide" id="slide6">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice6" alt="Voice">
-  <div class="picture-container"><img src="assets/sheep.png" id="pic6" alt="Sheep"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
-  </div>
-</div>
-
-<div class="slide" id="slide7">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice7" alt="Voice">
-  <div class="picture-container"><img src="assets/zoo.png" id="pic7" alt="Zoo"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
-  </div>
-</div>
-
-<div class="slide" id="slide8">
-  <div class="instruction">Look at the picture and choose the correct type</div>
-  <img class="voice-icon" src="assets/voice-icon.png" id="voice8" alt="Voice">
-  <div class="picture-container"><img src="assets/book.png" id="pic8" alt="Book"></div>
-  <div class="options">
-    <button data-answer="person">Person</button>
-    <button data-answer="place">Place</button>
-    <button data-answer="thing">Thing</button>
-    <button data-answer="animal">Animal</button>
-  </div>
-</div>
-
-<!-- Slide 10: Good Job -->
-<div class="slide" id="good-job-slide">
-  <h1>Good Job!</h1>
-  <div class="confetti"></div>
-  <button id="play-again">Play Again</button>
-</div>
-
-<audio id="correct-sound" src="assets/correct.mp3"></audio>
-<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
-<audio id="excellent-sound" src="assets/excellent.mp3"></audio>
+<audio id="audio-correct" src="assets/excellent.mp3"></audio>
+<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+<audio id="audio-noun"></audio>
 
 <script>
+const nouns = [
+  { name: 'girl', type: 'person' },
+  { name: 'cat', type: 'animal' },
+  { name: 'mall', type: 'place' },
+  { name: 'river', type: 'place' },
+  { name: 'doctor', type: 'person' },
+  { name: 'sheep', type: 'animal' },
+  { name: 'zoo', type: 'place' },
+  { name: 'book', type: 'thing' }
+];
+
 let currentSlide = 0;
+const logoSlideTime = 5000;
+
 const slides = document.querySelectorAll('.slide');
+const nounImg = document.getElementById('noun-img');
+const optionButtons = document.querySelectorAll('.option-btn');
+const voiceIcon = document.getElementById('voice-icon');
+const audioNoun = document.getElementById('audio-noun');
+const audioCorrect = document.getElementById('audio-correct');
+const audioWrong = document.getElementById('audio-wrong');
 
 function showSlide(index) {
-  slides.forEach(slide => slide.classList.remove('active'));
-  slides[index].classList.add('active');
+  slides.forEach(s => s.classList.remove('active'));
+  if(index < nouns.length) {
+    slides[1].classList.add('active'); // noun slide
+    loadNoun(index);
+  } else {
+    slides[slides.length-1].classList.add('active'); // well done
+    startConfetti();
+  }
 }
 
-showSlide(0);
+function loadNoun(index) {
+  const noun = nouns[index];
+  nounImg.src = `assets/${noun.name}.png`;
+  nounImg.alt = noun.name;
+  audioNoun.src = `assets/${noun.name}.mp3`;
+  playAudioOnce = false;
+}
 
-// Show logo for 5 seconds
-setTimeout(() => { currentSlide++; showSlide(currentSlide); }, 5000);
+let playAudioOnce = false;
+voiceIcon.onclick = () => {
+  audioNoun.currentTime = 0;
+  audioNoun.play();
+};
 
-// Handle options click
-slides.forEach((slide, sIndex) => {
-  const buttons = slide.querySelectorAll('.options button');
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      const answer = button.getAttribute('data-answer');
-      const correctAnswers = ['person','animal','place','place','person','animal','place','thing'];
-      if(answer === correctAnswers[sIndex-1]) {
-        document.getElementById('excellent-sound').play();
-        setTimeout(() => {
-          currentSlide++;
-          if(currentSlide >= slides.length-1) {
-            showSlide(slides.length-1);
-            startConfetti();
-          } else {
-            showSlide(currentSlide);
-          }
-        }, 500);
-      } else {
-        document.getElementById('wrong-sound').play();
-      }
-    });
-  });
-});
-
-// Voice replay
-slides.forEach((slide, sIndex) => {
-  const voiceIcon = slide.querySelector('.voice-icon');
-  if(voiceIcon) {
-    voiceIcon.addEventListener('click', () => {
-      const audio = new Audio(`assets/${slides[sIndex].querySelector('img').id}.mp3`);
-      audio.play();
-    });
+optionButtons.forEach(btn => {
+  btn.onclick = () => {
+    const correctType = nouns[currentSlide].type;
+    if(btn.dataset.value === correctType) {
+      audioCorrect.currentTime = 0;
+      audioCorrect.play();
+      currentSlide++;
+      showSlide(currentSlide);
+    } else {
+      audioWrong.currentTime = 0;
+      audioWrong.play();
+    }
   }
 });
+
+// Logo slide first
+setTimeout(() => {
+  currentSlide = 0;
+  showSlide(currentSlide);
+}, logoSlideTime);
 
 // Play Again button
-document.getElementById('play-again').addEventListener('click', () => location.reload());
+document.getElementById('play-again').onclick = () => {
+  currentSlide = 0;
+  stopConfetti();
+  showSlide(currentSlide);
+};
 
-// Confetti function
+// Confetti setup
+let confettiCanvas, confettiCtx, confettiParticles = [], confettiInterval;
+
 function startConfetti() {
-  const confettiContainer = document.querySelector('.confetti');
-  for(let i=0;i<100;i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti-piece';
-    confetti.style.backgroundColor = `hsl(${Math.random()*360},70%,50%)`;
-    confetti.style.left = Math.random()*100 + 'vw';
-    confetti.style.animationDuration = (2 + Math.random()*2) + 's';
-    confettiContainer.appendChild(confetti);
+  confettiCanvas = document.getElementById('confetti-canvas');
+  confettiCtx = confettiCanvas.getContext('2d');
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  confettiParticles = [];
+  for(let i=0; i<150; i++) {
+    confettiParticles.push({
+      x: Math.random()*confettiCanvas.width,
+      y: Math.random()*confettiCanvas.height,
+      r: Math.random()*6+4,
+      d: Math.random()*50+10,
+      color: `hsl(${Math.random()*360},70%,60%)`,
+      tilt: Math.random()*10-10,
+      tiltAngleIncrement: Math.random()*0.07+0.05
+    });
   }
+  confettiInterval = setInterval(drawConfetti, 20);
+}
+
+function drawConfetti() {
+  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiParticles.forEach(p => {
+    confettiCtx.beginPath();
+    confettiCtx.lineWidth = p.r;
+    confettiCtx.strokeStyle = p.color;
+    confettiCtx.moveTo(p.x+p.tilt+p.r/2,p.y);
+    confettiCtx.lineTo(p.x+p.tilt,p.y+p.tilt+ p.r/2);
+    confettiCtx.stroke();
+    p.tilt += p.tiltAngleIncrement;
+    p.y += (Math.cos(p.d)+1+ p.r/2)/2;
+    if(p.y>confettiCanvas.height) {
+      p.y = -10;
+      p.x = Math.random()*confettiCanvas.width;
+    }
+  });
+}
+
+function stopConfetti() {
+  clearInterval(confettiInterval);
+  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
 }
 </script>
 </body>
