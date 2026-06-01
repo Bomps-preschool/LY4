@@ -5,136 +5,174 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community Helpers Game</title>
 <style>
-    body {
-        margin: 0;
-        font-family: 'Arial', sans-serif;
-        background-color: #fde6e0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
-    #game-container {
-        width: 700px;
-        background: linear-gradient(to bottom right, #fde6e0, #ffe0d1, #ffd2b3);
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        text-align: center;
-    }
-    #instruction {
-        font-size: 24px;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-    #question {
-        font-size: 20px;
-        margin-bottom: 20px;
-        min-height: 40px;
-    }
-    .answer-btn {
-        display: inline-block;
-        padding: 15px 25px;
-        margin: 10px;
-        font-size: 18px;
-        border-radius: 10px;
-        background-color: #ffffff;
-        border: 2px solid #555;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.2s ease;
-    }
-    .answer-btn:hover {
-        background-color: #ffd2b3;
-    }
-    #end-screen {
-        display: none;
-        font-size: 32px;
-        font-weight: bold;
-        color: green;
-        margin-top: 30px;
-    }
-    #play-again {
-        margin-top: 20px;
-        font-size: 20px;
-        padding: 10px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        background-color: #ffeb3b;
-        border: none;
-    }
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: #ffe5d9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #game-container {
+    width: 80%;
+    max-width: 900px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #ffd9d9, #ffb6b6, #ff9f9f);
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  }
+  #logo-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+  }
+  #logo-screen img {
+    max-width: 250px;
+  }
+  #question-screen {
+    display: none;
+  }
+  #question-text {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  .options-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .option-btn {
+    font-size: 18px;
+    padding: 12px 20px;
+    border: 2px solid #444;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #fff;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+  .option-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+  }
+  #end-screen {
+    display: none;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  #play-again-btn {
+    margin-top: 20px;
+    font-size: 22px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    background-color: #fff25c;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
+
 <div id="game-container">
-    <div id="instruction">Listen to the question and choose the correct answer</div>
-    <div id="question">Loading...</div>
-    <div id="answers">
-        <button class="answer-btn" data-answer="Person">Person</button>
-        <button class="answer-btn" data-answer="Place">Place</button>
-        <button class="answer-btn" data-answer="Thing">Thing</button>
-        <button class="answer-btn" data-answer="Animal">Animal</button>
+  <!-- Logo Screen -->
+  <div id="logo-screen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+  </div>
+
+  <!-- Question Screen -->
+  <div id="question-screen">
+    <div id="question-text">Instruction: Listen to the question and choose the correct answer</div>
+    <div class="options-container">
+      <button class="option-btn" data-answer="Sweeper">Sweeper</button>
+      <button class="option-btn" data-answer="Doctor">Doctor</button>
+      <button class="option-btn" data-answer="Teacher">Teacher</button>
+      <button class="option-btn" data-answer="Postman">Postman</button>
+      <button class="option-btn" data-answer="Firefighter">Firefighter</button>
     </div>
-    <div id="end-screen">Good Job!</div>
-    <button id="play-again">Play Again</button>
+  </div>
+
+  <!-- End Screen -->
+  <div id="end-screen">
+    🎉 Well Done! 🎉
+    <br>
+    <button id="play-again-btn">Play Again</button>
+  </div>
 </div>
 
-<audio id="correct-sound" src="assets/claps.mp3"></audio>
-<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
-<audio id="question-sound"></audio>
-
 <script>
-const questions = [
-    {sound: 'assets/question-1.mp3', answer: 'Sweeper'},
-    {sound: 'assets/question-2.mp3', answer: 'Doctor'},
-    {sound: 'assets/question-3.mp3', answer: 'Teacher'},
-    {sound: 'assets/question-4.mp3', answer: 'Postman'},
-    {sound: 'assets/question-5.mp3', answer: 'Firefighter'}
-];
+  const questions = [
+    {text: "Who helps you keep the surroundings clean?", audio: "assets/question-1.mp3", answer: "Sweeper"},
+    {text: "Who treats sick people?", audio: "assets/question-2.mp3", answer: "Doctor"},
+    {text: "Who teaches you at school?", audio: "assets/question-3.mp3", answer: "Teacher"},
+    {text: "Who delivers letters?", audio: "assets/question-4.mp3", answer: "Postman"},
+    {text: "Who helps you during a fire?", audio: "assets/question-5.mp3", answer: "Firefighter"}
+  ];
 
-let currentQuestion = 0;
-const questionSound = document.getElementById('question-sound');
-const correctSound = document.getElementById('correct-sound');
-const wrongSound = document.getElementById('wrong-sound');
-const questionDiv = document.getElementById('question');
-const answers = document.querySelectorAll('.answer-btn');
-const endScreen = document.getElementById('end-screen');
-const playAgain = document.getElementById('play-again');
+  const logoScreen = document.getElementById('logo-screen');
+  const questionScreen = document.getElementById('question-screen');
+  const endScreen = document.getElementById('end-screen');
+  const questionText = document.getElementById('question-text');
+  const optionButtons = document.querySelectorAll('.option-btn');
 
-function showQuestion() {
-    const q = questions[currentQuestion];
-    questionDiv.textContent = '';
-    questionSound.src = q.sound;
-    questionSound.play();
-}
+  const correctSound = new Audio('assets/correct.mp3');
+  const wrongSound = new Audio('assets/wrong.mp3');
+  const clapSound = new Audio('assets/claps.mp3');
 
-answers.forEach(btn => {
+  let currentQ = 0;
+
+  function playQuestionAudio() {
+    const qAudio = new Audio(questions[currentQ].audio);
+    qAudio.play();
+  }
+
+  function showQuestion() {
+    questionScreen.style.display = 'block';
+    questionText.textContent = questions[currentQ].text;
+    playQuestionAudio();
+  }
+
+  optionButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-        const q = questions[currentQuestion];
-        const selected = btn.textContent;
-        if(selected === q.answer) {
-            correctSound.play();
-            correctSound.onended = () => {
-                currentQuestion++;
-                if(currentQuestion < questions.length) {
-                    showQuestion();
-                } else {
-                    endScreen.style.display = 'block';
-                }
-            };
-        } else {
-            wrongSound.play();
-        }
+      const selected = btn.getAttribute('data-answer');
+      if(selected === questions[currentQ].answer) {
+        correctSound.play();
+        correctSound.onended = () => {
+          clapSound.play();
+          clapSound.onended = () => {
+            currentQ++;
+            if(currentQ < questions.length) {
+              showQuestion();
+            } else {
+              questionScreen.style.display = 'none';
+              endScreen.style.display = 'block';
+            }
+          };
+        };
+      } else {
+        wrongSound.play();
+      }
     });
-});
+  });
 
-playAgain.addEventListener('click', () => {
-    currentQuestion = 0;
+  document.getElementById('play-again-btn').addEventListener('click', () => {
+    currentQ = 0;
     endScreen.style.display = 'none';
     showQuestion();
-});
+  });
 
-window.onload = showQuestion;
+  // Show logo for 3 seconds
+  setTimeout(() => {
+    logoScreen.style.display = 'none';
+    showQuestion();
+  }, 3000);
 </script>
+
 </body>
 </html>
