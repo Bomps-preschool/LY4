@@ -3,139 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Helpers Game</title>
+<title>Community Helper Game</title>
 <style>
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #FFE5CC;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+  body {
     margin: 0;
-}
-#game-container {
-    background-color: #FFCCCC;
-    padding: 40px;
-    border-radius: 15px;
+    font-family: Arial, sans-serif;
+    background-color: #ffe6cc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #game-container {
+    width: 90%;
+    max-width: 800px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-h2#instruction {
-    font-size: 1.8em;
-    margin-bottom: 30px;
+  }
+  #logo-slide {
+    display: none;
+  }
+  #logo-slide img {
+    width: 200px;
+    margin-top: 100px;
+  }
+  #question-slide {
+    display: none;
+    background-color: #ffc9b3;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  #instruction {
+    font-size: 1.3em;
     font-weight: bold;
-}
-h3#question {
-    font-size: 1.5em;
     margin-bottom: 20px;
-}
-button.option-btn {
-    padding: 15px 25px;
-    margin: 10px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 10px;
-    border: 2px solid #888;
-    transition: transform 0.2s;
-}
-button.option-btn:hover {
-    transform: scale(1.05);
-}
-button#play-again {
-    padding: 15px 25px;
-    margin-top: 30px;
+  }
+  #question {
     font-size: 1.2em;
-    background-color: #FFEB3B;
-    border: none;
-    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .answer-btn {
+    font-size: 1em;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 8px;
+    border: 1px solid #333;
     cursor: pointer;
-}
+    background-color: #fff;
+  }
+  .answer-btn:hover {
+    background-color: #f0f0f0;
+  }
+  #end-slide {
+    display: none;
+    background-color: #ffedcc;
+    padding: 50px;
+    border-radius: 20px;
+  }
+  #end-slide button {
+    font-size: 1.2em;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #fff244;
+    border: 1px solid #333;
+  }
 </style>
 </head>
 <body>
 
 <div id="game-container">
-    <h2 id="instruction">Listen to the question and choose the correct answer</h2>
-    <h3 id="question"></h3>
-    <div id="options-container">
-        <button class="option-btn"></button>
-        <button class="option-btn"></button>
-        <button class="option-btn"></button>
-        <button class="option-btn"></button>
-        <button class="option-btn"></button>
-    </div>
-    <button id="play-again" style="display:none;">Play Again</button>
+
+  <!-- Logo Slide -->
+  <div id="logo-slide">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+  </div>
+
+  <!-- Question Slide -->
+  <div id="question-slide">
+    <div id="instruction">Listen to the question and choose the correct answer</div>
+    <div id="question"></div>
+    <div id="answers"></div>
+  </div>
+
+  <!-- End Slide -->
+  <div id="end-slide">
+    <h1>Good Job!</h1>
+    <button id="play-again">Play Again</button>
+  </div>
+
 </div>
 
-<audio id="audio-question"></audio>
-<audio id="audio-correct" src="assets/correct.mp3"></audio>
-<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
-<audio id="audio-clap" src="assets/claps.mp3"></audio>
+<audio id="sound" src=""></audio>
+<audio id="correct-sound" src="assets/correct.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
 const questions = [
-    {text: "Who helps you keep the surroundings clean?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Sweeper", audio: "assets/question-1.mp3"},
-    {text: "Who treats sick people?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Doctor", audio: "assets/question-2.mp3"},
-    {text: "Who teaches you at school?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Teacher", audio: "assets/question-3.mp3"},
-    {text: "Who delivers letters?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Postman", audio: "assets/question-4.mp3"},
-    {text: "Who helps you during a fire?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Firefighter", audio: "assets/question-5.mp3"},
+  { text: "Who helps you keep the surroundings clean?", answer: "Sweeper", audio: "assets/question-1.mp3" },
+  { text: "Who treats sick people?", answer: "Doctor", audio: "assets/question-2.mp3" },
+  { text: "Who teaches you at school?", answer: "Teacher", audio: "assets/question-3.mp3" },
+  { text: "Who delivers letters?", answer: "Postman", audio: "assets/question-4.mp3" },
+  { text: "Who helps you during a fire?", answer: "Firefighter", audio: "assets/question-5.mp3" }
 ];
 
-let currentQuestion = 0;
+let currentIndex = 0;
 
+const logoSlide = document.getElementById("logo-slide");
+const questionSlide = document.getElementById("question-slide");
+const endSlide = document.getElementById("end-slide");
 const questionEl = document.getElementById("question");
-const optionBtns = document.querySelectorAll(".option-btn");
+const answersEl = document.getElementById("answers");
+const soundEl = document.getElementById("sound");
+const correctSound = document.getElementById("correct-sound");
+const wrongSound = document.getElementById("wrong-sound");
 const playAgainBtn = document.getElementById("play-again");
-const audioQuestion = document.getElementById("audio-question");
-const audioCorrect = document.getElementById("audio-correct");
-const audioWrong = document.getElementById("audio-wrong");
-const audioClap = document.getElementById("audio-clap");
 
-function loadQuestion() {
-    if(currentQuestion >= questions.length){
-        questionEl.textContent = "🎉 Well Done! 🎉";
-        document.getElementById("options-container").style.display = "none";
-        playAgainBtn.style.display = "inline-block";
-        return;
-    }
-
-    const q = questions[currentQuestion];
-    questionEl.textContent = q.text;
-    optionBtns.forEach((btn, index) => {
-        btn.textContent = q.options[index];
-        btn.style.display = q.options[index] ? "inline-block" : "none";
-    });
-    audioQuestion.src = q.audio;
-    audioQuestion.play();
+function showLogo() {
+  logoSlide.style.display = "block";
+  questionSlide.style.display = "none";
+  endSlide.style.display = "none";
+  setTimeout(() => {
+    logoSlide.style.display = "none";
+    showQuestion();
+  }, 5000); // show logo for 5 seconds
 }
 
-optionBtns.forEach(btn => {
-    btn.addEventListener("click", ()=>{
-        const selected = btn.textContent;
-        const correctAnswer = questions[currentQuestion].answer;
-        if(selected === correctAnswer){
-            audioCorrect.play();
-            audioClap.play();
-            audioClap.onended = () => {
-                currentQuestion++;
-                loadQuestion();
-            }
-        } else {
-            audioWrong.play();
-        }
-    });
-});
+function showQuestion() {
+  if(currentIndex >= questions.length){
+    showEnd();
+    return;
+  }
+  const q = questions[currentIndex];
+  questionEl.textContent = q.text;
+  answersEl.innerHTML = "";
 
-playAgainBtn.addEventListener("click", () => {
-    currentQuestion = 0;
-    document.getElementById("options-container").style.display = "block";
-    playAgainBtn.style.display = "none";
-    loadQuestion();
-});
+  const options = ["Sweeper","Doctor","Teacher","Postman","Firefighter"];
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.classList.add("answer-btn");
+    btn.onclick = () => checkAnswer(opt);
+    answersEl.appendChild(btn);
+  });
 
-loadQuestion();
+  questionSlide.style.display = "block";
+  soundEl.src = q.audio;
+  soundEl.play();
+}
+
+function checkAnswer(ans){
+  const q = questions[currentIndex];
+  if(ans === q.answer){
+    correctSound.play();
+    correctSound.onended = () => {
+      currentIndex++;
+      showQuestion();
+    }
+  } else {
+    wrongSound.play();
+  }
+}
+
+function showEnd(){
+  questionSlide.style.display = "none";
+  endSlide.style.display = "block";
+}
+
+playAgainBtn.onclick = () => {
+  currentIndex = 0;
+  showLogo();
+}
+
+// Start the game
+showLogo();
 </script>
 
 </body>
