@@ -5,173 +5,137 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community Helpers Game</title>
 <style>
-  body {
-    margin: 0;
+body {
     font-family: 'Arial', sans-serif;
-    background: #ffe5d9;
+    background-color: #FFE5CC;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
-  }
-  #game-container {
-    width: 80%;
-    max-width: 900px;
+    margin: 0;
+}
+#game-container {
+    background-color: #FFCCCC;
+    padding: 40px;
+    border-radius: 15px;
     text-align: center;
-    padding: 20px;
-    border-radius: 20px;
-    background: linear-gradient(145deg, #ffd9d9, #ffb6b6, #ff9f9f);
-    box-shadow: 0 0 30px rgba(0,0,0,0.1);
-  }
-  #logo-screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px;
-  }
-  #logo-screen img {
-    max-width: 250px;
-  }
-  #question-screen {
-    display: none;
-  }
-  #question-text {
-    font-size: 24px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+h2#instruction {
+    font-size: 1.8em;
+    margin-bottom: 30px;
     font-weight: bold;
+}
+h3#question {
+    font-size: 1.5em;
     margin-bottom: 20px;
-    padding: 10px;
-  }
-  .options-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  .option-btn {
-    font-size: 18px;
-    padding: 12px 20px;
-    border: 2px solid #444;
+}
+button.option-btn {
+    padding: 15px 25px;
+    margin: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #888;
+    transition: transform 0.2s;
+}
+button.option-btn:hover {
+    transform: scale(1.05);
+}
+button#play-again {
+    padding: 15px 25px;
+    margin-top: 30px;
+    font-size: 1.2em;
+    background-color: #FFEB3B;
+    border: none;
     border-radius: 10px;
     cursor: pointer;
-    background: #fff;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-  }
-  .option-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 12px rgba(0,0,0,0.2);
-  }
-  #end-screen {
-    display: none;
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  #play-again-btn {
-    margin-top: 20px;
-    font-size: 22px;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 12px;
-    background-color: #fff25c;
-    cursor: pointer;
-  }
+}
 </style>
 </head>
 <body>
 
 <div id="game-container">
-  <!-- Logo Screen -->
-  <div id="logo-screen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
-  </div>
-
-  <!-- Question Screen -->
-  <div id="question-screen">
-    <div id="question-text">Instruction: Listen to the question and choose the correct answer</div>
-    <div class="options-container">
-      <button class="option-btn" data-answer="Sweeper">Sweeper</button>
-      <button class="option-btn" data-answer="Doctor">Doctor</button>
-      <button class="option-btn" data-answer="Teacher">Teacher</button>
-      <button class="option-btn" data-answer="Postman">Postman</button>
-      <button class="option-btn" data-answer="Firefighter">Firefighter</button>
+    <h2 id="instruction">Listen to the question and choose the correct answer</h2>
+    <h3 id="question"></h3>
+    <div id="options-container">
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
     </div>
-  </div>
-
-  <!-- End Screen -->
-  <div id="end-screen">
-    🎉 Well Done! 🎉
-    <br>
-    <button id="play-again-btn">Play Again</button>
-  </div>
+    <button id="play-again" style="display:none;">Play Again</button>
 </div>
 
+<audio id="audio-question"></audio>
+<audio id="audio-correct" src="assets/correct.mp3"></audio>
+<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+<audio id="audio-clap" src="assets/claps.mp3"></audio>
+
 <script>
-  const questions = [
-    {text: "Who helps you keep the surroundings clean?", audio: "assets/question-1.mp3", answer: "Sweeper"},
-    {text: "Who treats sick people?", audio: "assets/question-2.mp3", answer: "Doctor"},
-    {text: "Who teaches you at school?", audio: "assets/question-3.mp3", answer: "Teacher"},
-    {text: "Who delivers letters?", audio: "assets/question-4.mp3", answer: "Postman"},
-    {text: "Who helps you during a fire?", audio: "assets/question-5.mp3", answer: "Firefighter"}
-  ];
+const questions = [
+    {text: "Who helps you keep the surroundings clean?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Sweeper", audio: "assets/question-1.mp3"},
+    {text: "Who treats sick people?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Doctor", audio: "assets/question-2.mp3"},
+    {text: "Who teaches you at school?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Teacher", audio: "assets/question-3.mp3"},
+    {text: "Who delivers letters?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Postman", audio: "assets/question-4.mp3"},
+    {text: "Who helps you during a fire?", options: ["Sweeper","Doctor","Teacher","Postman","Firefighter"], answer: "Firefighter", audio: "assets/question-5.mp3"},
+];
 
-  const logoScreen = document.getElementById('logo-screen');
-  const questionScreen = document.getElementById('question-screen');
-  const endScreen = document.getElementById('end-screen');
-  const questionText = document.getElementById('question-text');
-  const optionButtons = document.querySelectorAll('.option-btn');
+let currentQuestion = 0;
 
-  const correctSound = new Audio('assets/correct.mp3');
-  const wrongSound = new Audio('assets/wrong.mp3');
-  const clapSound = new Audio('assets/claps.mp3');
+const questionEl = document.getElementById("question");
+const optionBtns = document.querySelectorAll(".option-btn");
+const playAgainBtn = document.getElementById("play-again");
+const audioQuestion = document.getElementById("audio-question");
+const audioCorrect = document.getElementById("audio-correct");
+const audioWrong = document.getElementById("audio-wrong");
+const audioClap = document.getElementById("audio-clap");
 
-  let currentQ = 0;
+function loadQuestion() {
+    if(currentQuestion >= questions.length){
+        questionEl.textContent = "🎉 Well Done! 🎉";
+        document.getElementById("options-container").style.display = "none";
+        playAgainBtn.style.display = "inline-block";
+        return;
+    }
 
-  function playQuestionAudio() {
-    const qAudio = new Audio(questions[currentQ].audio);
-    qAudio.play();
-  }
-
-  function showQuestion() {
-    questionScreen.style.display = 'block';
-    questionText.textContent = questions[currentQ].text;
-    playQuestionAudio();
-  }
-
-  optionButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const selected = btn.getAttribute('data-answer');
-      if(selected === questions[currentQ].answer) {
-        correctSound.play();
-        correctSound.onended = () => {
-          clapSound.play();
-          clapSound.onended = () => {
-            currentQ++;
-            if(currentQ < questions.length) {
-              showQuestion();
-            } else {
-              questionScreen.style.display = 'none';
-              endScreen.style.display = 'block';
-            }
-          };
-        };
-      } else {
-        wrongSound.play();
-      }
+    const q = questions[currentQuestion];
+    questionEl.textContent = q.text;
+    optionBtns.forEach((btn, index) => {
+        btn.textContent = q.options[index];
+        btn.style.display = q.options[index] ? "inline-block" : "none";
     });
-  });
+    audioQuestion.src = q.audio;
+    audioQuestion.play();
+}
 
-  document.getElementById('play-again-btn').addEventListener('click', () => {
-    currentQ = 0;
-    endScreen.style.display = 'none';
-    showQuestion();
-  });
+optionBtns.forEach(btn => {
+    btn.addEventListener("click", ()=>{
+        const selected = btn.textContent;
+        const correctAnswer = questions[currentQuestion].answer;
+        if(selected === correctAnswer){
+            audioCorrect.play();
+            audioClap.play();
+            audioClap.onended = () => {
+                currentQuestion++;
+                loadQuestion();
+            }
+        } else {
+            audioWrong.play();
+        }
+    });
+});
 
-  // Show logo for 3 seconds
-  setTimeout(() => {
-    logoScreen.style.display = 'none';
-    showQuestion();
-  }, 3000);
+playAgainBtn.addEventListener("click", () => {
+    currentQuestion = 0;
+    document.getElementById("options-container").style.display = "block";
+    playAgainBtn.style.display = "none";
+    loadQuestion();
+});
+
+loadQuestion();
 </script>
 
 </body>
