@@ -35,11 +35,6 @@
     margin: 20px 0;
     text-align: center;
   }
-  .voice-icon {
-    width: 70px;
-    cursor: pointer;
-    margin-bottom: 20px;
-  }
   .options {
     display: flex;
     gap: 20px;
@@ -94,7 +89,6 @@
 <div id="question-screen">
   <div class="instruction">Listen to the question and choose the correct answer</div>
   <div class="question-text" id="question-text">Question appears here</div>
-  <img src="assets/voice-icon.png" class="voice-icon" id="voice-btn">
   <div class="options" id="options"></div>
 </div>
 
@@ -115,11 +109,9 @@ const questionScreen = document.getElementById('question-screen');
 const endScreen = document.getElementById('end-screen');
 const questionText = document.getElementById('question-text');
 const optionsDiv = document.getElementById('options');
-const voiceBtn = document.getElementById('voice-btn');
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
 const questionSound = document.getElementById('question-sound');
-
 const playAgainBtn = document.getElementById('play-again');
 
 const questions = [
@@ -144,6 +136,7 @@ function showQuestion() {
   const q = questions[currentQuestion];
   questionText.innerText = q.text;
   questionSound.src = q.audio;
+  questionSound.play(); // play automatically when slide loads
   optionsDiv.innerHTML = '';
   q.options.forEach(opt => {
     const btn = document.createElement('button');
@@ -152,10 +145,6 @@ function showQuestion() {
     btn.onclick = () => checkAnswer(opt);
     optionsDiv.appendChild(btn);
   });
-}
-
-voiceBtn.onclick = () => {
-  questionSound.play();
 }
 
 function checkAnswer(selected) {
