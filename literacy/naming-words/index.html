@@ -2,64 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Naming Words Game</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', cursive, sans-serif; }
-  body { background: #ffd6e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; overflow: hidden; }
+  body {
+    background: #ffd6e0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
   body::before {
     content: '';
     position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%);
-    animation: rotateLight 20s linear infinite;
-    z-index: 0;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.3), transparent 70%);
+    z-index:0;
   }
-  @keyframes rotateLight {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+
+  #game-container {
+    position: relative;
+    z-index:1;
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
   }
-  #game-container { width: 100%; max-width: 720px; text-align: center; position: relative; z-index: 1; }
-  .slide { display: none; width: 100%; }
-  .active { display: block; }
-  #instruction { font-size: 1.5rem; margin: 20px 0 10px 0; }
-  img.noun-img { max-width: 80%; height: auto; margin: 20px 0; border-radius: 15px; }
-  .options { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
-  .option-btn { padding: 15px 25px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #333; cursor: pointer; background: #fff; transition: 0.2s; }
-  .option-btn:hover { background: #ffe0e6; }
-  #voice-icon { width: 60px; height: 60px; position: absolute; left: -70px; top: 50%; transform: translateY(-50%); cursor: pointer; }
-  #logo-slide img { width: 300px; margin-top: 20%; }
-  #well-done { font-size: 2rem; margin-bottom: 20px; }
-  #play-again { padding: 15px 25px; font-size: 1.5rem; border-radius: 15px; cursor: pointer; background: #ffeb3b; border: 2px solid #333; }
-  canvas { position: absolute; top: 0; left: 0; pointer-events: none; }
+
+  #instruction {
+    font-size: 1.6rem;
+    margin: 15px 0 10px 0;
+    background: rgba(255,255,255,0.6);
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+  }
+
+  #logo-slide img {
+    width: 250px;
+    margin-top: 50px;
+  }
+
+  .slide img.main-img {
+    width: 250px;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+  }
+
+  .options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+  }
+
+  .option-btn {
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    border: 2px solid #555;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: transform 0.2s;
+  }
+
+  .option-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .voice-icon {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  #well-done {
+    font-size: 2rem;
+    margin-top: 50px;
+  }
+
+  #play-again {
+    margin-top: 20px;
+    padding: 15px 25px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  canvas {
+    position: absolute;
+    top:0;
+    left:0;
+    pointer-events: none;
+  }
+
 </style>
 </head>
 <body>
 <div id="game-container">
 
-  <!-- Slide 1: Innovine Logo -->
-  <div class="slide active" id="logo-slide">
+  <!-- Slide 1: Logo -->
+  <div class="slide" id="logo-slide">
     <img src="assets/innovine-logo.png" alt="Innovine Logo">
   </div>
 
-  <!-- Slides 2-9: Nouns -->
-  <div class="slide" id="slide-noun">
+  <!-- Dynamic slides for nouns -->
+  <div class="slide" id="game-slide" style="display:none;">
     <div id="instruction">Look at the picture and choose the correct type</div>
-    <img id="noun-img" class="noun-img" src="" alt="noun">
-    <img id="voice-icon" src="assets/voice-icon.png" alt="voice">
-    <div class="options">
-      <button class="option-btn" data-value="person">Person</button>
-      <button class="option-btn" data-value="place">Place</button>
-      <button class="option-btn" data-value="thing">Thing</button>
-      <button class="option-btn" data-value="animal">Animal</button>
-    </div>
+    <img src="" alt="noun" class="main-img" id="main-img">
+    <img src="assets/voice-icon.png" class="voice-icon" id="voice-btn">
+    <div class="options" id="options"></div>
   </div>
 
-  <!-- Slide 10: Well Done -->
-  <div class="slide" id="slide-well-done">
+  <!-- Well Done Slide -->
+  <div class="slide" id="end-slide" style="display:none;">
     <div id="well-done">🎉 Well Done! 🎉</div>
     <button id="play-again">Play Again</button>
     <canvas id="confetti-canvas"></canvas>
@@ -67,130 +132,125 @@
 
 </div>
 
-<audio id="audio-correct" src="assets/excellent.mp3"></audio>
-<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
-<audio id="audio-noun"></audio>
+<audio id="right-sound" src="assets/excellent.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
-const nouns = [
-  { name: 'girl', type: 'person' },
-  { name: 'cat', type: 'animal' },
-  { name: 'mall', type: 'place' },
-  { name: 'river', type: 'place' },
-  { name: 'doctor', type: 'person' },
-  { name: 'sheep', type: 'animal' },
-  { name: 'zoo', type: 'place' },
-  { name: 'book', type: 'thing' }
+const slidesData = [
+  {img:"assets/girl.png", audio:"assets/girl.mp3", options:["Person","Place","Thing","Animal"], correct:"Person"},
+  {img:"assets/cat.png", audio:"assets/cat.mp3", options:["Person","Place","Thing","Animal"], correct:"Animal"},
+  {img:"assets/mall.png", audio:"assets/mall.mp3", options:["Person","Place","Thing","Animal"], correct:"Place"},
+  {img:"assets/river.png", audio:"assets/river.mp3", options:["Person","Place","Thing","Animal"], correct:"Place"},
+  {img:"assets/doctor.png", audio:"assets/doctor.mp3", options:["Person","Place","Thing","Animal"], correct:"Person"},
+  {img:"assets/sheep.png", audio:"assets/sheep.mp3", options:["Person","Place","Thing","Animal"], correct:"Animal"},
+  {img:"assets/zoo.png", audio:"assets/zoo.mp3", options:["Person","Place","Thing","Animal"], correct:"Place"},
+  {img:"assets/book.png", audio:"assets/book.mp3", options:["Person","Place","Thing","Animal"], correct:"Thing"}
 ];
 
-let currentSlide = 0;
-const logoSlideTime = 5000;
+let currentIndex = -1;
+const logoSlide = document.getElementById("logo-slide");
+const gameSlide = document.getElementById("game-slide");
+const mainImg = document.getElementById("main-img");
+const optionsContainer = document.getElementById("options");
+const voiceBtn = document.getElementById("voice-btn");
+const rightSound = document.getElementById("right-sound");
+const wrongSound = document.getElementById("wrong-sound");
+const endSlide = document.getElementById("end-slide");
+const playAgain = document.getElementById("play-again");
+const confettiCanvas = document.getElementById("confetti-canvas");
 
-const slides = document.querySelectorAll('.slide');
-const nounImg = document.getElementById('noun-img');
-const optionButtons = document.querySelectorAll('.option-btn');
-const voiceIcon = document.getElementById('voice-icon');
-const audioNoun = document.getElementById('audio-noun');
-const audioCorrect = document.getElementById('audio-correct');
-const audioWrong = document.getElementById('audio-wrong');
-
-function showSlide(index) {
-  slides.forEach(s => s.classList.remove('active'));
-  if(index < nouns.length) {
-    slides[1].classList.add('active'); // noun slide
-    loadNoun(index);
-  } else {
-    slides[slides.length-1].classList.add('active'); // well done
-    startConfetti();
-  }
-}
-
-function loadNoun(index) {
-  const noun = nouns[index];
-  nounImg.src = `assets/${noun.name}.png`;
-  nounImg.alt = noun.name;
-  audioNoun.src = `assets/${noun.name}.mp3`;
-  playAudioOnce = false;
-}
-
-let playAudioOnce = false;
-voiceIcon.onclick = () => {
-  audioNoun.currentTime = 0;
-  audioNoun.play();
-};
-
-optionButtons.forEach(btn => {
-  btn.onclick = () => {
-    const correctType = nouns[currentSlide].type;
-    if(btn.dataset.value === correctType) {
-      audioCorrect.currentTime = 0;
-      audioCorrect.play();
-      currentSlide++;
-      showSlide(currentSlide);
-    } else {
-      audioWrong.currentTime = 0;
-      audioWrong.play();
-    }
-  }
-});
-
-// Logo slide first
+// Show logo for 5 seconds
 setTimeout(() => {
-  currentSlide = 0;
-  showSlide(currentSlide);
-}, logoSlideTime);
+  logoSlide.style.display = "none";
+  nextSlide();
+}, 5000);
 
-// Play Again button
-document.getElementById('play-again').onclick = () => {
-  currentSlide = 0;
-  stopConfetti();
-  showSlide(currentSlide);
-};
-
-// Confetti setup
-let confettiCanvas, confettiCtx, confettiParticles = [], confettiInterval;
-
-function startConfetti() {
-  confettiCanvas = document.getElementById('confetti-canvas');
-  confettiCtx = confettiCanvas.getContext('2d');
-  confettiCanvas.width = window.innerWidth;
-  confettiCanvas.height = window.innerHeight;
-  confettiParticles = [];
-  for(let i=0; i<150; i++) {
-    confettiParticles.push({
-      x: Math.random()*confettiCanvas.width,
-      y: Math.random()*confettiCanvas.height,
-      r: Math.random()*6+4,
-      d: Math.random()*50+10,
-      color: `hsl(${Math.random()*360},70%,60%)`,
-      tilt: Math.random()*10-10,
-      tiltAngleIncrement: Math.random()*0.07+0.05
-    });
+function nextSlide() {
+  currentIndex++;
+  if(currentIndex >= slidesData.length){
+    showEndSlide();
+    return;
   }
-  confettiInterval = setInterval(drawConfetti, 20);
-}
-
-function drawConfetti() {
-  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-  confettiParticles.forEach(p => {
-    confettiCtx.beginPath();
-    confettiCtx.lineWidth = p.r;
-    confettiCtx.strokeStyle = p.color;
-    confettiCtx.moveTo(p.x+p.tilt+p.r/2,p.y);
-    confettiCtx.lineTo(p.x+p.tilt,p.y+p.tilt+ p.r/2);
-    confettiCtx.stroke();
-    p.tilt += p.tiltAngleIncrement;
-    p.y += (Math.cos(p.d)+1+ p.r/2)/2;
-    if(p.y>confettiCanvas.height) {
-      p.y = -10;
-      p.x = Math.random()*confettiCanvas.width;
-    }
+  const data = slidesData[currentIndex];
+  mainImg.src = data.img;
+  mainImg.alt = "noun image";
+  gameSlide.style.display = "block";
+  optionsContainer.innerHTML = "";
+  data.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.classList.add("option-btn");
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt);
+    optionsContainer.appendChild(btn);
   });
 }
 
-function stopConfetti() {
-  clearInterval(confettiInterval);
-  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+function checkAnswer(selected){
+  const correct = slidesData[currentIndex].correct;
+  if(selected === correct){
+    rightSound.currentTime = 0;
+    rightSound.play();
+    nextSlide();
+  }else{
+    wrongSound.currentTime = 0;
+    wrongSound.play();
+  }
+}
+
+voiceBtn.addEventListener("click",()=>{
+  const data = slidesData[currentIndex];
+  const audio = new Audio(data.audio);
+  audio.play();
+});
+
+playAgain.addEventListener("click",()=>{
+  currentIndex = -1;
+  endSlide.style.display = "none";
+  nextSlide();
+});
+
+function showEndSlide(){
+  gameSlide.style.display = "none";
+  endSlide.style.display = "block";
+  startConfetti();
+}
+
+// Simple confetti
+function startConfetti(){
+  const ctx = confettiCanvas.getContext("2d");
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  const confettiCount = 150;
+  const confettis = [];
+  for(let i=0;i<confettiCount;i++){
+    confettis.push({
+      x:Math.random()*confettiCanvas.width,
+      y:Math.random()*-confettiCanvas.height,
+      r: Math.random()*6+4,
+      d:Math.random()*confettiCanvas.height,
+      color:`hsl(${Math.random()*360},100%,50%)`,
+      tilt:Math.random()*10-10
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+    confettis.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r/2);
+      ctx.stroke();
+      c.y += 2 + c.d/50;
+      if(c.y > confettiCanvas.height){
+        c.y = -10;
+        c.x = Math.random()*confettiCanvas.width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 </script>
 </body>
