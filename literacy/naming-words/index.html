@@ -2,28 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Naming Words Game</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', cursive, sans-serif; }
-  body { min-height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; background: linear-gradient(135deg, #ffd6e0, #ffe0b3, #d6f0ff, #d8ffd6);}
-  #game-container { width: 100%; max-width: 720px; text-align: center; position: relative; z-index: 1; }
-  .slide { display: none; width: 100%; position: relative; }
-  .active { display: block; }
-  #logo-slide img { width: 250px; margin-top: 50px; }
-  #instruction { font-size: 1.7rem; margin: 15px 0 10px 0; background: rgba(255,255,255,0.6); display: inline-block; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(255,255,255,0.5); }
-  .slide img.main-img { width: 250px; margin-top: 40px; border-radius: 10px; }
-  .options { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap; }
-  .option-btn { padding: 15px 25px; font-size: 1.3rem; border-radius: 12px; border: 2px solid #555; cursor: pointer; background-color: #ffffffcc; box-shadow: 0 4px 12px rgba(255,255,255,0.5); transition: transform 0.2s, background 0.3s; }
-  .option-btn:hover { transform: scale(1.05); background-color: #ffe0e6cc; }
-  .voice-icon { width: 60px; height: 60px; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; }
-  #well-done { font-size: 2.5rem; margin-top: 50px; }
-  #play-again { margin-top: 20px; padding: 15px 30px; font-size: 1.5rem; border-radius: 12px; cursor: pointer; border: none; background-color: #ffeb3b; }
-  canvas { position: absolute; top:0; left:0; pointer-events: none; }
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  /* Soft shaded gradient background */
+  background: linear-gradient(135deg, #ffd6e0, #ffe0b3, #d6f0ff, #d8ffd6);
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+  z-index:1;
+}
+
+#instruction {
+  font-size: 1.8rem;
+  margin: 10px 0 10px 0;
+  background: rgba(255,255,255,0.6);
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(255,255,255,0.5);
+}
+
+.slide { display: none; width: 100%; position: relative; }
+.active { display: block; }
+#logo-slide img { width: 250px; margin-top: 50px; }
+
+.slide img.main-img {
+  width: 250px;
+  height: auto;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.options {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  padding: 15px 25px;
+  font-size: 1.3rem;
+  border-radius: 12px;
+  border: 2px solid #555;
+  cursor: pointer;
+  background-color: #ffffffcc;
+  box-shadow: 0 4px 12px rgba(255,255,255,0.5); /* soft light effect */
+  transition: transform 0.2s, background 0.3s;
+}
+.option-btn:hover {
+  transform: scale(1.05);
+  background-color: #ffe0e6cc;
+}
+
+.voice-icon {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+#well-done {
+  font-size: 2.5rem;
+  margin-top: 50px;
+}
+#play-again {
+  margin-top: 20px;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  background-color: #ffeb3b;
+}
+canvas { position: absolute; top:0; left:0; pointer-events: none; }
 </style>
 </head>
 <body>
-
 <div id="game-container">
 
   <!-- Slide 1: Logo -->
@@ -32,15 +103,15 @@
   </div>
 
   <!-- Slide 2-9: Nouns -->
-  <div class="slide" id="game-slide">
+  <div class="slide" id="game-slide" style="display:none;">
     <div id="instruction">Look at the picture and choose the correct type</div>
-    <img src="" class="main-img" id="main-img" alt="noun">
+    <img src="" alt="noun" class="main-img" id="main-img">
     <img src="assets/voice-icon.png" class="voice-icon" id="voice-btn">
     <div class="options" id="options"></div>
   </div>
 
   <!-- Slide 10: Well Done -->
-  <div class="slide" id="end-slide">
+  <div class="slide" id="end-slide" style="display:none;">
     <div id="well-done">🎉 Well Done! 🎉</div>
     <button id="play-again">Play Again</button>
     <canvas id="confetti-canvas"></canvas>
@@ -48,9 +119,8 @@
 
 </div>
 
-<audio id="audio-correct" src="assets/excellent.mp3"></audio>
-<audio id="audio-wrong" src="assets/wrong.mp3"></audio>
-<audio id="audio-noun"></audio>
+<audio id="right-sound" src="assets/excellent.mp3"></audio>
+<audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
 const slidesData = [
@@ -65,76 +135,51 @@ const slidesData = [
 ];
 
 let currentIndex = -1;
-const logoSlideTime = 5000;
+const logoSlide = document.getElementById("logo-slide");
 const gameSlide = document.getElementById("game-slide");
 const mainImg = document.getElementById("main-img");
 const optionsContainer = document.getElementById("options");
 const voiceBtn = document.getElementById("voice-btn");
-const audioNoun = document.getElementById("audio-noun");
-const audioCorrect = document.getElementById("audio-correct");
-const audioWrong = document.getElementById("audio-wrong");
+const rightSound = document.getElementById("right-sound");
+const wrongSound = document.getElementById("wrong-sound");
 const endSlide = document.getElementById("end-slide");
 const playAgain = document.getElementById("play-again");
 const confettiCanvas = document.getElementById("confetti-canvas");
+const audioNoun = new Audio();
 
-// Show first noun slide after 5 seconds
-setTimeout(() => {
-  logoSlide.style.display = "none";
-  currentIndex = 0;
-  gameSlide.style.display = "block";
-  loadNoun(currentIndex);
-}, logoSlideTime);
+// Show logo first
+setTimeout(()=>{logoSlide.style.display="none"; currentIndex=0; gameSlide.style.display="block"; loadNoun(currentIndex);},5000);
 
 function loadNoun(index){
   const data = slidesData[index];
   mainImg.src = data.img;
-  mainImg.alt = "noun";
+  mainImg.alt = "noun image";
   audioNoun.src = data.audio;
   optionsContainer.innerHTML = "";
   ["Person","Place","Thing","Animal"].forEach(opt=>{
     const btn = document.createElement("button");
     btn.className="option-btn";
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(opt, data.correct);
+    btn.textContent=opt;
+    btn.onclick=()=>checkAnswer(opt,data.correct);
     optionsContainer.appendChild(btn);
   });
 }
 
 function checkAnswer(selected, correct){
   if(selected===correct){
-    audioCorrect.currentTime=0;
-    audioCorrect.play();
+    rightSound.currentTime=0; rightSound.play();
     currentIndex++;
-    if(currentIndex >= slidesData.length){
-      gameSlide.style.display = "none";
-      endSlide.style.display = "block";
-      startConfetti();
-    } else {
-      loadNoun(currentIndex);
-    }
-  } else {
-    audioWrong.currentTime=0;
-    audioWrong.play();
+    if(currentIndex>=slidesData.length){
+      gameSlide.style.display="none"; endSlide.style.display="block"; startConfetti();
+    } else loadNoun(currentIndex);
+  }else{
+    wrongSound.currentTime=0; wrongSound.play();
   }
 }
 
-voiceBtn.onclick=()=>{
-  audioNoun.currentTime=0;
-  audioNoun.play();
-};
+voiceBtn.onclick=()=>{ audioNoun.currentTime=0; audioNoun.play(); }
 
-// Play Again button
-playAgain.onclick=()=>{
-  currentIndex=-1;
-  endSlide.style.display = "none";
-  logoSlide.style.display = "block";
-  setTimeout(()=>{
-    logoSlide.style.display="none";
-    currentIndex=0;
-    gameSlide.style.display="block";
-    loadNoun(currentIndex);
-  }, logoSlideTime);
-};
+playAgain.onclick=()=>{currentIndex=-1; endSlide.style.display="none"; gameSlide.style.display="block"; loadNoun(0);}
 
 // Confetti
 function startConfetti(){
@@ -144,14 +189,7 @@ function startConfetti(){
   const confettiCount=150;
   const confettis=[];
   for(let i=0;i<confettiCount;i++){
-    confettis.push({
-      x:Math.random()*confettiCanvas.width,
-      y:Math.random()*confettiCanvas.height-100,
-      r:Math.random()*6+4,
-      color:`hsl(${Math.random()*360},70%,60%)`,
-      tilt:Math.random()*10-10,
-      tiltAngle:Math.random()*0.07+0.05
-    });
+    confettis.push({x:Math.random()*confettiCanvas.width,y:Math.random()*confettiCanvas.height-100,r:Math.random()*6+4,color:`hsl(${Math.random()*360},70%,60%)`,tilt:Math.random()*10-10,tiltAngle:Math.random()*0.07+0.05});
   }
   function draw(){
     ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
@@ -159,8 +197,8 @@ function startConfetti(){
       ctx.beginPath();
       ctx.lineWidth=c.r;
       ctx.strokeStyle=c.color;
-      ctx.moveTo(c.x+c.tilt+c.r/2, c.y);
-      ctx.lineTo(c.x+c.tilt, c.y+c.tilt+c.r/2);
+      ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
+      ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
       ctx.stroke();
       c.tilt+=c.tiltAngle;
       c.y+=(Math.cos(c.tiltAngle)+1+c.r/2)/2;
