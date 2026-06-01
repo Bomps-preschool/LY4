@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Helpers Game</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: #fef5e7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .slide {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .active {
+    display: flex;
+  }
+  #logoSlide img {
+    width: 200px;
+    margin-top: 100px;
+  }
+  #questionSlide img {
+    width: 250px;
+    margin: 30px 0;
+  }
+  #questionSlide h2 {
+    margin-top: 20px;
+  }
+  .answers {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .answers button {
+    padding: 15px 25px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 2px solid #333;
+    cursor: pointer;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .voice-icon {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+  }
+  #congratsSlide {
+    font-size: 32px;
+    background: #d5f5e3;
+    padding: 50px;
+    border-radius: 20px;
+    flex-direction: column;
+  }
+  #playAgainBtn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    background: #ffe066;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Logo -->
+<div id="logoSlide" class="slide active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Question Slide -->
+<div id="questionSlide" class="slide">
+  <img id="helperImage" src="" alt="Community Helper">
+  <img src="assets/voice-icon.png" class="voice-icon" id="voiceBtn" alt="Play Question">
+  <h2 id="instructionText">Listen to the question and choose the correct helper</h2>
+  <div class="answers" id="answerButtons"></div>
+</div>
+
+<!-- Congratulations Slide -->
+<div id="congratsSlide" class="slide">
+  🎉 Well Done! 🎉
+  <button id="playAgainBtn">Play Again</button>
+</div>
+
+<audio id="voiceAudio"></audio>
+<audio id="correctAudio" src="assets/correct.mp3"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3"></audio>
+
+<script>
+const slides = {
+  logo: document.getElementById('logoSlide'),
+  question: document.getElementById('questionSlide'),
+  congrats: document.getElementById('congratsSlide')
+};
+
+const questions = [
+  {img: 'girl.png', audio: 'question-1.mp3', answer: 'Sweeper', options: ['Doctor','Sweeper','Teacher']},
+  {img: 'doctor.png', audio: 'question-2.mp3', answer: 'Doctor', options: ['Doctor','Sweeper','Teacher']},
+  {img: 'teacher.png', audio: 'question-3.mp3', answer: 'Teacher', options: ['Sweeper','Teacher','Postman']},
+  {img: 'postman.png', audio: 'question-4.mp3', answer: 'Postman', options: ['Sweeper','Postman','Firefighter']},
+  {img: 'firefighter.png', audio: 'question-5.mp3', answer: 'Firefighter', options: ['Postman','Sweeper','Firefighter']}
+];
+
+let currentQuestion = 0;
+
+const helperImage = document.getElementById('helperImage');
+const voiceBtn = document.getElementById('voiceBtn');
+const voiceAudio = document.getElementById('voiceAudio');
+const answerButtons = document.getElementById('answerButtons');
+const correctAudio = document.getElementById('correctAudio');
+const wrongAudio = document.getElementById('wrongAudio');
+
+function showSlide(slide) {
+  Object.values(slides).forEach(s => s.classList.remove('active'));
+  slide.classList.add('active');
+}
+
+// Show logo for 5 seconds
+setTimeout(() => {
+  showSlide(slides.question);
+  loadQuestion();
+}, 5000);
+
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  helperImage.src = 'assets/' + q.img;
+  voiceAudio.src = 'assets/' + q.audio;
+  answerButtons.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(opt);
+    answerButtons.appendChild(btn);
+  });
+}
+
+voiceBtn.addEventListener('click', () => {
+  voiceAudio.play();
+});
+
+function checkAnswer(selected) {
+  const correct = questions[currentQuestion].answer;
+  if(selected === correct) {
+    correctAudio.play();
+    currentQuestion++;
+    if(currentQuestion < questions.length) {
+      setTimeout(loadQuestion, 800);
+    } else {
+      setTimeout(() => showSlide(slides.congrats), 800);
+    }
+  } else {
+    wrongAudio.play();
+  }
+}
+
+document.getElementById('playAgainBtn').addEventListener('click', () => {
+  currentQuestion = 0;
+  showSlide(slides.logo);
+  setTimeout(() => {
+    showSlide(slides.question);
+    loadQuestion();
+  }, 5000);
+});
+</script>
+
+</body>
+</html>
