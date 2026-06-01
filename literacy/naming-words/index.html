@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naming Words Game</title>
+<style>
+body, html {
+    margin:0;
+    padding:0;
+    font-family:'Comic Sans MS', cursive;
+    width:100%;
+    height:100%;
+    background: #ffe5cc;
+    overflow-x: hidden;
+}
+.slide { display:none; width:100%; height:100vh; justify-content:center; align-items:center; flex-direction:column; text-align:center; }
+.slide img { max-width: 40%; height: auto; margin-bottom: 20px; }
+.options { display:flex; justify-content:center; gap:20px; margin-top:20px; flex-wrap: wrap; }
+.option-btn { padding:10px 20px; font-size:1.2rem; border-radius:10px; cursor:pointer; border:none; background-color:#ffcc80; transition:0.2s; }
+.option-btn:hover { background-color:#ffb74d; }
+#voiceIcon { width:50px; height:50px; cursor:pointer; position:absolute; left:20px; bottom:20px; }
+#congrats h1 { font-size:3rem; margin-bottom:20px; }
+#playAgain { padding:15px 30px; font-size:1.5rem; border:none; border-radius:10px; background:#ffeb3b; cursor:pointer; }
+canvas.confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1000; }
+@media(max-width:768px){
+    .slide img { max-width:60%; }
+    .option-btn { font-size:1rem; padding:8px 16px; }
+    #voiceIcon { width:40px; height:40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Innovine Logo -->
+<div class="slide" id="logoSlide" style="display:flex;">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Noun Slides (2-9) -->
+<div class="slide" id="slide-girl">
+    <img src="assets/girl.png" alt="Girl">
+    <img src="assets/voice-icon.png" id="voiceGirl">
+    <div class="options">
+        <button class="option-btn" data-answer="wrong">Place</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="correct">Person</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-cat">
+    <img src="assets/cat.png" alt="Cat">
+    <img src="assets/voice-icon.png" id="voiceCat">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Animal</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+        <button class="option-btn" data-answer="wrong">Place</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-mall">
+    <img src="assets/mall.png" alt="Mall">
+    <img src="assets/voice-icon.png" id="voiceMall">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Place</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-river">
+    <img src="assets/river.png" alt="River">
+    <img src="assets/voice-icon.png" id="voiceRiver">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Place</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-doctor">
+    <img src="assets/doctor.png" alt="Doctor">
+    <img src="assets/voice-icon.png" id="voiceDoctor">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Person</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="wrong">Place</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-sheep">
+    <img src="assets/sheep.png" alt="Sheep">
+    <img src="assets/voice-icon.png" id="voiceSheep">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Animal</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+        <button class="option-btn" data-answer="wrong">Place</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-zoo">
+    <img src="assets/zoo.png" alt="Zoo">
+    <img src="assets/voice-icon.png" id="voiceZoo">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Place</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="wrong">Thing</button>
+    </div>
+</div>
+
+<div class="slide" id="slide-book">
+    <img src="assets/book.png" alt="Book">
+    <img src="assets/voice-icon.png" id="voiceBook">
+    <div class="options">
+        <button class="option-btn" data-answer="correct">Thing</button>
+        <button class="option-btn" data-answer="wrong">Person</button>
+        <button class="option-btn" data-answer="wrong">Animal</button>
+        <button class="option-btn" data-answer="wrong">Place</button>
+    </div>
+</div>
+
+<!-- Slide 10: Congrats -->
+<div class="slide" id="slide-congrats">
+    <h1>Well Done!</h1>
+    <canvas class="confetti"></canvas>
+    <button id="playAgain">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/excellent.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>
+const slides = [
+    'logoSlide',
+    'slide-girl','slide-cat','slide-mall','slide-river','slide-doctor','slide-sheep','slide-zoo','slide-book',
+    'slide-congrats'
+];
+
+let current = 0;
+function showSlide(index){
+    slides.forEach(id => document.getElementById(id).style.display='none');
+    document.getElementById(slides[index]).style.display='flex';
+}
+showSlide(current);
+
+// Show logo for 5 sec
+setTimeout(()=>{ current++; showSlide(current); }, 5000);
+
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+
+slides.slice(1,9).forEach(id=>{
+    const slide = document.getElementById(id);
+    const options = slide.querySelectorAll('.option-btn');
+    options.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+            if(btn.dataset.answer==='correct'){
+                correctSound.currentTime=0;
+                correctSound.play();
+                current++;
+                showSlide(current);
+                if(current===slides.length-1) launchConfetti();
+            } else {
+                wrongSound.currentTime=0;
+                wrongSound.play();
+            }
+        });
+    });
+
+    const voiceIcon = slide.querySelector('#voice'+slide.split('-')[1].charAt(0).toUpperCase()+slide.split('-')[1].slice(1));
+    if(voiceIcon){
+        voiceIcon.addEventListener('click', ()=>{
+            const audio = new Audio(`assets/${slide.split('-')[1]}.mp3`);
+            audio.play();
+        });
+    }
+});
+
+// Confetti
+function launchConfetti(){
+    const canvas = document.querySelector('.confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const particles = [];
+    for(let i=0;i<150;i++){
+        particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height- canvas.height,r:Math.random()*6+4,color:`hsl(${Math.random()*360},70%,60%)`,tilt:Math.random()*10-10,tiltAngle:Math.random()*0.07+0.05});
+    }
+    let angle=0;
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p=>{
+            ctx.beginPath();
+            ctx.lineWidth=p.r;
+            ctx.strokeStyle=p.color;
+            ctx.moveTo(p.x+p.tilt+p.r/2,p.y);
+            ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/2);
+            ctx.stroke();
+        });
+        update();
+        requestAnimationFrame(draw);
+    }
+    function update(){
+        angle+=0.01;
+        particles.forEach(p=>{
+            p.tiltAngle+=p.tiltAngle;
+            p.y+=(Math.cos(p.tiltAngle)+3+p.r/2)/2;
+            p.tilt=Math.sin(p.tiltAngle)*15;
+            if(p.y>canvas.height){p.y=-10;p.x=Math.random()*canvas.width;}
+        });
+    }
+    draw();
+}
+
+// Play Again
+document.getElementById('playAgain').addEventListener('click', ()=>location.reload());
+</script>
+</body>
+</html>
