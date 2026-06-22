@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Number Value Game</title>
+
 <style>
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; }
 
@@ -31,9 +32,9 @@ body {
 canvas.draw-canvas { border:2px solid #2e8b57; background:#fff; touch-action: none; }
 
 button { padding:12px 24px; border-radius:8px; font-size:18px; cursor:pointer; transition: all 0.3s; font-weight:bold; }
+
 button:hover { opacity:0.9; transform: scale(1.05); }
 
-  
 #nextBtn { 
     background: #4CAF50;  
     color: #fff;
@@ -47,9 +48,12 @@ button:hover { opacity:0.9; transform: scale(1.05); }
 }
 
 #end { font-size:2em; color:#2e8b57; text-align:center; }
+
 canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
+
 </style>
 </head>
+
 <body>
 
 <div class="slide active" id="splash">
@@ -72,20 +76,20 @@ Count the objects and write the number in box given below!
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
 
 <script>
-// Updated number of images per slide
+
 const numbers = [
-  {num:23, img:'assets/ball.png'},       // 23 balls
-  {num:45, img:'assets/dolphin.png'},    // 45 dolphins
-  {num:12, img:'assets/airplane.png'},       // 12 airplane
-  {num:36, img:'assets/jet.png'},        // 36 jets
-  {num:30, img:'assets/lamp.png'}        // 30 lamps
+  {num:23, img:'assets/ball.png'},
+  {num:45, img:'assets/dolphin.png'},
+  {num:12, img:'assets/airplane.png'},
+  {num:36, img:'assets/jet.png'},
+  {num:30, img:'assets/lamp.png'}
 ];
 
 const gameSlidesContainer = document.getElementById('game-slides');
+
 numbers.forEach((item,index)=>{
   const slide = document.createElement('div');
   slide.classList.add('slide');
-  slide.dataset.num = item.num;
   slide.innerHTML = `
     <div class="objects-container" id="objects-${index}"></div>
     <canvas class="draw-canvas" id="canvas-${index}" width="300" height="100"></canvas>
@@ -111,6 +115,7 @@ setTimeout(()=>{
 },5000);
 
 function initSlide(index){
+
   const slide = slides[index+1];
   const objectsContainer = slide.querySelector(`#objects-${index}`);
   const canvas = slide.querySelector(`#canvas-${index}`);
@@ -118,29 +123,37 @@ function initSlide(index){
   const nextBtn = slide.querySelector(`#nextBtn-${index}`);
   const clearBtn = slide.querySelector(`#clearBtn-${index}`);
 
+  let hasDrawn = false; // ✅ NEW FIX FLAG
+
   objectsContainer.innerHTML='';
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  nextBtn.style.display='none';
+  nextBtn.style.display='inline-block';
 
-  // Show correct number of objects for each slide
   for(let i=0;i<numbers[index].num;i++){
     const obj = document.createElement('img');
     obj.src = numbers[index].img;
-    obj.alt='object';
     objectsContainer.appendChild(obj);
   }
 
-  // Drawing logic
   let drawing=false;
-  canvas.addEventListener('pointerdown',()=>{ drawing=true; ctx.beginPath(); });
-  canvas.addEventListener('pointerup',()=>{ drawing=false; nextBtn.style.display='inline-block'; });
+
+  canvas.addEventListener('pointerdown',()=>{
+    drawing=true;
+    hasDrawn=true; // ✅ detect drawing
+    ctx.beginPath();
+  });
+
+  canvas.addEventListener('pointerup',()=>{ drawing=false; });
   canvas.addEventListener('pointerleave',()=>{ drawing=false; });
+
   canvas.addEventListener('pointermove',(e)=>{
     if(!drawing) return;
+
     const rect = canvas.getBoundingClientRect();
     ctx.lineWidth=4;
     ctx.lineCap='round';
     ctx.strokeStyle='#2e8b57';
+
     ctx.lineTo(e.clientX-rect.left, e.clientY-rect.top);
     ctx.stroke();
     ctx.beginPath();
@@ -149,15 +162,27 @@ function initSlide(index){
 
   clearBtn.addEventListener('click',()=>{
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    nextBtn.style.display='none';
+    hasDrawn = false;
   });
 
   nextBtn.addEventListener('click',()=>{
+
+    // ❗ FIX: no drawing = try again
+    if(!hasDrawn){
+      document.getElementById("audio-wrong").play();
+      alert("Try Again");
+      return;
+    }
+
+    // move to next
     if(index+1 < numbers.length){
       showSlide(index+2);
       initSlide(index+1);
-    } else showEndSlide();
+    } else {
+      showEndSlide();
+    }
   });
+
 }
 
 function showEndSlide(){
@@ -173,10 +198,20 @@ function launchConfetti(){
   const ctx=canvas.getContext('2d');
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
+
   const confetti=[];
   for(let i=0;i<150;i++){
-    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+    confetti.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+4,
+      d:Math.random()*20+10,
+      color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)],
+      tilt:Math.random()*10-10,
+      tiltAngleIncrement:Math.random()*0.07+0.05
+    });
   }
+
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     confetti.forEach(c=>{
@@ -186,14 +221,21 @@ function launchConfetti(){
       ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
       ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
       ctx.stroke();
+
       c.tilt+=c.tiltAngleIncrement;
       c.y+=(Math.cos(c.d)+3+c.r/2)/2;
-      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+
+      if(c.y>canvas.height){
+        c.y=-10;
+        c.x=Math.random()*canvas.width;
+      }
     });
     requestAnimationFrame(draw);
   }
+
   draw();
 }
 </script>
+
 </body>
 </html>
