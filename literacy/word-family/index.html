@@ -87,21 +87,6 @@ body {
 
 #end { font-size:2em; color:#2e8b57; text-align:center; }
 
-/* PLAY AGAIN BUTTON */
-#playAgainBtn{
-  margin-top:20px;
-  padding:12px 25px;
-  font-size:18px;
-  border:none;
-  border-radius:10px;
-  background:#2e8b57;
-  color:white;
-  cursor:pointer;
-}
-#playAgainBtn:hover{
-  background:#246f45;
-}
-
 canvas { position:absolute; top:0; left:0; pointer-events:none; }
 
 </style>
@@ -178,8 +163,19 @@ setTimeout(()=>{
   initSlide(0);
 }, 5000);
 
-function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
+/* ✅ STRONG SHUFFLE FIX */
+function shuffleArray(arr){
+  let newArr = arr.slice();
 
+  for(let i = newArr.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+
+  return newArr;
+}
+
+/* INIT SLIDE */
 function initSlide(index){
 
   const slide = slides[index+1];
@@ -197,10 +193,11 @@ function initSlide(index){
   }
 
   let lettersArray = word.split('');
+
   const wordsToShuffle = ['leg','mop','zip','jet','dig','hat','jam','log','bun','cub'];
 
   if(wordsToShuffle.includes(word)){
-    lettersArray = shuffleArray(lettersArray);
+    lettersArray = shuffleArray([...lettersArray]); // ✅ FIX APPLIED
   }
 
   lettersArray.forEach(l=>{
@@ -240,6 +237,7 @@ function initSlide(index){
   });
 }
 
+/* END */
 function showEndSlide(){
   slides.forEach(s=>s.classList.remove('active'));
   document.getElementById('end').classList.add('active');
@@ -248,6 +246,7 @@ function showEndSlide(){
   launchConfetti();
 }
 
+/* CONFETTI */
 function launchConfetti(){
   const canvas=document.getElementById('confetti');
   const ctx=canvas.getContext('2d');
@@ -292,7 +291,7 @@ function launchConfetti(){
   draw();
 }
 
-/* PLAY AGAIN BUTTON */
+/* PLAY AGAIN */
 document.getElementById("playAgainBtn").addEventListener("click", () => {
   location.reload();
 });
