@@ -7,7 +7,13 @@
 
 <style>
 
-body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; }
+html, body {
+  margin:0;
+  padding:0;
+  font-family:'Comic Sans MS', cursive,sans-serif;
+  height:100%;
+  overflow:hidden;
+}
 
 /* BACKGROUND */
 body { 
@@ -22,62 +28,79 @@ body {
   100%{background-position:0% 50%;} 
 }
 
-.slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
+.slide {
+  width:100vw;
+  height:100vh;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+}
+
 .active { display:flex; }
 
-#splash img { width:250px; height:auto; }
+#splash img { width:220px; height:auto; }
 
+/* INSTRUCTION (compact for fit) */
 .instruction-top {
   width:100%;
   text-align:center;
-  font-size:3.6em;  /* increased font size */
+  font-size:1.3em;
   color:#2e8b57;
   font-weight:bold;
-  padding:12px;
+  padding:8px;
   display:none;
 }
 
+/* IMAGE (reduced height for no scroll) */
 .picture img { 
-  width:200px; 
-  height:200px; 
-  margin-bottom:20px; 
-  transform:translateY(-30px); 
+  width:180px; 
+  max-height:200px;
+  margin-bottom:10px; 
+  transform:translateY(-20px); 
   animation: floatImg 4s ease-in-out infinite;
 }
 
 @keyframes floatImg {
-  0%, 100% { transform: translateY(-30px); }
-  50% { transform: translateY(-25px); }
+  0%, 100% { transform: translateY(-20px); }
+  50% { transform: translateY(-15px); }
 }
 
-.letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
+/* BOXES */
+.letter-boxes { 
+  display:flex; 
+  gap:10px; 
+  margin-bottom:10px; 
+}
 
 .letter-box { 
-  width:80px; 
-  height:80px; 
+  width:70px; 
+  height:70px; 
   border:2px solid #2e8b57; 
   display:flex; 
   justify-content:center; 
   align-items:center; 
-  font-size:24px; 
+  font-size:22px; 
   font-weight:bold; 
   background:#ffffff; 
   box-shadow: 0 0 5px #66ccff, 0 0 10px rgba(102, 204, 255, 0.3);
 }
 
-.letter-box.correct { box-shadow: 0 0 10px #2e8b57, 0 0 15px rgba(46, 139, 87, 0.3); }
-
+/* BUTTONS */
 .letter-buttons { 
   display:flex; 
   flex-wrap:wrap; 
   gap:10px; 
   justify-content:center; 
   max-width:80vw; 
+  margin-top:10px;
 }
 
 .letter-buttons button { 
-  padding:10px 15px; 
-  font-size:40px; 
+  padding:8px 12px; 
+  font-size:32px; 
   cursor:pointer; 
   background:#66ccff; 
   border:none; 
@@ -85,9 +108,20 @@ body {
   color:#fff; 
 }
 
-#end { font-size:2em; color:#2e8b57; text-align:center; }
+/* END SCREEN */
+#end { 
+  font-size:2em; 
+  color:#2e8b57; 
+  text-align:center; 
+}
 
-canvas { position:absolute; top:0; left:0; pointer-events:none; }
+/* CONFETTI */
+canvas { 
+  position:absolute; 
+  top:0; 
+  left:0; 
+  pointer-events:none; 
+}
 
 </style>
 </head>
@@ -149,7 +183,6 @@ words.forEach((item, index)=>{
 });
 
 const slides = document.querySelectorAll('.slide');
-
 let currentSlide = 0;
 
 function showSlide(i){
@@ -163,19 +196,17 @@ setTimeout(()=>{
   initSlide(0);
 }, 5000);
 
-/* ✅ STRONG SHUFFLE FIX */
+/* SHUFFLE */
 function shuffleArray(arr){
   let newArr = arr.slice();
-
   for(let i = newArr.length - 1; i > 0; i--){
     let j = Math.floor(Math.random() * (i + 1));
     [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
   }
-
   return newArr;
 }
 
-/* INIT SLIDE */
+/* INIT */
 function initSlide(index){
 
   const slide = slides[index+1];
@@ -192,13 +223,7 @@ function initSlide(index){
     boxesContainer.appendChild(box);
   }
 
-  let lettersArray = word.split('');
-
-  const wordsToShuffle = ['leg','mop','zip','jet','dig','hat','jam','log','bun','cub'];
-
-  if(wordsToShuffle.includes(word)){
-    lettersArray = shuffleArray([...lettersArray]); // ✅ FIX APPLIED
-  }
+  let lettersArray = shuffleArray(word.split(''));
 
   lettersArray.forEach(l=>{
     const btn = document.createElement('button');
