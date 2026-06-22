@@ -4,10 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patterning Game</title>
-<style>
-body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive, sans-serif; }
 
-/* Eye-catching animated pastel gradient background */
+<style>
+
+html, body {
+  margin:0;
+  padding:0;
+  font-family:'Comic Sans MS', cursive, sans-serif;
+  height:100%;
+  overflow:hidden;
+}
+
+/* BACKGROUND */
 body {
   background: linear-gradient(135deg, #fce4ec, #e1bee7, #bbdefb);
   background-size: 400% 400%;
@@ -20,57 +28,150 @@ body {
   100%{background-position:0% 50%;}
 }
 
-.slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
+/* SLIDES */
+.slide {
+  width:100vw;
+  height:100vh;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
 .active { display:flex; }
-#splash img { width:250px; height:auto; }
 
-.instruction-top { width:100%; text-align:center; font-size:1.05em; color:#2e7d32; font-weight:bold; padding:10px; display:none; }
+#splash img { width:220px; height:auto; }
 
-.pattern-row { display:flex; justify-content:center; margin-bottom:20px; }
-.pattern-row img, .option-row img { width:90px; height:90px; margin:2px; animation: floatAnim 3s ease-in-out infinite; }
-.option-row { display:flex; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-.option-row img { cursor:pointer; transition: all 0.3s; }
-.option-row img:hover { transform: scale(1.1); box-shadow:0px 0px 8px #666; }
+/* INSTRUCTION */
+.instruction-top {
+  width:100%;
+  text-align:center;
+  font-size:clamp(14px, 2vw, 18px);
+  color:#2e7d32;
+  font-weight:bold;
+  padding:8px;
+  display:none;
+}
 
+/* PATTERN + OPTIONS */
+.pattern-row {
+  display:flex;
+  justify-content:center;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+  max-width:95vw;
+}
+
+.pattern-row img,
+.option-row img {
+  width: clamp(55px, 8vw, 90px);
+  height: clamp(55px, 8vw, 90px);
+  margin:2px;
+  animation: floatAnim 3s ease-in-out infinite;
+}
+
+.option-row {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+  max-width:95vw;
+}
+
+.option-row img {
+  cursor:pointer;
+  transition: all 0.3s;
+}
+
+.option-row img:hover {
+  transform: scale(1.1);
+  box-shadow:0px 0px 8px #666;
+}
+
+/* EMPTY SLOT */
+.empty-slot {
+  width: clamp(55px, 8vw, 90px);
+  height: clamp(55px, 8vw, 90px);
+  border:2px dashed #2e7d32;
+  margin:2px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* FLOAT ANIMATION */
 @keyframes floatAnim {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
   100% { transform: translateY(0px); }
 }
 
-.empty-slot { width:90px; height:90px; border:2px dashed #2e7d32; margin:2px; display:flex; justify-content:center; align-items:center; }
+/* BUTTONS */
+button {
+  padding:8px 16px;
+  font-size:clamp(14px,2vw,16px);
+  border-radius:8px;
+  cursor:pointer;
+  margin:10px;
+  transition: all 0.3s;
+}
 
-button { padding:10px 20px; font-size:16px; border-radius:8px; cursor:pointer; margin:10px; transition: all 0.3s; }
-button:hover { opacity:0.9; transform: scale(1.05); }
+button:hover {
+  opacity:0.9;
+  transform: scale(1.05);
+}
+
 #nextBtn { background:#4caf50; color:white; }
 #clearBtn { background:#ff5722; color:white; }
 
-#end { font-size:2em; color:#2e7d32; text-align:center; }
-canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
+/* END */
+#end {
+  font-size:2em;
+  color:#2e7d32;
+  text-align:center;
+}
+
+canvas#confetti {
+  position:absolute;
+  top:0;
+  left:0;
+  pointer-events:none;
+}
+
 </style>
 </head>
+
 <body>
 
+<!-- SPLASH -->
 <div class="slide active" id="splash">
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
+<!-- INSTRUCTION -->
 <div class="instruction-top" id="instruction-bar">
 Tap the correct picture to complete the pattern!
 </div>
 
+<!-- GAME -->
 <div id="game-slides"></div>
 
+<!-- END -->
 <div class="slide" id="end">
   <h1>Well Done!</h1>
   <canvas id="confetti"></canvas>
 </div>
 
+<!-- AUDIO -->
 <audio id="audio-correct" src="assets/correct.mp3"></audio>
 <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
 <audio id="audio-excellent" src="assets/claps.mp3"></audio>
 
 <script>
+
 const patterns = [
   {type:"ABAB", row:["car","umbrella","car","umbrella","car"], empty:2, expected:["umbrella","car"], options:["car","umbrella","grapes"]},
   {type:"AABBAABB", row:["grapes","grapes","juice","juice","grapes"], empty:2, expected:["grapes","juice"], options:["balloon","juice","grapes"]},
@@ -79,6 +180,7 @@ const patterns = [
 ];
 
 const container = document.getElementById('game-slides');
+
 patterns.forEach((p,index)=>{
   const slide = document.createElement('div');
   slide.classList.add('slide');
@@ -108,6 +210,7 @@ setTimeout(()=>{
 },5000);
 
 function initSlide(index){
+
   const slide = slides[index+1];
   const p = patterns[index];
   const patternRow = slide.querySelector(`#pattern-${index}`);
@@ -119,14 +222,12 @@ function initSlide(index){
   optionRow.innerHTML="";
   nextBtn.style.display='none';
 
-  // show pattern
   p.row.forEach(item=>{
     const img = document.createElement('img');
     img.src=`assets/${item}.png`;
     patternRow.appendChild(img);
   });
 
-  // create empty slots
   for(let i=0;i<p.empty;i++){
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('empty-slot');
@@ -135,29 +236,34 @@ function initSlide(index){
     patternRow.appendChild(emptyDiv);
   }
 
-  // options
   p.options.forEach(opt=>{
     const optImg = document.createElement('img');
     optImg.src=`assets/${opt}.png`;
+
     optImg.addEventListener('click', ()=>{
+
       const emptyDivs = patternRow.querySelectorAll('.empty-slot');
       let placed=false;
+
       emptyDivs.forEach(slot=>{
         if(slot.dataset.filled==="false" && !placed){
           const expectedIndex = parseInt(slot.dataset.index);
+
           if(opt === p.expected[expectedIndex]){
             slot.innerHTML = `<img src="assets/${opt}.png">`;
             slot.dataset.filled="true";
             placed=true;
-            audioCorrect();
+            document.getElementById('audio-correct').play();
           } else {
-            audioWrong();
+            document.getElementById('audio-wrong').play();
           }
         }
       });
+
       const remaining = patternRow.querySelectorAll('.empty-slot[data-filled="false"]');
       if(remaining.length===0) nextBtn.style.display='inline-block';
     });
+
     optionRow.appendChild(optImg);
   });
 
@@ -186,18 +292,25 @@ function showEndSlide(){
   launchConfetti();
 }
 
-function audioCorrect(){ document.getElementById('audio-correct').play(); }
-function audioWrong(){ document.getElementById('audio-wrong').play(); }
-
 function launchConfetti(){
   const canvas=document.getElementById('confetti');
   const ctx=canvas.getContext('2d');
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
+
   const confetti=[];
   for(let i=0;i<150;i++){
-    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+    confetti.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+4,
+      d:Math.random()*20+10,
+      color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)],
+      tilt:Math.random()*10-10,
+      tiltAngleIncrement:Math.random()*0.07+0.05
+    });
   }
+
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     confetti.forEach(c=>{
@@ -207,14 +320,22 @@ function launchConfetti(){
       ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
       ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
       ctx.stroke();
+
       c.tilt+=c.tiltAngleIncrement;
       c.y+=(Math.cos(c.d)+3+c.r/2)/2;
-      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+
+      if(c.y>canvas.height){
+        c.y=-10;
+        c.x=Math.random()*canvas.width;
+      }
     });
     requestAnimationFrame(draw);
   }
+
   draw();
 }
+
 </script>
+
 </body>
 </html>
