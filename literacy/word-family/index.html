@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Family Game</title>
+
 <style>
+
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; }
 
-/* Melodic, eye-catching animated background */
+/* BACKGROUND */
 body { 
   background: linear-gradient(135deg, #ffcccc, #ffb3ff, #ccffff, #ffdd99); 
   background-size: 400% 400%; 
   animation: bgAnimate 15s ease infinite; 
 }
+
 @keyframes bgAnimate { 
   0%{background-position:0% 50%;} 
   50%{background-position:100% 50%;} 
@@ -21,21 +24,25 @@ body {
 
 .slide { width:100vw; height:100vh; display:none; justify-content:center; align-items:center; flex-direction:column; position:relative; }
 .active { display:flex; }
+
 #splash img { width:250px; height:auto; }
 
 .instruction-top {
   width:100%;
   text-align:center;
-  font-size:1em; /* small font */
+  font-size:1em;
   color:#2e8b57;
   font-weight:bold;
   padding:10px;
-  display:none; /* hidden initially */
+  display:none;
 }
 
-.picture img { width:200px; height:200; margin-bottom:20px; transform:translateY(-30px); 
+.picture img { 
+  width:200px; 
+  height:200px; 
+  margin-bottom:20px; 
+  transform:translateY(-30px); 
   animation: floatImg 4s ease-in-out infinite;
-  transition: transform 0.5s ease-in-out;
 }
 
 @keyframes floatImg {
@@ -44,32 +51,62 @@ body {
 }
 
 .letter-boxes { display:flex; gap:10px; margin-bottom:20px; }
-/* Soft highlight effect for letter boxes */
-.letter-box { width:80px; height:80px; border:2px solid #2e8b57; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:bold; background:#ffffff; 
+
+.letter-box { 
+  width:80px; 
+  height:80px; 
+  border:2px solid #2e8b57; 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  font-size:24px; 
+  font-weight:bold; 
+  background:#ffffff; 
   box-shadow: 0 0 5px #66ccff, 0 0 10px rgba(102, 204, 255, 0.3);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
+
 .letter-box.correct { box-shadow: 0 0 10px #2e8b57, 0 0 15px rgba(46, 139, 87, 0.3); }
-.letter-box:hover { box-shadow: 0 0 15px #66ccff, 0 0 25px rgba(102, 204, 255, 0.4); transform: scale(1.05); }
 
-.letter-buttons { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; }
-/* Soft highlight effect for letter buttons */
-.letter-buttons button { padding:10px 15px; font-size:40px; cursor:pointer; background:#66ccff; border:none; border-radius:5px; color:#fff; 
-  box-shadow: 0 0 5px #66ccff, 0 0 10px rgba(102, 204, 255, 0.3);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  animation: softBounce 2s infinite;
+.letter-buttons { 
+  display:flex; 
+  flex-wrap:wrap; 
+  gap:10px; 
+  justify-content:center; 
+  max-width:80vw; 
 }
-.letter-buttons button:hover { background:#2e8b57; box-shadow: 0 0 15px #66ccff, 0 0 25px rgba(102, 204, 255, 0.4); transform: scale(1.05); }
 
-@keyframes softBounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+.letter-buttons button { 
+  padding:10px 15px; 
+  font-size:40px; 
+  cursor:pointer; 
+  background:#66ccff; 
+  border:none; 
+  border-radius:5px; 
+  color:#fff; 
 }
 
 #end { font-size:2em; color:#2e8b57; text-align:center; }
+
+/* PLAY AGAIN BUTTON */
+#playAgainBtn{
+  margin-top:20px;
+  padding:12px 25px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#2e8b57;
+  color:white;
+  cursor:pointer;
+}
+#playAgainBtn:hover{
+  background:#246f45;
+}
+
 canvas { position:absolute; top:0; left:0; pointer-events:none; }
+
 </style>
 </head>
+
 <body>
 
 <!-- Splash -->
@@ -77,7 +114,7 @@ canvas { position:absolute; top:0; left:0; pointer-events:none; }
   <img src="assets/innovine-logo.png" alt="Innovine Logo">
 </div>
 
-<!-- Top instruction (only for game slides) -->
+<!-- Instruction -->
 <div class="instruction-top" id="instruction-bar">
 Click the letters in the correct order to make the word that matches the picture below. Have fun learning word families!
 </div>
@@ -85,9 +122,10 @@ Click the letters in the correct order to make the word that matches the picture
 <!-- Game Slides -->
 <div id="game-slides"></div>
 
-<!-- End Slide (instruction hidden on Good Job slide) -->
+<!-- End Slide -->
 <div class="slide" id="end">
   <h1>Good Job!</h1>
+  <button id="playAgainBtn">Play Again</button>
   <canvas id="confetti"></canvas>
 </div>
 
@@ -97,7 +135,7 @@ Click the letters in the correct order to make the word that matches the picture
 <audio id="audio-excellent" src="assets/excellent.mp3"></audio>
 
 <script>
-// Word data
+
 const words = [
   {word:'hat', img:'assets/hat.png'},
   {word:'leg', img:'assets/leg.png'},
@@ -111,8 +149,8 @@ const words = [
   {word:'log', img:'assets/log.png'}
 ];
 
-// Generate slides
 const gameSlidesContainer = document.getElementById('game-slides');
+
 words.forEach((item, index)=>{
   const slide = document.createElement('div');
   slide.classList.add('slide');
@@ -126,65 +164,70 @@ words.forEach((item, index)=>{
 });
 
 const slides = document.querySelectorAll('.slide');
+
 let currentSlide = 0;
 
-// Show a slide
 function showSlide(i){
   slides.forEach(s=>s.classList.remove('active'));
   slides[i].classList.add('active');
 }
 
-// Splash 5s → first word
 setTimeout(()=>{ 
   document.getElementById('instruction-bar').style.display = 'block';
   showSlide(1);
   initSlide(0);
 }, 5000);
 
-// Shuffle helper
 function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-// Initialize a word slide
 function initSlide(index){
-  const slide = slides[index+1]; // skip splash
+
+  const slide = slides[index+1];
   const word = words[index].word;
   const boxesContainer = slide.querySelector(`#boxes-${index}`);
   const buttonsContainer = slide.querySelector(`#buttons-${index}`);
+
   boxesContainer.innerHTML='';
   buttonsContainer.innerHTML='';
 
-  // Create letter boxes
   for(let i=0;i<word.length;i++){
     const box = document.createElement('div');
     box.classList.add('letter-box');
     boxesContainer.appendChild(box);
   }
 
-  // Shuffle letters for certain words
   let lettersArray = word.split('');
-  const wordsToShuffle = ['leg','mop','zip','jet','dig','hat','jam','log','bun,','cub'];
+  const wordsToShuffle = ['leg','mop','zip','jet','dig','hat','jam','log','bun','cub'];
+
   if(wordsToShuffle.includes(word)){
     lettersArray = shuffleArray(lettersArray);
   }
 
-  // Create letter buttons
   lettersArray.forEach(l=>{
     const btn = document.createElement('button');
     btn.textContent = l;
+
     btn.addEventListener('click', ()=>{
+
       const emptyBox = Array.from(boxesContainer.children).find(b=>b.textContent==='');
+
       if(emptyBox){
         emptyBox.textContent=l;
+
         const formedWord = Array.from(boxesContainer.children).map(b=>b.textContent).join('');
+
         if(formedWord.length===word.length){
+
           if(formedWord===word){
             document.getElementById('audio-correct').play();
+
             setTimeout(()=>{
               if(index+1<words.length){
                 initSlide(index+1);
                 showSlide(index+2);
               } else showEndSlide();
             },500);
+
           } else {
             document.getElementById('audio-wrong').play();
             Array.from(boxesContainer.children).forEach(b=>b.textContent='');
@@ -192,29 +235,39 @@ function initSlide(index){
         }
       }
     });
+
     buttonsContainer.appendChild(btn);
   });
 }
 
-// End Slide + Confetti
 function showEndSlide(){
   slides.forEach(s=>s.classList.remove('active'));
   document.getElementById('end').classList.add('active');
   document.getElementById('audio-excellent').play();
-  document.getElementById('instruction-bar').style.display='none'; // Hide instruction on Good Job slide
+  document.getElementById('instruction-bar').style.display='none';
   launchConfetti();
 }
 
-// Confetti animation
 function launchConfetti(){
   const canvas=document.getElementById('confetti');
   const ctx=canvas.getContext('2d');
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
+
   const confetti=[];
+
   for(let i=0;i<150;i++){
-    confetti.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*6+4, d:Math.random()*20+10, color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)], tilt:Math.random()*10-10, tiltAngleIncrement:Math.random()*0.07+0.05});
+    confetti.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+4,
+      d:Math.random()*20+10,
+      color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)],
+      tilt:Math.random()*10-10,
+      tiltAngleIncrement:Math.random()*0.07+0.05
+    });
   }
+
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     confetti.forEach(c=>{
@@ -224,14 +277,27 @@ function launchConfetti(){
       ctx.moveTo(c.x+c.tilt+c.r/2,c.y);
       ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/2);
       ctx.stroke();
+
       c.tilt+=c.tiltAngleIncrement;
       c.y+=(Math.cos(c.d)+3+c.r/2)/2;
-      if(c.y>canvas.height){c.y=-10;c.x=Math.random()*canvas.width;}
+
+      if(c.y>canvas.height){
+        c.y=-10;
+        c.x=Math.random()*canvas.width;
+      }
     });
     requestAnimationFrame(draw);
   }
+
   draw();
 }
+
+/* PLAY AGAIN BUTTON */
+document.getElementById("playAgainBtn").addEventListener("click", () => {
+  location.reload();
+});
+
 </script>
+
 </body>
 </html>
