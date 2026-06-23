@@ -4,73 +4,97 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Community Helper Game</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffe6cc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  #game-container {
-    width: 90%;
-    max-width: 800px;
-    text-align: center;
-  }
-  #logo-slide {
-    display: none;
-  }
-  #logo-slide img {
-    width: 200px;
-    margin-top: 100px;
-  }
-  #question-slide {
-    display: none;
-    background-color: #ffc9b3;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-  #instruction {
-    font-size: 1.3em;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  #question {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-  }
-  .answer-btn {
-    font-size: 1em;
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    cursor: pointer;
-    background-color: #fff;
-  }
-  .answer-btn:hover {
-    background-color: #f0f0f0;
-  }
-  #end-slide {
-    display: none;
-    background-color: #ffedcc;
-    padding: 50px;
-    border-radius: 20px;
-  }
-  #end-slide button {
-    font-size: 1.2em;
-    padding: 12px 20px;
-    margin-top: 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #fff244;
-    border: 1px solid #333;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ffe6cc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#game-container {
+  width: 90%;
+  max-width: 800px;
+  text-align: center;
+}
+
+#logo-slide {
+  display: none;
+}
+
+#logo-slide img {
+  width: 200px;
+  margin-top: 100px;
+}
+
+#question-slide {
+  display: none;
+  background-color: #ffc9b3;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#instruction {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#question {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.answer-btn {
+  font-size: 1em;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  cursor: pointer;
+  background-color: #fff;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.answer-btn img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 5px;
+}
+
+.answer-btn:hover {
+  background-color: #f0f0f0;
+}
+
+#end-slide {
+  display: none;
+  background-color: #ffedcc;
+  padding: 50px;
+  border-radius: 20px;
+}
+
+#end-slide button {
+  font-size: 1.2em;
+  padding: 12px 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #fff244;
+  border: 1px solid #333;
+}
 </style>
 </head>
+
 <body>
 
 <div id="game-container">
@@ -100,6 +124,7 @@
 <audio id="wrong-sound" src="assets/wrong.mp3"></audio>
 
 <script>
+
 const questions = [
   { text: "Who helps you keep the surroundings clean?", answer: "Sweeper", audio: "assets/question-1.mp3" },
   { text: "Who treats sick people?", answer: "Doctor", audio: "assets/question-2.mp3" },
@@ -124,27 +149,43 @@ function showLogo() {
   logoSlide.style.display = "block";
   questionSlide.style.display = "none";
   endSlide.style.display = "none";
+
   setTimeout(() => {
     logoSlide.style.display = "none";
     showQuestion();
-  }, 5000); // show logo for 5 seconds
+  }, 5000);
 }
 
 function showQuestion() {
+
   if(currentIndex >= questions.length){
     showEnd();
     return;
   }
+
   const q = questions[currentIndex];
   questionEl.textContent = q.text;
   answersEl.innerHTML = "";
 
-  const options = ["Firefighter","Teacher","Sweeper","Doctor","Postman"];
+  const options = [
+    {name:"Firefighter", img:"assets/firefighter.png"},
+    {name:"Teacher", img:"assets/teacher.png"},
+    {name:"Sweeper", img:"assets/sweeper.png"},
+    {name:"Doctor", img:"assets/doctor.png"},
+    {name:"Postman", img:"assets/postman.png"}
+  ];
+
   options.forEach(opt => {
     const btn = document.createElement("button");
-    btn.textContent = opt;
     btn.classList.add("answer-btn");
-    btn.onclick = () => checkAnswer(opt);
+
+    btn.innerHTML = `
+      <img src="${opt.img}" alt="${opt.name}">
+      <div>${opt.name}</div>
+    `;
+
+    btn.onclick = () => checkAnswer(opt.name);
+
     answersEl.appendChild(btn);
   });
 
@@ -155,6 +196,7 @@ function showQuestion() {
 
 function checkAnswer(ans){
   const q = questions[currentIndex];
+
   if(ans === q.answer){
     correctSound.play();
     correctSound.onended = () => {
@@ -176,8 +218,9 @@ playAgainBtn.onclick = () => {
   showLogo();
 }
 
-// Start the game
+// Start game
 showLogo();
+
 </script>
 
 </body>
