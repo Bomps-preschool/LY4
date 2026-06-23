@@ -10,51 +10,65 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #ffe6cc;
+
   display: flex;
   justify-content: center;
   align-items: center;
+
   height: 100vh;
+  overflow: hidden; /* ✅ prevents scrolling */
 }
 
 #game-container {
-  width: 90%;
-  max-width: 800px;
+  width: 95%;
+  max-width: 900px;
   text-align: center;
 }
 
+/* LOGO */
 #logo-slide {
   display: none;
 }
 
 #logo-slide img {
-  width: 200px;
-  margin-top: 100px;
+  width: clamp(140px, 25vw, 220px);
+  margin-top: 10px;
 }
 
+/* QUESTION CARD */
 #question-slide {
   display: none;
   background-color: #ffc9b3;
-  padding: 30px;
+  padding: clamp(15px, 3vw, 30px);
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+/* TEXT */
 #instruction {
-  font-size: 1.3em;
+  font-size: clamp(14px, 2vw, 20px);
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 #question {
-  font-size: 1.2em;
-  margin-bottom: 20px;
+  font-size: clamp(14px, 2vw, 18px);
+  margin-bottom: 15px;
 }
 
-/* BIG BUTTONS */
+/* ANSWERS WRAPPER */
+#answers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* BUTTONS */
 .answer-btn {
-  font-size: 1.2em;
-  padding: 20px 25px;
-  margin: 10px;
+  font-size: clamp(12px, 1.8vw, 18px);
+  padding: 15px 18px;
+  margin: 5px;
   border-radius: 12px;
   border: 1px solid #333;
   cursor: pointer;
@@ -65,30 +79,31 @@ body {
   align-items: center;
   justify-content: center;
 
-  min-width: 180px;
+  min-width: clamp(120px, 20vw, 180px);
 }
 
-/* BIG IMAGES */
+/* IMAGES */
 .answer-btn img {
-  width: 90px;
-  height: 90px;
-  margin-bottom: 8px;
+  width: clamp(60px, 12vw, 90px);
+  height: clamp(60px, 12vw, 90px);
+  margin-bottom: 6px;
 }
 
 .answer-btn:hover {
   background-color: #f0f0f0;
 }
 
+/* END SCREEN */
 #end-slide {
   display: none;
   background-color: #ffedcc;
-  padding: 50px;
+  padding: 40px;
   border-radius: 20px;
 }
 
 #end-slide button {
-  font-size: 1.2em;
-  padding: 12px 20px;
+  font-size: clamp(14px, 2vw, 18px);
+  padding: 12px 18px;
   margin-top: 20px;
   border-radius: 8px;
   cursor: pointer;
@@ -221,7 +236,7 @@ playAgainBtn.onclick = () => {
   showLogo();
 }
 
-// START GAME
+// START
 showLogo();
 
 </script>
