@@ -1613,3 +1613,1173 @@ Play Again
 </body>
 
 </html>
+
+/* ---------------- CHILD ---------------- */
+
+
+.movingChild{
+
+
+position:absolute;
+
+width:90px;
+
+display:none;
+
+
+}
+
+
+
+.walk{
+
+
+animation:walk 1.5s forwards;
+
+}
+
+
+
+@keyframes walk{
+
+
+from{
+
+left:5%;
+
+}
+
+
+to{
+
+left:70%;
+
+}
+
+
+}
+
+
+
+
+
+/* ---------------- END SCREEN ---------------- */
+
+
+#endScreen{
+
+
+background:white;
+
+justify-content:center;
+
+align-items:center;
+
+text-align:center;
+
+
+}
+
+
+
+.endBox{
+
+
+border:4px solid #e6a3c2;
+
+border-radius:30px;
+
+padding:40px;
+
+
+}
+
+
+
+.endBox h1{
+
+
+font-size:60px;
+
+color:#d84f91;
+
+
+}
+
+
+
+.badge{
+
+
+background:#ffe89c;
+
+border:4px solid #dcae35;
+
+border-radius:40px;
+
+padding:20px;
+
+font-size:35px;
+
+color:#51438b;
+
+
+}
+
+
+
+.playAgain{
+
+
+margin-top:30px;
+
+padding:15px 45px;
+
+font-size:28px;
+
+border:none;
+
+border-radius:30px;
+
+background:#7bbf8c;
+
+color:white;
+
+
+}
+
+
+
+
+canvas{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+pointer-events:none;
+
+}
+
+
+
+/* RESPONSIVE */
+
+
+@media(max-width:1100px){
+
+
+.mainArea{
+
+height:calc(100vh - 160px);
+
+}
+
+
+.pictureArea img{
+
+max-height:220px;
+
+}
+
+
+.house{
+
+width:140px;
+
+}
+
+
+.word{
+
+font-size:24px;
+
+padding:12px 25px;
+
+}
+
+
+}
+
+
+
+
+@media(max-width:800px){
+
+
+.mainArea{
+
+flex-direction:column;
+
+height:calc(100vh - 160px);
+
+gap:10px;
+
+}
+
+
+.pictureArea,
+.houseArea{
+
+width:95%;
+
+height:45%;
+
+}
+
+
+
+.pictureArea img{
+
+width:70%;
+
+height:55%;
+
+max-height:150px;
+
+}
+
+
+
+.house{
+
+width:100px;
+
+}
+
+
+.sentence{
+
+font-size:24px;
+
+}
+
+
+.word{
+
+font-size:20px;
+
+padding:10px 20px;
+
+}
+
+
+}
+
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+
+<img src="assets/innovine-logo.png">
+
+</div>
+
+
+
+<!-- INTRO -->
+
+
+<div id="introScreen" class="screen">
+
+
+<div class="introBox">
+
+
+<h1 class="title">
+
+🏡 Build the Has-Have House
+
+</h1>
+
+
+<div class="subtitle">
+
+Help the children find the correct grammar house!
+
+</div>
+
+
+
+<div class="instructionBox">
+
+
+<h2>How to Play</h2>
+
+
+<p>👀 Look at the picture and read the sentence.</p>
+
+<p>🏠 Choose HAS or HAVE.</p>
+
+<p>✨ Send the character to the correct house.</p>
+
+<p>📱 Tap the word and then choose the house.</p>
+
+
+</div>
+
+
+
+<button class="startBtn" onclick="startGame()">
+
+Start Game
+
+</button>
+
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- GAME -->
+
+
+<div id="gameScreen" class="screen">
+
+
+<div class="header">
+
+
+<div class="gameTitle">
+
+🏡 Has-Have House
+
+</div>
+
+
+<div class="score">
+
+⭐ <span id="score">0</span>/10
+
+</div>
+
+
+</div>
+
+
+<div class="progress">
+
+Question <span id="qNo">1</span> of 10
+
+</div>
+
+
+
+
+<div class="mainArea">
+
+
+<div class="pictureArea">
+
+
+<img id="picture">
+
+
+<div id="sentence" class="sentence"></div>
+
+
+</div>
+
+
+
+<div class="houseArea">
+
+
+<div class="houseContainer">
+
+
+<img id="hasHouse" class="house" src="assets/has-house.png">
+
+
+<img id="haveHouse" class="house" src="assets/have-house.png">
+
+
+</div>
+
+
+<div class="wordArea">
+
+
+<div class="word" id="word1">
+
+has
+
+</div>
+
+
+<div class="word" id="word2">
+
+have
+
+</div>
+
+
+</div>
+
+
+<div id="message" class="message"></div>
+
+
+</div>
+
+
+</div>
+
+
+
+<img id="movingChild" class="movingChild" src="assets/happy-child.png">
+
+
+</div>
+
+
+
+<script>
+
+
+const questions=[
+
+{
+img:"cat-ball.png",
+sentence:"The cat ___ a blue ball.",
+answer:"has"
+},
+
+{
+img:"girl-flowers.png",
+sentence:"She ___ beautiful flowers.",
+answer:"has"
+},
+
+{
+img:"children-playground.png",
+sentence:"They ___ a big playground.",
+answer:"have"
+},
+
+{
+img:"family-car.png",
+sentence:"We ___ a new car.",
+answer:"have"
+},
+
+{
+img:"bird-wings.png",
+sentence:"It ___ small wings.",
+answer:"has"
+},
+
+{
+img:"girl-storybook.png",
+sentence:"She ___ an interesting book.",
+answer:"has"
+},
+
+{
+img:"boy-crayons.png",
+sentence:"He ___ many crayons.",
+answer:"has"
+},
+
+{
+img:"children-balloons.png",
+sentence:"They ___ colourful balloons.",
+answer:"have"
+},
+
+{
+img:"teacher-books.png",
+sentence:"She ___ many books.",
+answer:"has"
+},
+
+{
+img:"child-toys.png",
+sentence:"I ___ three toys.",
+answer:"have"
+}
+
+];
+
+
+let current=0;
+
+let score=0;
+
+let selectedWord="";
+
+let gameQuestions=[];
+
+
+
+
+/* LOGO TIMER */
+
+
+setTimeout(()=>{
+
+
+document.getElementById("logoScreen").style.display="none";
+
+
+document.getElementById("introScreen").style.display="flex";
+
+
+},5000);
+
+
+
+
+
+
+/* START GAME */
+
+
+function startGame(){
+
+
+document.getElementById("introScreen").style.display="none";
+
+
+document.getElementById("gameScreen").style.display="flex";
+
+
+
+gameQuestions=[...questions]
+.sort(()=>Math.random()-0.5);
+
+
+
+current=0;
+
+score=0;
+
+
+
+loadQuestion();
+
+
+}
+  function loadQuestion(){
+
+
+let q=gameQuestions[current];
+
+
+
+document.getElementById("qNo").innerHTML=current+1;
+
+
+document.getElementById("score").innerHTML=score;
+
+
+
+document.getElementById("picture").src=
+"assets/"+q.img;
+
+
+
+
+let parts=q.sentence.split("___");
+
+
+
+document.getElementById("sentence").innerHTML=
+
+parts[0]+
+" <span class='blank'></span> "+
+parts[1];
+
+
+
+document.getElementById("message").innerHTML="";
+
+
+
+selectedWord="";
+
+
+
+document.querySelectorAll(".word")
+.forEach(w=>{
+
+w.classList.remove("selected");
+
+});
+
+
+
+document.querySelectorAll(".house")
+.forEach(h=>{
+
+h.classList.remove("correctHouse");
+
+});
+
+
+}
+
+
+
+
+
+
+
+/* SELECT WORD */
+
+
+document.getElementById("word1").onclick=function(){
+
+selectWord("has");
+
+};
+
+
+
+document.getElementById("word2").onclick=function(){
+
+selectWord("have");
+
+};
+
+
+
+
+
+function selectWord(word){
+
+
+selectedWord=word;
+
+
+
+document.querySelectorAll(".word")
+.forEach(w=>{
+
+w.classList.remove("selected");
+
+});
+
+
+
+if(word=="has"){
+
+
+document.getElementById("word1")
+.classList.add("selected");
+
+
+}
+
+else{
+
+
+document.getElementById("word2")
+.classList.add("selected");
+
+
+}
+
+
+
+document.getElementById("message").innerHTML=
+"Choose the correct house 🏠";
+
+
+}
+
+
+
+
+
+
+/* HOUSE CLICK */
+
+
+document.getElementById("hasHouse").onclick=function(){
+
+checkAnswer("has");
+
+};
+
+
+
+document.getElementById("haveHouse").onclick=function(){
+
+checkAnswer("have");
+
+};
+
+
+
+
+
+
+/* CHECK ANSWER - FIXED */
+
+
+function checkAnswer(choice){
+
+
+if(selectedWord==""){
+
+return;
+
+}
+
+
+
+let correct =
+gameQuestions[current].answer;
+
+
+
+// WORD AND HOUSE BOTH MUST MATCH
+
+if(selectedWord==correct && choice==correct){
+
+
+
+score++;
+
+
+
+document.getElementById("score").innerHTML=score;
+
+
+
+document.getElementById("correctSound").play();
+
+
+
+
+let house;
+
+
+if(correct=="has"){
+
+house=document.getElementById("hasHouse");
+
+}
+
+else{
+
+house=document.getElementById("haveHouse");
+
+}
+
+
+
+
+house.classList.add("correctHouse");
+
+
+
+document.getElementById("message").innerHTML=
+"⭐ Great Job!";
+
+
+
+walkChild();
+
+
+
+setTimeout(()=>{
+
+
+nextQuestion();
+
+
+},1600);
+
+
+
+}
+
+else{
+
+
+document.getElementById("wrongSound").play();
+
+
+
+document.getElementById("message").innerHTML=
+"Oops! Try Again 😊";
+
+
+}
+
+
+
+selectedWord="";
+
+
+document.querySelectorAll(".word")
+.forEach(w=>{
+
+w.classList.remove("selected");
+
+});
+
+
+}
+
+
+
+
+
+
+/* CHILD ANIMATION */
+
+
+function walkChild(){
+
+
+let child=document.getElementById("movingChild");
+
+
+
+child.style.display="block";
+
+
+
+child.classList.remove("walk");
+
+
+
+void child.offsetWidth;
+
+
+
+child.classList.add("walk");
+
+
+
+setTimeout(()=>{
+
+
+child.style.display="none";
+
+
+},1500);
+
+
+
+}
+
+
+
+
+
+
+/* NEXT QUESTION */
+
+
+function nextQuestion(){
+
+
+current++;
+
+
+
+if(current>=gameQuestions.length){
+
+
+finishGame();
+
+
+}
+
+else{
+
+
+loadQuestion();
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+/* END SCREEN FIX */
+
+
+function finishGame(){
+
+
+document.getElementById("gameScreen")
+.style.display="none";
+
+
+document.getElementById("endScreen")
+.style.display="flex";
+
+
+
+document.getElementById("endScreen")
+.style.zIndex="2000";
+
+
+
+document.getElementById("finalScore")
+.innerHTML=
+"⭐ Score: "+score+"/10";
+
+
+
+document.getElementById("clapSound")
+.play();
+
+
+
+launchConfetti();
+
+
+}
+
+
+
+
+
+
+
+/* RESTART */
+
+
+function restartGame(){
+
+
+document.getElementById("endScreen")
+.style.display="none";
+
+
+document.getElementById("gameScreen")
+.style.display="flex";
+
+
+
+current=0;
+
+score=0;
+
+
+
+gameQuestions=[...questions]
+.sort(()=>Math.random()-0.5);
+
+
+
+loadQuestion();
+
+
+}
+
+
+
+
+
+
+/* CONFETTI */
+
+
+function launchConfetti(){
+
+
+let canvas=document.getElementById("confetti");
+
+let ctx=canvas.getContext("2d");
+
+
+
+canvas.width=window.innerWidth;
+
+canvas.height=window.innerHeight;
+
+
+
+let pieces=[];
+
+
+
+for(let i=0;i<100;i++){
+
+
+pieces.push({
+
+x:Math.random()*canvas.width,
+
+y:Math.random()*canvas.height,
+
+size:Math.random()*8+3,
+
+speed:Math.random()*3+2
+
+});
+
+
+}
+
+
+
+
+
+function draw(){
+
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+
+
+pieces.forEach(p=>{
+
+
+ctx.fillStyle="#d84f91";
+
+
+ctx.fillRect(
+p.x,
+p.y,
+p.size,
+p.size
+);
+
+
+
+p.y+=p.speed;
+
+
+
+if(p.y>canvas.height){
+
+p.y=0;
+
+}
+
+
+});
+
+
+
+requestAnimationFrame(draw);
+
+
+}
+
+
+
+draw();
+
+
+}
+
+
+</script>
+
+
+
+
+
+<!-- END SCREEN -->
+
+
+<div id="endScreen" class="screen">
+
+
+<div class="endBox">
+
+
+<h1>
+
+🎉 Well Done!
+
+</h1>
+
+
+
+<div class="badge">
+
+🏆 Has-Have Hero
+
+</div>
+
+
+
+<h2 id="finalScore"></h2>
+
+
+
+<p style="
+font-size:28px;
+color:#51438b;
+">
+
+Excellent Grammar Explorer! ⭐
+
+</p>
+
+
+
+<button class="playAgain" onclick="restartGame()">
+
+Play Again
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- AUDIO FILES -->
+
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<audio id="clapSound" src="assets/claps.mp3"></audio>
+
+
+
+
+<!-- CONFETTI -->
+
+
+<canvas id="confetti"></canvas>
+
+
+
+</body>
+
+</html>
