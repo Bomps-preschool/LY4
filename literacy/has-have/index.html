@@ -44,6 +44,7 @@ left:0;
 
 width:100%;
 height:100vh;
+height:100dvh;
 
 background:white;
 
@@ -80,6 +81,7 @@ left:0;
 
 width:100%;
 height:100vh;
+height:100dvh;
 
 display:none;
 
@@ -200,6 +202,10 @@ padding:10px;
 
 flex-direction:column;
 
+overflow:hidden;
+
+min-height:0;
+
 }
 
 
@@ -221,6 +227,8 @@ border:3px solid #e6a3c2;
 border-radius:20px;
 
 padding:10px 20px;
+
+flex-shrink:0;
 
 
 }
@@ -257,6 +265,8 @@ font-size:22px;
 
 color:#51438b;
 
+flex-shrink:0;
+
 }
 
 
@@ -282,6 +292,10 @@ justify-content:center;
 align-items:center;
 
 gap:25px;
+
+min-height:0;
+
+overflow:hidden;
 
 }
 
@@ -314,6 +328,8 @@ justify-content:center;
 
 align-items:center;
 
+min-height:0;
+
 
 }
 
@@ -327,6 +343,8 @@ width:85%;
 height:75%;
 
 object-fit:contain;
+
+min-height:0;
 
 
 }
@@ -386,6 +404,8 @@ flex-direction:column;
 justify-content:center;
 
 align-items:center;
+
+min-height:0;
 
 
 }
@@ -666,9 +686,116 @@ pointer-events:none;
 @media(max-width:800px){
 
 
+#introScreen{
+
+padding:8px;
+
+}
+
+
+.introBox{
+
+width:96%;
+
+max-height:96%;
+
+padding:14px;
+
+}
+
+
+.title{
+
+font-size:clamp(28px,7vw,40px);
+
+margin:8px 0;
+
+}
+
+
+.subtitle{
+
+font-size:clamp(17px,4.5vw,24px);
+
+}
+
+
+.instructionBox{
+
+padding:10px;
+
+font-size:clamp(15px,4vw,20px);
+
+}
+
+
+.instructionBox h2{
+
+margin:5px 0;
+
+}
+
+
+.instructionBox p{
+
+margin:8px 0;
+
+}
+
+
+.startBtn{
+
+margin-top:12px;
+
+font-size:22px;
+
+padding:11px 35px;
+
+}
+
+
+#gameScreen{
+
+padding:6px;
+
+}
+
+
+.header{
+
+padding:6px 12px;
+
+}
+
+
+.gameTitle{
+
+font-size:clamp(19px,5vw,27px);
+
+}
+
+
+.score{
+
+font-size:clamp(17px,4.5vw,23px);
+
+}
+
+
+.progress{
+
+font-size:clamp(16px,4vw,20px);
+
+}
+
+
 .mainArea{
 
 flex-direction:column;
+
+gap:8px;
+
+min-height:0;
 
 }
 
@@ -676,9 +803,25 @@ flex-direction:column;
 .pictureArea,
 .houseArea{
 
-width:95%;
+width:96%;
 
-height:45%;
+height:auto;
+
+min-height:0;
+
+}
+
+
+.pictureArea{
+
+flex:1.05;
+
+}
+
+
+.houseArea{
+
+flex:.95;
 
 }
 
@@ -686,7 +829,9 @@ height:45%;
 
 .pictureArea img{
 
-width:75%;
+width:70%;
+
+height:58%;
 
 }
 
@@ -694,14 +839,352 @@ width:75%;
 
 .house{
 
-width:110px;
+width:min(29vw,125px);
+
+max-height:13vh;
+
+object-fit:contain;
+
+}
+
+
+.houseContainer{
+
+gap:12px;
 
 }
 
 
 .sentence{
 
+font-size:clamp(19px,5vw,25px);
+
+margin-top:5px;
+
+}
+
+
+.blank{
+
+width:80px;
+
+border-bottom-width:4px;
+
+}
+
+
+.wordArea{
+
+margin-top:8px;
+
+gap:12px;
+
+}
+
+
+.word{
+
+padding:8px 23px;
+
+font-size:clamp(20px,5vw,26px);
+
+}
+
+
+.message{
+
+font-size:clamp(18px,4.5vw,23px);
+
+margin-top:6px;
+
+}
+
+
+.endBox{
+
+width:92%;
+
+padding:25px;
+
+}
+
+
+.endBox h1{
+
+font-size:clamp(38px,11vw,55px);
+
+}
+
+
+.badge{
+
+padding:15px;
+
+font-size:clamp(24px,7vw,33px);
+
+}
+
+
+.playAgain{
+
+margin-top:20px;
+
+padding:12px 35px;
+
+font-size:23px;
+
+}
+
+
+}
+
+
+
+/* MOBILE LANDSCAPE */
+
+
+@media(max-width:800px) and (orientation:landscape){
+
+
+.mainArea{
+
+flex-direction:row;
+
+gap:8px;
+
+}
+
+
+.pictureArea{
+
+width:54%;
+
+height:90%;
+
+flex:none;
+
+}
+
+
+.houseArea{
+
+width:44%;
+
+height:90%;
+
+flex:none;
+
+}
+
+
+.pictureArea img{
+
+width:75%;
+
+height:62%;
+
+}
+
+
+.house{
+
+width:min(18vw,100px);
+
+}
+
+
+}
+
+
+
+/* SHORT SCREEN DEVICES */
+
+
+@media(max-height:650px){
+
+
+.introBox{
+
+padding:10px;
+
+}
+
+
+.title{
+
+font-size:30px;
+
+margin:4px 0;
+
+}
+
+
+.subtitle{
+
+font-size:18px;
+
+}
+
+
+.instructionBox{
+
+padding:7px;
+
+font-size:15px;
+
+}
+
+
+.instructionBox h2{
+
+margin:3px 0;
+
+}
+
+
+.instructionBox p{
+
+margin:4px 0;
+
+}
+
+
+.startBtn{
+
+margin-top:7px;
+
+padding:8px 28px;
+
+font-size:20px;
+
+}
+
+
+.header{
+
+padding:4px 12px;
+
+}
+
+
+.gameTitle{
+
+font-size:22px;
+
+}
+
+
+.score{
+
+font-size:19px;
+
+}
+
+
+.progress{
+
+font-size:16px;
+
+}
+
+
+.mainArea{
+
+gap:10px;
+
+}
+
+
+.pictureArea,
+.houseArea{
+
+height:92%;
+
+}
+
+
+.pictureArea img{
+
+height:64%;
+
+}
+
+
+.sentence{
+
+font-size:22px;
+
+margin-top:3px;
+
+}
+
+
+.house{
+
+width:min(18vw,130px);
+
+max-height:28vh;
+
+}
+
+
+.wordArea{
+
+margin-top:7px;
+
+}
+
+
+.word{
+
+padding:7px 20px;
+
+font-size:21px;
+
+}
+
+
+.message{
+
+font-size:19px;
+
+margin-top:5px;
+
+}
+
+
+.endBox{
+
+padding:18px;
+
+}
+
+
+.endBox h1{
+
+font-size:38px;
+
+margin:8px 0;
+
+}
+
+
+.badge{
+
 font-size:24px;
+
+padding:10px;
+
+}
+
+
+.playAgain{
+
+margin-top:12px;
+
+padding:9px 30px;
+
+font-size:21px;
 
 }
 
@@ -882,6 +1365,8 @@ have
 
 
 </div>
+
+
 <script>
 
 
@@ -1190,7 +1675,7 @@ gameQuestions[current].answer;
 
 
 
-if(choice==correct){
+if(selectedWord==correct && choice==correct){
 
 
 
@@ -1536,6 +2021,8 @@ draw();
 
 
 </script>
+
+
 <!-- END SCREEN -->
 
 <div id="endScreen" class="screen">
