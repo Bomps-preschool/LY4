@@ -9,34 +9,30 @@
 
 <meta
 name="viewport"
-content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
 >
 
 <style>
 
 /* =====================================================
-   GENERAL SETTINGS
+   GENERAL
 ===================================================== */
 
 :root{
 
     --pink:#d95391;
-    --dark-pink:#ae3d75;
 
     --purple:#7660a8;
+
     --dark-purple:#55427f;
 
-    --cream:#fffaf1;
-
     --yellow:#ffd978;
+
     --orange:#f3a85f;
 
     --green:#62b58b;
+
     --red:#df6b6b;
-
-    --blue:#76b6d8;
-
-    --white:#ffffff;
 
 }
 
@@ -61,23 +57,24 @@ body{
 
     overflow:hidden;
 
+    background:white;
+
 }
 
 
 body{
 
     font-family:
-
     "Comic Sans MS",
     "Trebuchet MS",
     Arial,
     sans-serif;
 
-    background:white;
-
     -webkit-text-size-adjust:100%;
 
-    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+
+    overscroll-behavior:none;
 
 }
 
@@ -90,7 +87,7 @@ button{
 
 
 /* =====================================================
-   DECORATIVE BACKGROUND
+   BACKGROUND
 ===================================================== */
 
 .colourful-background{
@@ -130,21 +127,19 @@ button{
 
     height:420px;
 
-    top:-210px;
+    top:-220px;
 
-    left:-170px;
+    left:-180px;
 
     border-radius:50%;
 
     background:
 
     rgba(
-
         231,
         148,
         184,
-        0.30
-
+        0.28
     );
 
     z-index:-1;
@@ -162,7 +157,7 @@ button{
 
     height:480px;
 
-    right:-210px;
+    right:-220px;
 
     bottom:-250px;
 
@@ -171,12 +166,10 @@ button{
     background:
 
     rgba(
-
         114,
         181,
         173,
-        0.25
-
+        0.24
     );
 
     z-index:-1;
@@ -185,7 +178,7 @@ button{
 
 
 /* =====================================================
-   LOGO SCREEN
+   LOGO
 ===================================================== */
 
 #logoScreen{
@@ -198,6 +191,8 @@ button{
 
     height:100vh;
 
+    height:100svh;
+
     height:100dvh;
 
     display:flex;
@@ -208,7 +203,7 @@ button{
 
     background:white;
 
-    z-index:1000;
+    z-index:10000;
 
 }
 
@@ -219,7 +214,9 @@ button{
 
     max-width:58vw;
 
-    height:auto;
+    max-height:55vh;
+
+    object-fit:contain;
 
 }
 
@@ -238,9 +235,13 @@ button{
 
     height:100vh;
 
+    height:100svh;
+
     height:100dvh;
 
     display:none;
+
+    overflow:hidden;
 
 }
 
@@ -253,12 +254,11 @@ button{
 
 
 /* =====================================================
-   START SCREEN
+   START AND END SCREEN SHARED SETTINGS
 ===================================================== */
 
-#startScreen{
-
-    flex-direction:column;
+#startScreen,
+#endScreen{
 
     justify-content:center;
 
@@ -267,76 +267,77 @@ button{
     padding:
 
     max(
-
-        20px,
-
-        env(
-
-            safe-area-inset-top
-
-        )
-
+        7px,
+        env(safe-area-inset-top)
     )
 
     max(
-
-        15px,
-
-        env(
-
-            safe-area-inset-right
-
-        )
-
+        7px,
+        env(safe-area-inset-right)
     )
 
     max(
-
-        20px,
-
-        env(
-
-            safe-area-inset-bottom
-
-        )
-
+        7px,
+        env(safe-area-inset-bottom)
     )
 
     max(
-
-        15px,
-
-        env(
-
-            safe-area-inset-left
-
-        )
-
+        7px,
+        env(safe-area-inset-left)
     );
 
 }
 
 
+/* =====================================================
+   START SCREEN
+===================================================== */
+
 .title-card{
 
     width:min(
-
         820px,
-
-        94%
-
+        96vw
     );
+
+    max-height:
+
+    calc(
+        100vh
+        -
+        14px
+    );
+
+    max-height:
+
+    calc(
+        100dvh
+        -
+        14px
+    );
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    overflow:hidden;
 
     padding:
 
     clamp(
+        9px,
+        2.4vh,
+        28px
+    )
 
-        18px,
-
-        3vh,
-
+    clamp(
+        12px,
+        3vw,
         32px
-
     );
 
     text-align:center;
@@ -344,49 +345,45 @@ button{
     background:
 
     rgba(
-
         255,
-
         255,
-
         255,
-
-        0.94
-
+        0.96
     );
 
     border:
 
-    4px solid
+    clamp(
+        2px,
+        0.35vw,
+        4px
+    )
 
-    rgba(
+    solid
 
-        217,
+    #dfa0bd;
 
-        83,
+    border-radius:
 
-        145,
-
-        0.65
-
+    clamp(
+        18px,
+        3vw,
+        30px
     );
-
-    border-radius:30px;
 
     box-shadow:
 
-    0 15px 35px
+    0
+
+    14px
+
+    32px
 
     rgba(
-
         80,
-
         61,
-
         104,
-
         0.18
-
     );
 
 }
@@ -394,19 +391,17 @@ button{
 
 .title-monster{
 
+    flex-shrink:1;
+
     font-size:
 
     clamp(
-
-        72px,
-
-        11vw,
-
-        125px
-
+        40px,
+        10vh,
+        105px
     );
 
-    line-height:1;
+    line-height:0.95;
 
     animation:
 
@@ -422,7 +417,6 @@ button{
 
 
 @keyframes titleBounce{
-
 
     0%,
     100%{
@@ -440,25 +434,28 @@ button{
 
         transform:
 
-        translateY(-10px)
+        translateY(-6px)
 
         rotate(2deg);
 
     }
-
 
 }
 
 
 .game-title{
 
+    flex-shrink:0;
+
     margin:
 
-    8px
+    clamp(
+        2px,
+        0.8vh,
+        8px
+    )
 
-    0
-
-    5px;
+    0;
 
     color:
 
@@ -467,29 +464,31 @@ button{
     font-size:
 
     clamp(
-
-        34px,
-
-        5vw,
-
-        68px
-
+        27px,
+        6.2vh,
+        64px
     );
 
-    line-height:1.1;
+    line-height:1.08;
 
 }
 
 
 .subtitle{
 
+    flex-shrink:0;
+
     margin:
 
-    5px
+    2px
 
     0
 
-    18px;
+    clamp(
+        4px,
+        1.4vh,
+        15px
+    );
 
     color:
 
@@ -498,45 +497,75 @@ button{
     font-size:
 
     clamp(
-
-        18px,
-
-        2vw,
-
-        28px
-
+        14px,
+        2.7vh,
+        26px
     );
+
+    line-height:1.3;
 
 }
 
 
 .start-instruction-box{
 
+    flex-shrink:1;
+
     width:100%;
 
     margin:
 
-    12px
+    clamp(
+        4px,
+        1.4vh,
+        14px
+    )
 
-    auto
+    0
 
-    22px;
+    clamp(
+        7px,
+        1.7vh,
+        20px
+    );
 
     padding:
 
-    16px
+    clamp(
+        7px,
+        1.5vh,
+        15px
+    )
 
-    20px;
+    clamp(
+        8px,
+        2vw,
+        20px
+    );
+
+    overflow:hidden;
 
     background:white;
 
     border:
 
-    3px solid
+    clamp(
+        2px,
+        0.25vw,
+        3px
+    )
+
+    solid
 
     #e9a8c3;
 
-    border-radius:20px;
+    border-radius:
+
+    clamp(
+        13px,
+        2vw,
+        20px
+    );
 
     color:
 
@@ -545,16 +574,12 @@ button{
     font-size:
 
     clamp(
-
-        17px,
-
-        2vw,
-
-        25px
-
+        13px,
+        2.5vh,
+        23px
     );
 
-    line-height:1.6;
+    line-height:1.42;
 
 }
 
@@ -565,28 +590,46 @@ button{
 
     var(--pink);
 
+    font-size:1.1em;
+
 }
 
 
 #startButton{
 
-    min-width:200px;
+    flex-shrink:0;
 
-    min-height:64px;
+    min-width:
+
+    clamp(
+        150px,
+        25vw,
+        210px
+    );
+
+    min-height:
+
+    clamp(
+        43px,
+        6.8vh,
+        62px
+    );
 
     padding:
 
-    13px
+    8px
 
-    38px;
+    30px;
 
     border:
 
     3px solid
 
-    #936fb9;
+    #59467d;
 
-    border-radius:20px;
+    border-radius:18px;
+
+    color:white;
 
     background:
 
@@ -600,18 +643,12 @@ button{
 
     );
 
-    color:white;
-
     font-size:
 
     clamp(
-
-        22px,
-
-        2.5vw,
-
-        32px
-
+        18px,
+        3vh,
+        30px
     );
 
     font-weight:bold;
@@ -620,38 +657,13 @@ button{
 
     box-shadow:
 
-    0 8px 0
+    0
 
-    #493b6c,
+    6px
 
-    0 13px 22px
+    0
 
-    rgba(
-
-        71,
-
-        53,
-
-        100,
-
-        0.20
-
-    );
-
-    transition:
-
-    transform
-
-    0.18s;
-
-}
-
-
-#startButton:hover{
-
-    transform:
-
-    translateY(-3px);
+    #493b6c;
 
 }
 
@@ -660,11 +672,15 @@ button{
 
     transform:
 
-    translateY(5px);
+    translateY(4px);
 
     box-shadow:
 
-    0 3px 0
+    0
+
+    2px
+
+    0
 
     #493b6c;
 
@@ -684,51 +700,23 @@ button{
     padding:
 
     max(
-
-        7px,
-
-        env(
-
-            safe-area-inset-top
-
-        )
-
+        5px,
+        env(safe-area-inset-top)
     )
 
     max(
-
-        12px,
-
-        env(
-
-            safe-area-inset-right
-
-        )
-
+        9px,
+        env(safe-area-inset-right)
     )
 
     max(
-
-        8px,
-
-        env(
-
-            safe-area-inset-bottom
-
-        )
-
+        5px,
+        env(safe-area-inset-bottom)
     )
 
     max(
-
-        12px,
-
-        env(
-
-            safe-area-inset-left
-
-        )
-
+        9px,
+        env(safe-area-inset-left)
     );
 
 }
@@ -741,11 +729,8 @@ button{
 .top-bar{
 
     width:min(
-
         1500px,
-
         100%
-
     );
 
     display:grid;
@@ -763,13 +748,9 @@ button{
     gap:
 
     clamp(
-
-        8px,
-
-        2vw,
-
-        22px
-
+        7px,
+        1.5vw,
+        20px
     );
 
     flex-shrink:0;
@@ -781,9 +762,17 @@ button{
 
     padding:
 
-    9px
+    clamp(
+        5px,
+        0.9vh,
+        9px
+    )
 
-    18px;
+    clamp(
+        9px,
+        1.4vw,
+        18px
+    );
 
     color:white;
 
@@ -797,18 +786,14 @@ button{
 
     white;
 
-    border-radius:18px;
+    border-radius:15px;
 
     font-size:
 
     clamp(
-
-        17px,
-
-        1.8vw,
-
-        27px
-
+        15px,
+        1.7vw,
+        26px
     );
 
     font-weight:bold;
@@ -817,18 +802,17 @@ button{
 
     box-shadow:
 
-    0 5px 14px
+    0
+
+    4px
+
+    12px
 
     rgba(
-
         57,
-
         46,
-
         88,
-
         0.18
-
     );
 
 }
@@ -843,7 +827,7 @@ button{
 
 .progress-label{
 
-    margin-bottom:4px;
+    margin-bottom:3px;
 
     color:
 
@@ -852,13 +836,9 @@ button{
     font-size:
 
     clamp(
-
-        14px,
-
-        1.4vw,
-
-        21px
-
+        12px,
+        1.35vw,
+        20px
     );
 
     font-weight:bold;
@@ -875,13 +855,9 @@ button{
     height:
 
     clamp(
-
-        12px,
-
-        1.7vh,
-
-        20px
-
+        9px,
+        1.5vh,
+        18px
     );
 
     overflow:hidden;
@@ -935,20 +911,24 @@ button{
     min-width:
 
     clamp(
-
-        105px,
-
-        11vw,
-
-        155px
-
+        88px,
+        10vw,
+        145px
     );
 
     padding:
 
-    8px
+    clamp(
+        4px,
+        0.8vh,
+        8px
+    )
 
-    15px;
+    clamp(
+        8px,
+        1.2vw,
+        15px
+    );
 
     text-align:center;
 
@@ -966,18 +946,14 @@ button{
 
     #e2bc58;
 
-    border-radius:18px;
+    border-radius:15px;
 
     font-size:
 
     clamp(
-
-        18px,
-
-        1.8vw,
-
-        28px
-
+        15px,
+        1.7vw,
+        27px
     );
 
     font-weight:bold;
@@ -988,17 +964,14 @@ button{
 
 
 /* =====================================================
-   INSTRUCTION BOX
+   GAME INSTRUCTION
 ===================================================== */
 
 .game-instruction{
 
     width:min(
-
-        1400px,
-
-        96%
-
+        1420px,
+        97%
     );
 
     flex-shrink:0;
@@ -1006,13 +979,9 @@ button{
     margin:
 
     clamp(
-
-        5px,
-
-        0.9vh,
-
-        10px
-
+        3px,
+        0.7vh,
+        8px
     )
 
     0;
@@ -1020,16 +989,12 @@ button{
     padding:
 
     clamp(
-
-        7px,
-
-        1vh,
-
-        11px
-
+        4px,
+        0.85vh,
+        9px
     )
 
-    15px;
+    12px;
 
     color:
 
@@ -1038,15 +1003,10 @@ button{
     background:
 
     rgba(
-
         255,
-
         255,
-
         255,
-
         0.96
-
     );
 
     border:
@@ -1055,55 +1015,34 @@ button{
 
     #eaa6c1;
 
-    border-radius:17px;
+    border-radius:14px;
 
     font-size:
 
     clamp(
-
-        17px,
-
-        1.8vw,
-
-        27px
-
+        14px,
+        1.65vw,
+        25px
     );
 
     font-weight:bold;
 
+    line-height:1.2;
+
     text-align:center;
-
-    box-shadow:
-
-    0 4px 13px
-
-    rgba(
-
-        91,
-
-        70,
-
-        110,
-
-        0.12
-
-    );
 
 }
 
 
 /* =====================================================
-   MAIN GAME LAYOUT
+   MAIN GAME AREA
 ===================================================== */
 
 .game-content{
 
     width:min(
-
         1500px,
-
         100%
-
     );
 
     flex:1;
@@ -1115,19 +1054,13 @@ button{
     grid-template-columns:
 
     minmax(
-
         0,
-
         1.12fr
-
     )
 
     minmax(
-
-        350px,
-
+        320px,
         0.88fr
-
     );
 
     align-items:stretch;
@@ -1135,13 +1068,9 @@ button{
     gap:
 
     clamp(
-
-        15px,
-
-        3vw,
-
-        45px
-
+        9px,
+        2vw,
+        30px
     );
 
 }
@@ -1164,27 +1093,18 @@ button{
     padding:
 
     clamp(
-
-        8px,
-
-        1.3vw,
-
-        17px
-
+        5px,
+        0.8vw,
+        12px
     );
 
     background:
 
     rgba(
-
         255,
-
         255,
-
         255,
-
-        0.93
-
+        0.94
     );
 
     border:
@@ -1193,22 +1113,21 @@ button{
 
     #e9a8c3;
 
-    border-radius:25px;
+    border-radius:20px;
 
     box-shadow:
 
-    0 12px 28px
+    0
+
+    10px
+
+    23px
 
     rgba(
-
         76,
-
         58,
-
         97,
-
-        0.15
-
+        0.14
     );
 
 }
@@ -1246,7 +1165,7 @@ button{
 
     #c4aed7;
 
-    border-radius:18px;
+    border-radius:15px;
 
 }
 
@@ -1259,56 +1178,74 @@ button{
 
     height:100%;
 
-    max-width:100%;
+    min-width:0;
 
-    max-height:100%;
+    min-height:0;
 
     object-fit:contain;
 
     padding:
 
     clamp(
-
-        5px,
-
-        1vw,
-
-        12px
-
+        3px,
+        0.6vw,
+        9px
     );
 
 }
 
 
+/* =====================================================
+   QUESTION AND VOICE BUTTON
+===================================================== */
+
 #questionText{
 
     flex-shrink:0;
 
+    min-height:
+
+    clamp(
+        45px,
+        7vh,
+        70px
+    );
+
     margin-top:
 
     clamp(
-
-        6px,
-
-        1vh,
-
-        12px
-
+        4px,
+        0.7vh,
+        9px
     );
 
     padding:
 
     clamp(
-
-        8px,
-
-        1.2vh,
-
-        14px
-
+        5px,
+        0.8vh,
+        10px
     )
 
-    15px;
+    clamp(
+        7px,
+        1vw,
+        13px
+    );
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:
+
+    clamp(
+        7px,
+        1vw,
+        13px
+    );
 
     color:
 
@@ -1322,25 +1259,120 @@ button{
 
     #df9fbb;
 
-    border-radius:16px;
+    border-radius:14px;
 
     font-size:
 
     clamp(
-
-        20px,
-
-        2.4vw,
-
-        37px
-
+        18px,
+        2.15vw,
+        34px
     );
 
     font-weight:bold;
 
-    line-height:1.2;
+    line-height:1.15;
 
     text-align:center;
+
+}
+
+
+#questionSentence{
+
+    min-width:0;
+
+}
+
+
+#speakQuestionButton{
+
+    flex-shrink:0;
+
+    width:
+
+    clamp(
+        38px,
+        4vw,
+        55px
+    );
+
+    height:
+
+    clamp(
+        38px,
+        4vw,
+        55px
+    );
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:0;
+
+    border:
+
+    2px solid
+
+    #a68ac2;
+
+    border-radius:50%;
+
+    color:white;
+
+    background:
+
+    linear-gradient(
+
+        145deg,
+
+        #9274ba,
+
+        #695394
+
+    );
+
+    font-size:
+
+    clamp(
+        18px,
+        2vw,
+        27px
+    );
+
+    cursor:pointer;
+
+    box-shadow:
+
+    0
+
+    3px
+
+    0
+
+    #554173;
+
+}
+
+
+#speakQuestionButton:active{
+
+    transform:
+
+    translateY(2px);
+
+    box-shadow:
+
+    0
+
+    1px
+
+    0
+
+    #554173;
 
 }
 
@@ -1366,27 +1398,18 @@ button{
     padding:
 
     clamp(
-
-        7px,
-
-        1.2vw,
-
-        15px
-
+        5px,
+        0.8vw,
+        11px
     );
 
     background:
 
     rgba(
-
         255,
-
         255,
-
         255,
-
         0.58
-
     );
 
     border:
@@ -1394,36 +1417,27 @@ button{
     3px solid
 
     rgba(
-
         123,
-
         94,
-
         159,
-
         0.30
-
     );
 
-    border-radius:25px;
+    border-radius:20px;
 
 }
 
 
 .monster-message{
 
-    width:94%;
+    width:96%;
 
     min-height:
 
     clamp(
-
-        40px,
-
-        6vh,
-
-        60px
-
+        34px,
+        5vh,
+        52px
     );
 
     display:flex;
@@ -1434,9 +1448,9 @@ button{
 
     padding:
 
-    6px
+    4px
 
-    12px;
+    9px;
 
     color:
 
@@ -1450,21 +1464,19 @@ button{
 
     #c1acd7;
 
-    border-radius:16px;
+    border-radius:13px;
 
     font-size:
 
     clamp(
-
-        16px,
-
-        1.7vw,
-
-        25px
-
+        14px,
+        1.55vw,
+        23px
     );
 
     font-weight:bold;
+
+    line-height:1.15;
 
     text-align:center;
 
@@ -1472,7 +1484,7 @@ button{
 
 
 /* =====================================================
-   FRIENDLY MONSTER
+   MONSTER
 ===================================================== */
 
 .monster-stage{
@@ -1499,26 +1511,20 @@ button{
     width:
 
     clamp(
-
-        205px,
-
-        25vw,
-
-        350px
-
-    );
-
-    height:
-
-    clamp(
-
-        200px,
-
-        30vh,
-
+        165px,
+        27vmin,
         335px
-
     );
+
+    aspect-ratio:
+
+    1.04
+
+    /
+
+    1;
+
+    flex-shrink:1;
 
     transform-origin:
 
@@ -1533,21 +1539,11 @@ button{
 
     left:50%;
 
-    bottom:
-
-    clamp(
-
-        22px,
-
-        3vh,
-
-        38px
-
-    );
+    bottom:10%;
 
     width:78%;
 
-    height:78%;
+    height:77%;
 
     transform:
 
@@ -1567,7 +1563,13 @@ button{
 
     border:
 
-    5px solid
+    clamp(
+        3px,
+        0.35vw,
+        5px
+    )
+
+    solid
 
     #59447e;
 
@@ -1585,40 +1587,30 @@ button{
 
     inset
 
-    -14px
+    -12px
 
-    -14px
+    -12px
 
     0
 
     rgba(
-
         71,
-
         48,
-
         105,
-
         0.12
-
     ),
 
     0
 
-    13px
+    11px
 
-    19px
+    17px
 
     rgba(
-
         73,
-
         54,
-
         96,
-
         0.20
-
     );
 
 }
@@ -1643,15 +1635,10 @@ button{
     background:
 
     rgba(
-
         246,
-
         211,
-
         225,
-
         0.30
-
     );
 
     border-radius:50%;
@@ -1667,9 +1654,9 @@ button{
 
     left:50%;
 
-    width:9px;
+    width:3%;
 
-    height:20%;
+    height:21%;
 
     transform:
 
@@ -1690,21 +1677,19 @@ button{
 
     position:absolute;
 
-    top:-8px;
+    top:-9%;
 
     left:50%;
 
     width:
 
     clamp(
-
-        22px,
-
-        2.5vw,
-
-        34px
-
+        21px,
+        9vw,
+        33px
     );
+
+    max-width:33px;
 
     aspect-ratio:1;
 
@@ -1743,7 +1728,13 @@ button{
 
     border:
 
-    5px solid
+    clamp(
+        3px,
+        0.35vw,
+        5px
+    )
+
+    solid
 
     #59447e;
 
@@ -1801,17 +1792,7 @@ button{
 
     position:relative;
 
-    width:
-
-    clamp(
-
-        45px,
-
-        5.2vw,
-
-        67px
-
-    );
+    width:39%;
 
     aspect-ratio:1;
 
@@ -1819,7 +1800,13 @@ button{
 
     border:
 
-    4px solid
+    clamp(
+        3px,
+        0.3vw,
+        4px
+    )
+
+    solid
 
     #59447e;
 
@@ -1887,15 +1874,10 @@ button{
     background:
 
     rgba(
-
         244,
-
         155,
-
         175,
-
         0.75
-
     );
 
     border-radius:50%;
@@ -1918,7 +1900,7 @@ button{
 
 
 /* =====================================================
-   MONSTER MOUTH
+   MOUTH
 ===================================================== */
 
 .mouth{
@@ -1959,7 +1941,13 @@ button{
 
     border:
 
-    5px solid
+    clamp(
+        3px,
+        0.35vw,
+        5px
+    )
+
+    solid
 
     #523c68;
 
@@ -1979,27 +1967,16 @@ button{
 
     0
 
-    -14px
+    -12px
 
     0
 
     rgba(
-
         188,
-
         76,
-
         104,
-
         0.30
-
     );
-
-    transition:
-
-    box-shadow
-
-    0.2s;
 
     z-index:5;
 
@@ -2020,25 +1997,7 @@ button{
 
     height:17%;
 
-    background:
-
-    repeating-linear-gradient(
-
-        90deg,
-
-        white
-
-        0
-
-        18%,
-
-        #ddd7e2
-
-        18%
-
-        20%
-
-    );
+    background:white;
 
     border-radius:
 
@@ -2092,7 +2051,7 @@ button{
 
     position:relative;
 
-    z-index:4;
+    z-index:5;
 
     margin-top:12%;
 
@@ -2101,13 +2060,9 @@ button{
     font-size:
 
     clamp(
-
-        13px,
-
-        1.4vw,
-
-        21px
-
+        11px,
+        1.3vw,
+        20px
     );
 
     font-weight:bold;
@@ -2134,25 +2089,23 @@ button{
 
 @keyframes mouthGlow{
 
-
     from{
 
         box-shadow:
 
-        0 0 0
+        0
+
+        0
+
+        0
 
         0
 
         rgba(
-
             255,
-
             214,
-
             112,
-
             0.25
-
         );
 
     }
@@ -2162,30 +2115,28 @@ button{
 
         box-shadow:
 
-        0 0 0
+        0
 
-        12px
+        0
+
+        0
+
+        10px
 
         rgba(
-
             255,
-
             214,
-
             112,
-
-            0.48
-
+            0.46
         );
 
     }
-
 
 }
 
 
 /* =====================================================
-   MONSTER ARMS AND LEGS
+   ARMS AND FEET
 ===================================================== */
 
 .arm{
@@ -2204,7 +2155,13 @@ button{
 
     border:
 
-    4px solid
+    clamp(
+        3px,
+        0.3vw,
+        4px
+    )
+
+    solid
 
     #59447e;
 
@@ -2253,7 +2210,13 @@ button{
 
     border:
 
-    4px solid
+    clamp(
+        3px,
+        0.3vw,
+        4px
+    )
+
+    solid
 
     #59447e;
 
@@ -2315,7 +2278,6 @@ button{
 
 @keyframes happyDance{
 
-
     0%,
     100%{
 
@@ -2332,7 +2294,7 @@ button{
 
         transform:
 
-        translateY(-12px)
+        translateY(-10px)
 
         rotate(-5deg);
 
@@ -2343,12 +2305,11 @@ button{
 
         transform:
 
-        translateY(-12px)
+        translateY(-10px)
 
         rotate(5deg);
 
     }
-
 
 }
 
@@ -2368,7 +2329,6 @@ button{
 
 @keyframes monsterShake{
 
-
     0%,
     100%{
 
@@ -2383,7 +2343,7 @@ button{
 
         transform:
 
-        translateX(-10px);
+        translateX(-9px);
 
     }
 
@@ -2392,7 +2352,7 @@ button{
 
         transform:
 
-        translateX(10px);
+        translateX(9px);
 
     }
 
@@ -2401,7 +2361,7 @@ button{
 
         transform:
 
-        translateX(-7px);
+        translateX(-6px);
 
     }
 
@@ -2410,10 +2370,9 @@ button{
 
         transform:
 
-        translateX(7px);
+        translateX(6px);
 
     }
-
 
 }
 
@@ -2436,7 +2395,6 @@ button{
 
 @keyframes chew{
 
-
     0%,
     100%{
 
@@ -2451,12 +2409,11 @@ button{
 
     }
 
-
 }
 
 
 /* =====================================================
-   ANSWER WORD CARDS
+   WORD CARDS
 ===================================================== */
 
 .answer-area{
@@ -2476,7 +2433,7 @@ button{
 
     0
 
-    6px;
+    4px;
 
     color:
 
@@ -2485,13 +2442,9 @@ button{
     font-size:
 
     clamp(
-
-        14px,
-
-        1.5vw,
-
-        21px
-
+        12px,
+        1.35vw,
+        19px
     );
 
     font-weight:bold;
@@ -2512,29 +2465,19 @@ button{
     grid-template-columns:
 
     repeat(
-
         3,
-
         minmax(
-
             0,
-
             1fr
-
         )
-
     );
 
     gap:
 
     clamp(
-
-        6px,
-
-        1vw,
-
-        12px
-
+        5px,
+        0.8vw,
+        10px
     );
 
 }
@@ -2544,20 +2487,14 @@ button{
 
     position:relative;
 
-    z-index:1;
-
     min-width:0;
 
     min-height:
 
     clamp(
-
-        48px,
-
-        7vh,
-
-        72px
-
+        43px,
+        6.3vh,
+        66px
     );
 
     display:flex;
@@ -2568,9 +2505,7 @@ button{
 
     padding:
 
-    8px
-
-    7px;
+    6px;
 
     color:
 
@@ -2584,18 +2519,14 @@ button{
 
     #caacd4;
 
-    border-radius:16px;
+    border-radius:14px;
 
     font-size:
 
     clamp(
-
-        17px,
-
-        1.8vw,
-
-        27px
-
+        15px,
+        1.65vw,
+        25px
     );
 
     font-weight:bold;
@@ -2606,72 +2537,51 @@ button{
 
     user-select:none;
 
-    touch-action:none;
-
     -webkit-user-select:none;
 
-    -webkit-tap-highlight-color:
-
-    transparent;
+    touch-action:none;
 
     box-shadow:
 
-    0 6px 0
+    0
+
+    5px
+
+    0
 
     #b79ac3,
 
-    0 9px 15px
+    0
+
+    7px
+
+    12px
 
     rgba(
-
         81,
-
         62,
-
         102,
-
         0.13
-
     );
 
     transition:
 
     border-color
 
-    0.18s,
+    0.17s,
 
     background
 
-    0.18s,
+    0.17s,
 
     box-shadow
 
-    0.18s;
+    0.17s;
 
 }
 
-
-.word-card:hover{
-
-    border-color:
-
-    #a989bc;
-
-}
-
-
-.word-card:active{
-
-    cursor:grabbing;
-
-}
-
-
-/* Selected cards now remain in their original position */
 
 .word-card.selected{
-
-    z-index:2;
 
     color:
 
@@ -2689,23 +2599,26 @@ button{
 
     box-shadow:
 
-    0 0 0
+    0
+
+    0
+
+    0
 
     4px
 
     rgba(
-
         223,
-
         174,
-
         58,
-
-        0.25
-
+        0.24
     ),
 
-    0 6px 0
+    0
+
+    5px
+
+    0
 
     #b79ac3;
 
@@ -2756,7 +2669,6 @@ button{
 
 @keyframes wordShake{
 
-
     0%,
     100%{
 
@@ -2771,7 +2683,7 @@ button{
 
         transform:
 
-        translateX(-8px);
+        translateX(-7px);
 
     }
 
@@ -2780,7 +2692,7 @@ button{
 
         transform:
 
-        translateX(8px);
+        translateX(7px);
 
     }
 
@@ -2789,10 +2701,9 @@ button{
 
         transform:
 
-        translateX(-5px);
+        translateX(-4px);
 
     }
-
 
 }
 
@@ -2826,18 +2737,11 @@ button{
 
 @keyframes correctGlow{
 
-
     from{
 
         transform:
 
         scale(1);
-
-        box-shadow:
-
-        0 5px 0
-
-        #82c5a1;
 
     }
 
@@ -2846,32 +2750,30 @@ button{
 
         transform:
 
-        scale(1.07);
+        scale(1.05);
 
         box-shadow:
 
-        0 0 20px
+        0
+
+        0
+
+        18px
 
         rgba(
-
             64,
-
             160,
-
             111,
-
-            0.58
-
+            0.55
         );
 
     }
-
 
 }
 
 
 /* =====================================================
-   DRAGGING WORD
+   DRAG COPY
 ===================================================== */
 
 .drag-ghost{
@@ -2880,19 +2782,9 @@ button{
 
     z-index:5000;
 
-    width:
+    min-width:110px;
 
-    clamp(
-
-        100px,
-
-        14vw,
-
-        190px
-
-    );
-
-    min-height:55px;
+    min-height:48px;
 
     display:flex;
 
@@ -2902,9 +2794,9 @@ button{
 
     padding:
 
-    8px
+    7px
 
-    15px;
+    13px;
 
     color:
 
@@ -2920,49 +2812,39 @@ button{
 
     #dbad40;
 
-    border-radius:16px;
+    border-radius:14px;
 
     font-size:
 
     clamp(
-
-        17px,
-
-        2vw,
-
-        27px
-
+        16px,
+        1.8vw,
+        25px
     );
 
     font-weight:bold;
 
     box-shadow:
 
-    0 12px 25px
+    0
+
+    10px
+
+    22px
 
     rgba(
-
         71,
-
         54,
-
         89,
-
         0.25
-
     );
 
     transform:
 
     translate(
-
         -50%,
-
         -50%
-
-    )
-
-    rotate(-3deg);
+    );
 
     pointer-events:none;
 
@@ -2985,7 +2867,7 @@ button{
 
     align-items:center;
 
-    padding:8px;
+    padding:7px;
 
     color:
 
@@ -3001,18 +2883,14 @@ button{
 
     #d5a633;
 
-    border-radius:14px;
+    border-radius:13px;
 
     font-size:
 
     clamp(
-
-        16px,
-
-        2vw,
-
-        26px
-
+        15px,
+        1.8vw,
+        24px
     );
 
     font-weight:bold;
@@ -3053,7 +2931,7 @@ button{
 
 
 /* =====================================================
-   STAR POP
+   STAR
 ===================================================== */
 
 .star-pop{
@@ -3062,18 +2940,12 @@ button{
 
     z-index:7000;
 
-    color:#e6af2f;
-
     font-size:
 
     clamp(
-
-        55px,
-
+        50px,
         8vw,
-
-        100px
-
+        95px
     );
 
     animation:
@@ -3093,22 +2965,16 @@ button{
 
 @keyframes starPop{
 
-
     0%{
 
         transform:
 
         translate(
-
             -50%,
-
             -50%
-
         )
 
-        scale(0)
-
-        rotate(-90deg);
+        scale(0);
 
         opacity:0;
 
@@ -3120,16 +2986,11 @@ button{
         transform:
 
         translate(
-
             -50%,
-
-            -75%
-
+            -80%
         )
 
-        scale(1.3)
-
-        rotate(12deg);
+        scale(1.25);
 
         opacity:1;
 
@@ -3141,21 +3002,17 @@ button{
         transform:
 
         translate(
-
             -50%,
-
-            -130%
-
+            -135%
         )
 
-        scale(0.8)
+        scale(0.75)
 
-        rotate(35deg);
+        rotate(30deg);
 
         opacity:0;
 
     }
-
 
 }
 
@@ -3164,7 +3021,30 @@ button{
    END SCREEN
 ===================================================== */
 
-#endScreen{
+.end-card{
+
+    width:min(
+        770px,
+        96vw
+    );
+
+    max-height:
+
+    calc(
+        100vh
+        -
+        14px
+    );
+
+    max-height:
+
+    calc(
+        100dvh
+        -
+        14px
+    );
+
+    display:flex;
 
     flex-direction:column;
 
@@ -3172,119 +3052,66 @@ button{
 
     align-items:center;
 
-    padding:
-
-    max(
-
-        20px,
-
-        env(
-
-            safe-area-inset-top
-
-        )
-
-    )
-
-    max(
-
-        14px,
-
-        env(
-
-            safe-area-inset-right
-
-        )
-
-    )
-
-    max(
-
-        20px,
-
-        env(
-
-            safe-area-inset-bottom
-
-        )
-
-    )
-
-    max(
-
-        14px,
-
-        env(
-
-            safe-area-inset-left
-
-        )
-
-    );
-
-    text-align:center;
-
-}
-
-
-.end-card{
-
-    width:min(
-
-        770px,
-
-        94%
-
-    );
+    overflow:hidden;
 
     padding:
 
     clamp(
+        8px,
+        2.3vh,
+        27px
+    )
 
-        18px,
-
-        3vh,
-
-        35px
-
+    clamp(
+        10px,
+        3vw,
+        30px
     );
+
+    text-align:center;
 
     background:
 
     rgba(
-
         255,
-
         255,
-
         255,
-
-        0.95
-
+        0.96
     );
 
     border:
 
-    5px solid
+    clamp(
+        2px,
+        0.38vw,
+        5px
+    )
+
+    solid
 
     #dea0ba;
 
-    border-radius:32px;
+    border-radius:
+
+    clamp(
+        18px,
+        3vw,
+        31px
+    );
 
     box-shadow:
 
-    0 16px 35px
+    0
+
+    15px
+
+    33px
 
     rgba(
-
         78,
-
         59,
-
         100,
-
         0.20
-
     );
 
 }
@@ -3292,17 +3119,17 @@ button{
 
 .end-monster{
 
+    flex-shrink:1;
+
     font-size:
 
     clamp(
-
-        70px,
-
-        10vw,
-
-        125px
-
+        38px,
+        9vh,
+        105px
     );
+
+    line-height:0.92;
 
     animation:
 
@@ -3319,13 +3146,17 @@ button{
 
 .end-title{
 
+    flex-shrink:0;
+
     margin:
 
-    4px
+    clamp(
+        2px,
+        0.6vh,
+        6px
+    )
 
-    0
-
-    8px;
+    0;
 
     color:
 
@@ -3334,35 +3165,45 @@ button{
     font-size:
 
     clamp(
-
-        35px,
-
-        5vw,
-
-        65px
-
+        29px,
+        6.2vh,
+        61px
     );
+
+    line-height:1.05;
 
 }
 
 
 .badge{
 
+    flex-shrink:0;
+
     display:inline-block;
 
     margin:
 
-    8px
+    clamp(
+        4px,
+        1vh,
+        10px
+    )
 
-    0
-
-    15px;
+    0;
 
     padding:
 
-    11px
+    clamp(
+        5px,
+        1.2vh,
+        10px
+    )
 
-    25px;
+    clamp(
+        12px,
+        2.5vw,
+        24px
+    );
 
     color:
 
@@ -3382,29 +3223,35 @@ button{
 
     border:
 
-    4px solid
+    clamp(
+        2px,
+        0.3vw,
+        4px
+    )
+
+    solid
 
     #d9a62c;
 
-    border-radius:50px;
+    border-radius:45px;
 
     font-size:
 
     clamp(
-
-        20px,
-
-        2.5vw,
-
-        32px
-
+        16px,
+        3.2vh,
+        30px
     );
 
     font-weight:bold;
 
     box-shadow:
 
-    0 6px 0
+    0
+
+    5px
+
+    0
 
     #bf8e25;
 
@@ -3413,38 +3260,56 @@ button{
 
 .result-grid{
 
+    flex-shrink:1;
+
+    width:100%;
+
     display:grid;
 
     grid-template-columns:
 
     repeat(
-
         3,
-
-        1fr
-
+        minmax(
+            0,
+            1fr
+        )
     );
 
-    gap:12px;
+    gap:
+
+    clamp(
+        4px,
+        1vw,
+        11px
+    );
 
     margin:
 
-    10px
+    clamp(
+        5px,
+        1.2vh,
+        11px
+    )
 
-    0
-
-    17px;
+    0;
 
 }
 
 
 .result-box{
 
+    min-width:0;
+
     padding:
 
-    12px
+    clamp(
+        5px,
+        1.5vh,
+        12px
+    )
 
-    8px;
+    4px;
 
     color:
 
@@ -3456,38 +3321,58 @@ button{
 
     border:
 
-    3px solid
+    clamp(
+        2px,
+        0.25vw,
+        3px
+    )
+
+    solid
 
     #c8b6da;
 
-    border-radius:17px;
+    border-radius:
+
+    clamp(
+        10px,
+        1.5vw,
+        16px
+    );
 
     font-size:
 
     clamp(
-
-        16px,
-
-        1.8vw,
-
-        24px
-
+        12px,
+        2.7vh,
+        23px
     );
 
     font-weight:bold;
+
+    line-height:1.25;
 
 }
 
 
 #finalRemark{
 
+    flex-shrink:0;
+
     margin:
 
-    7px
+    clamp(
+        3px,
+        0.8vh,
+        8px
+    )
 
     0
 
-    20px;
+    clamp(
+        6px,
+        1.5vh,
+        17px
+    );
 
     color:
 
@@ -3496,31 +3381,43 @@ button{
     font-size:
 
     clamp(
-
-        19px,
-
-        2.2vw,
-
-        29px
-
+        15px,
+        3vh,
+        27px
     );
 
     font-weight:bold;
+
+    line-height:1.25;
 
 }
 
 
 #playAgainButton{
 
-    min-width:190px;
+    flex-shrink:0;
 
-    min-height:60px;
+    min-width:
+
+    clamp(
+        145px,
+        23vw,
+        190px
+    );
+
+    min-height:
+
+    clamp(
+        42px,
+        6.5vh,
+        58px
+    );
 
     padding:
 
-    12px
+    7px
 
-    34px;
+    28px;
 
     color:white;
 
@@ -3542,18 +3439,14 @@ button{
 
     #39795b;
 
-    border-radius:18px;
+    border-radius:17px;
 
     font-size:
 
     clamp(
-
-        21px,
-
-        2.4vw,
-
-        30px
-
+        18px,
+        3vh,
+        29px
     );
 
     font-weight:bold;
@@ -3562,7 +3455,11 @@ button{
 
     box-shadow:
 
-    0 7px 0
+    0
+
+    6px
+
+    0
 
     #31694f;
 
@@ -3573,11 +3470,15 @@ button{
 
     transform:
 
-    translateY(5px);
+    translateY(4px);
 
     box-shadow:
 
-    0 2px 0
+    0
+
+    2px
+
+    0
 
     #31694f;
 
@@ -3598,7 +3499,7 @@ button{
 
     height:100%;
 
-    z-index:8000;
+    z-index:9000;
 
     pointer-events:none;
 
@@ -3606,7 +3507,7 @@ button{
 
 
 /* =====================================================
-   TABLET LAYOUT
+   TABLETS
 ===================================================== */
 
 @media(max-width:1000px){
@@ -3617,38 +3518,13 @@ button{
         grid-template-columns:
 
         minmax(
-
             0,
-
             1fr
-
         )
 
         minmax(
-
-            300px,
-
+            280px,
             0.88fr
-
-        );
-
-        gap:12px;
-
-    }
-
-
-    .monster{
-
-        width:
-
-        clamp(
-
-            180px,
-
-            29vw,
-
-            290px
-
         );
 
     }
@@ -3658,7 +3534,7 @@ button{
 
 
 /* =====================================================
-   MOBILE PORTRAIT
+   PHONE AND TABLET PORTRAIT
 ===================================================== */
 
 @media(
@@ -3674,61 +3550,6 @@ and
     orientation:portrait
 
 ){
-
-
-    #gameScreen{
-
-        padding:
-
-        max(
-
-            5px,
-
-            env(
-
-                safe-area-inset-top
-
-            )
-
-        )
-
-        max(
-
-            7px,
-
-            env(
-
-                safe-area-inset-right
-
-            )
-
-        )
-
-        max(
-
-            5px,
-
-            env(
-
-                safe-area-inset-bottom
-
-            )
-
-        )
-
-        max(
-
-            7px,
-
-            env(
-
-                safe-area-inset-left
-
-            )
-
-        );
-
-    }
 
 
     .top-bar{
@@ -3760,32 +3581,14 @@ and
 
         width:100%;
 
-        margin:
-
-        4px
-
-        0;
-
-        padding:
-
-        5px
-
-        7px;
-
         border-width:2px;
-
-        border-radius:11px;
 
         font-size:
 
         clamp(
-
-            14px,
-
-            4vw,
-
-            18px
-
+            12px,
+            3.5vw,
+            17px
         );
 
     }
@@ -3798,29 +3601,24 @@ and
         grid-template-rows:
 
         minmax(
-
             0,
-
             1fr
-
         )
 
         auto;
 
-        gap:6px;
+        gap:5px;
 
     }
 
 
     .picture-panel{
 
-        min-height:0;
-
-        padding:5px;
+        padding:4px;
 
         border-width:2px;
 
-        border-radius:14px;
+        border-radius:13px;
 
     }
 
@@ -3829,43 +3627,43 @@ and
 
         border-width:2px;
 
-        border-radius:10px;
-
-    }
-
-
-    #questionImage{
-
-        padding:2px;
+        border-radius:9px;
 
     }
 
 
     #questionText{
 
-        margin-top:4px;
+        min-height:41px;
 
-        padding:
+        margin-top:3px;
 
-        5px
-
-        7px;
+        padding:4px;
 
         border-width:2px;
 
-        border-radius:10px;
+        border-radius:9px;
 
         font-size:
 
         clamp(
-
-            16px,
-
-            4.6vw,
-
-            22px
-
+            15px,
+            4vw,
+            21px
         );
+
+    }
+
+
+    #speakQuestionButton{
+
+        width:35px;
+
+        height:35px;
+
+        border-width:2px;
+
+        font-size:17px;
 
     }
 
@@ -3877,19 +3675,13 @@ and
         grid-template-columns:
 
         minmax(
-
-            130px,
-
-            0.44fr
-
+            120px,
+            0.43fr
         )
 
         minmax(
-
             0,
-
-            0.56fr
-
+            0.57fr
         );
 
         grid-template-rows:
@@ -3900,15 +3692,15 @@ and
 
         gap:
 
-        4px
+        3px
 
-        7px;
+        6px;
 
-        padding:5px;
+        padding:4px;
 
         border-width:2px;
 
-        border-radius:14px;
+        border-radius:13px;
 
     }
 
@@ -3923,24 +3715,20 @@ and
 
         3;
 
-        min-height:30px;
+        min-height:27px;
 
-        padding:3px;
+        padding:2px;
 
         border-width:2px;
 
-        border-radius:9px;
+        border-radius:8px;
 
         font-size:
 
         clamp(
-
-            13px,
-
-            3.5vw,
-
-            17px
-
+            11px,
+            3.2vw,
+            15px
         );
 
     }
@@ -3960,56 +3748,10 @@ and
         width:
 
         clamp(
-
-            125px,
-
-            36vw,
-
-            170px
-
+            112px,
+            33vw,
+            158px
         );
-
-        height:
-
-        clamp(
-
-            125px,
-
-            21vh,
-
-            175px
-
-        );
-
-    }
-
-
-    .monster-body{
-
-        border-width:3px;
-
-    }
-
-
-    .ear,
-    .eye{
-
-        border-width:3px;
-
-    }
-
-
-    .mouth{
-
-        border-width:3px;
-
-    }
-
-
-    .arm,
-    .foot{
-
-        border-width:3px;
 
     }
 
@@ -4030,13 +3772,9 @@ and
         font-size:
 
         clamp(
-
-            12px,
-
-            3.2vw,
-
-            15px
-
+            10px,
+            2.8vw,
+            13px
         );
 
     }
@@ -4046,7 +3784,7 @@ and
 
         grid-template-columns:1fr;
 
-        gap:5px;
+        gap:4px;
 
     }
 
@@ -4056,45 +3794,34 @@ and
         min-height:
 
         clamp(
-
-            38px,
-
-            6vh,
-
-            49px
-
+            33px,
+            5.3vh,
+            44px
         );
 
-        padding:4px;
+        padding:3px;
 
         border-width:2px;
 
-        border-radius:10px;
+        border-radius:9px;
 
         font-size:
 
         clamp(
-
-            15px,
-
-            4vw,
-
-            19px
-
+            13px,
+            3.6vw,
+            18px
         );
 
         box-shadow:
 
-        0 4px 0
+        0
+
+        3px
+
+        0
 
         #b79ac3;
-
-    }
-
-
-    .result-grid{
-
-        gap:5px;
 
     }
 
@@ -4103,7 +3830,7 @@ and
 
 
 /* =====================================================
-   VERY SMALL MOBILE
+   SMALL PHONES
 ===================================================== */
 
 @media(
@@ -4123,47 +3850,188 @@ and
 
     .star-score{
 
-        min-width:88px;
+        min-width:78px;
 
         padding:
 
-        5px
+        4px
 
-        8px;
-
-        font-size:15px;
-
-    }
-
-
-    .progress-label{
-
-        font-size:12px;
-
-    }
-
-
-    .game-instruction{
+        6px;
 
         font-size:13px;
 
     }
 
 
+    .progress-label{
+
+        font-size:11px;
+
+    }
+
+
+    .game-instruction{
+
+        font-size:11px;
+
+    }
+
+
     .monster{
 
-        width:120px;
-
-        height:128px;
+        width:108px;
 
     }
 
 
     .word-card{
 
-        min-height:36px;
+        min-height:31px;
 
-        font-size:14px;
+        font-size:13px;
+
+    }
+
+
+}
+
+
+/* =====================================================
+   SHORT SCREENS
+===================================================== */
+
+@media(max-height:700px){
+
+
+    .title-card,
+    .end-card{
+
+        padding:
+
+        7px
+
+        18px;
+
+    }
+
+
+    .title-monster,
+    .end-monster{
+
+        font-size:
+
+        clamp(
+            36px,
+            8vh,
+            66px
+        );
+
+    }
+
+
+    .game-title{
+
+        font-size:
+
+        clamp(
+            26px,
+            5.3vh,
+            44px
+        );
+
+    }
+
+
+    .subtitle{
+
+        font-size:
+
+        clamp(
+            13px,
+            2.3vh,
+            19px
+        );
+
+    }
+
+
+    .start-instruction-box{
+
+        margin:
+
+        4px
+
+        0
+
+        7px;
+
+        padding:
+
+        6px
+
+        10px;
+
+        font-size:
+
+        clamp(
+            12px,
+            2.2vh,
+            17px
+        );
+
+        line-height:1.3;
+
+    }
+
+
+    .end-title{
+
+        font-size:
+
+        clamp(
+            27px,
+            5.3vh,
+            43px
+        );
+
+    }
+
+
+    .badge{
+
+        font-size:
+
+        clamp(
+            15px,
+            2.8vh,
+            21px
+        );
+
+    }
+
+
+    .result-box{
+
+        font-size:
+
+        clamp(
+            11px,
+            2.35vh,
+            17px
+        );
+
+    }
+
+
+    #finalRemark{
+
+        font-size:
+
+        clamp(
+            14px,
+            2.5vh,
+            20px
+        );
 
     }
 
@@ -4195,51 +4063,23 @@ and
         padding:
 
         max(
-
-            3px,
-
-            env(
-
-                safe-area-inset-top
-
-            )
-
+            2px,
+            env(safe-area-inset-top)
         )
 
         max(
-
-            7px,
-
-            env(
-
-                safe-area-inset-right
-
-            )
-
+            6px,
+            env(safe-area-inset-right)
         )
 
         max(
-
-            3px,
-
-            env(
-
-                safe-area-inset-bottom
-
-            )
-
+            2px,
+            env(safe-area-inset-bottom)
         )
 
         max(
-
-            7px,
-
-            env(
-
-                safe-area-inset-left
-
-            )
-
+            6px,
+            env(safe-area-inset-left)
         );
 
     }
@@ -4249,24 +4089,20 @@ and
 
         padding:
 
-        4px
+        3px
 
-        10px;
+        8px;
 
         border-width:2px;
 
-        border-radius:10px;
+        border-radius:8px;
 
         font-size:
 
         clamp(
-
-            13px,
-
-            2vw,
-
-            17px
-
+            11px,
+            1.8vw,
+            16px
         );
 
     }
@@ -4274,28 +4110,24 @@ and
 
     .star-score{
 
-        min-width:90px;
+        min-width:80px;
 
         padding:
 
-        4px
+        3px
 
-        8px;
+        6px;
 
         border-width:2px;
 
-        border-radius:10px;
+        border-radius:8px;
 
         font-size:
 
         clamp(
-
-            13px,
-
-            1.8vw,
-
-            17px
-
+            11px,
+            1.7vw,
+            16px
         );
 
     }
@@ -4303,14 +4135,14 @@ and
 
     .progress-label{
 
-        font-size:12px;
+        font-size:10px;
 
     }
 
 
     .progress-track{
 
-        height:10px;
+        height:8px;
 
     }
 
@@ -4319,30 +4151,26 @@ and
 
         margin:
 
-        3px
+        2px
 
         0;
 
         padding:
 
-        3px
+        2px
 
-        8px;
+        6px;
 
         border-width:2px;
 
-        border-radius:9px;
+        border-radius:7px;
 
         font-size:
 
         clamp(
-
-            13px,
-
-            2vw,
-
-            17px
-
+            10px,
+            1.7vw,
+            15px
         );
 
     }
@@ -4356,18 +4184,18 @@ and
 
         0.88fr;
 
-        gap:8px;
+        gap:6px;
 
     }
 
 
     .picture-panel{
 
-        padding:4px;
+        padding:3px;
 
         border-width:2px;
 
-        border-radius:12px;
+        border-radius:9px;
 
     }
 
@@ -4376,73 +4204,72 @@ and
 
         border-width:2px;
 
-        border-radius:9px;
+        border-radius:7px;
 
     }
 
 
     #questionText{
 
-        margin-top:3px;
+        min-height:35px;
 
-        padding:
+        margin-top:2px;
 
-        4px
-
-        7px;
+        padding:2px;
 
         border-width:2px;
 
-        border-radius:9px;
+        border-radius:7px;
 
         font-size:
 
         clamp(
-
-            14px,
-
-            2.2vw,
-
-            20px
-
+            12px,
+            1.9vw,
+            18px
         );
+
+    }
+
+
+    #speakQuestionButton{
+
+        width:30px;
+
+        height:30px;
+
+        font-size:14px;
 
     }
 
 
     .monster-panel{
 
-        padding:4px;
+        padding:3px;
 
         border-width:2px;
 
-        border-radius:12px;
+        border-radius:9px;
 
     }
 
 
     .monster-message{
 
-        width:100%;
+        min-height:24px;
 
-        min-height:27px;
-
-        padding:2px;
+        padding:1px;
 
         border-width:2px;
 
-        border-radius:8px;
+        border-radius:6px;
 
         font-size:
 
         clamp(
-
-            12px,
-
-            1.7vw,
-
-            15px
-
+            9px,
+            1.45vw,
+            13px
         );
 
     }
@@ -4453,56 +4280,24 @@ and
         width:
 
         clamp(
-
-            135px,
-
-            20vw,
-
-            200px
-
+            115px,
+            29vh,
+            175px
         );
-
-        height:
-
-        clamp(
-
-            130px,
-
-            36vh,
-
-            190px
-
-        );
-
-    }
-
-
-    .monster-body,
-    .ear,
-    .eye,
-    .mouth,
-    .arm,
-    .foot{
-
-        border-width:3px;
 
     }
 
 
     .answer-heading{
 
-        margin-bottom:2px;
+        margin-bottom:1px;
 
         font-size:
 
         clamp(
-
-            11px,
-
-            1.5vw,
-
-            14px
-
+            9px,
+            1.3vw,
+            12px
         );
 
     }
@@ -4510,7 +4305,7 @@ and
 
     #wordBank{
 
-        gap:4px;
+        gap:3px;
 
     }
 
@@ -4520,36 +4315,32 @@ and
         min-height:
 
         clamp(
-
-            32px,
-
-            8vh,
-
-            43px
-
+            27px,
+            7vh,
+            38px
         );
 
-        padding:3px;
+        padding:2px;
 
         border-width:2px;
 
-        border-radius:8px;
+        border-radius:7px;
 
         font-size:
 
         clamp(
-
-            13px,
-
-            1.8vw,
-
-            17px
-
+            11px,
+            1.6vw,
+            15px
         );
 
         box-shadow:
 
-        0 3px 0
+        0
+
+        2px
+
+        0
 
         #b79ac3;
 
@@ -4560,23 +4351,141 @@ and
 
 
 /* =====================================================
-   LARGE DESKTOP
+   VERY SHORT LANDSCAPE SCREENS
 ===================================================== */
 
-@media(min-width:1800px){
+@media(max-height:480px){
 
 
-    .game-content,
-    .top-bar{
+    .title-card,
+    .end-card{
 
-        max-width:1700px;
+        width:min(
+            860px,
+            97vw
+        );
+
+        padding:
+
+        5px
+
+        15px;
 
     }
 
 
-    .game-instruction{
+    .title-monster,
+    .end-monster{
 
-        max-width:1580px;
+        font-size:35px;
+
+    }
+
+
+    .game-title{
+
+        margin:1px;
+
+        font-size:27px;
+
+    }
+
+
+    .subtitle{
+
+        margin:1px;
+
+        font-size:13px;
+
+    }
+
+
+    .start-instruction-box{
+
+        margin:
+
+        3px
+
+        0
+
+        5px;
+
+        padding:4px;
+
+        font-size:11px;
+
+        line-height:1.22;
+
+    }
+
+
+    #startButton{
+
+        min-height:36px;
+
+        font-size:16px;
+
+    }
+
+
+    .end-title{
+
+        font-size:27px;
+
+    }
+
+
+    .badge{
+
+        margin:3px;
+
+        padding:
+
+        4px
+
+        12px;
+
+        font-size:14px;
+
+    }
+
+
+    .result-grid{
+
+        margin:4px;
+
+    }
+
+
+    .result-box{
+
+        padding:4px;
+
+        font-size:11px;
+
+    }
+
+
+    #finalRemark{
+
+        margin:
+
+        2px
+
+        0
+
+        5px;
+
+        font-size:13px;
+
+    }
+
+
+    #playAgainButton{
+
+        min-height:36px;
+
+        font-size:16px;
 
     }
 
@@ -4592,7 +4501,7 @@ and
 
 
 <!-- =====================================================
-     INNOVINE LOGO SCREEN
+     LOGO
 ===================================================== -->
 
 <div id="logoScreen">
@@ -4712,8 +4621,6 @@ class="screen colourful-background"
 >
 
 
-<!-- TOP BAR -->
-
 <div class="top-bar">
 
 
@@ -4771,8 +4678,6 @@ id="starScore"
 
 
 
-<!-- INSTRUCTIONS -->
-
 <div class="game-instruction">
 
 Look at the picture. Drag or tap the correct word into the monster's mouth.
@@ -4781,12 +4686,10 @@ Look at the picture. Drag or tap the correct word into the monster's mouth.
 
 
 
-<!-- MAIN GAME AREA -->
-
 <div class="game-content">
 
 
-<!-- PICTURE AREA -->
+<!-- PICTURE -->
 
 <div class="picture-panel">
 
@@ -4810,16 +4713,39 @@ alt="Question picture"
 
 <div id="questionText">
 
+
+<span id="questionSentence">
+
 Question
 
-</div>
+</span>
+
+
+<button
+
+id="speakQuestionButton"
+
+type="button"
+
+aria-label="Hear the question again"
+
+title="Hear the question again"
+
+>
+
+🔊
+
+</button>
 
 
 </div>
 
 
+</div>
 
-<!-- MONSTER AREA -->
+
+
+<!-- MONSTER -->
 
 <div class="monster-panel">
 
@@ -4898,22 +4824,18 @@ id="monster"
 
 <div class="eye">
 
-
 <div class="pupil">
 
 </div>
-
 
 </div>
 
 
 <div class="eye">
 
-
 <div class="pupil">
 
 </div>
-
 
 </div>
 
@@ -4966,7 +4888,7 @@ Feed me!
 
 
 
-<!-- ANSWER WORDS -->
+<!-- ANSWERS -->
 
 <div class="answer-area">
 
@@ -5151,6 +5073,15 @@ preload="auto"
 ></audio>
 
 
+<audio
+
+id="questionSound"
+
+preload="auto"
+
+></audio>
+
+
 
 <!-- =====================================================
      CONFETTI
@@ -5176,6 +5107,10 @@ const questionBank=[
 image:
 
 "assets/question-1.png",
+
+audio:
+
+"assets/question-1.mp3",
 
 question:
 
@@ -5207,6 +5142,10 @@ image:
 
 "assets/question-2.png",
 
+audio:
+
+"assets/question-2.mp3",
+
 question:
 
 "Who is on the mat?",
@@ -5236,6 +5175,10 @@ answer:
 image:
 
 "assets/question-3.png",
+
+audio:
+
+"assets/question-3.mp3",
 
 question:
 
@@ -5267,6 +5210,10 @@ image:
 
 "assets/question-4.png",
 
+audio:
+
+"assets/question-4.mp3",
+
 question:
 
 "What is on his head?",
@@ -5296,6 +5243,10 @@ answer:
 image:
 
 "assets/question-5.png",
+
+audio:
+
+"assets/question-5.mp3",
 
 question:
 
@@ -5327,6 +5278,10 @@ image:
 
 "assets/question-6.png",
 
+audio:
+
+"assets/question-6.mp3",
+
 question:
 
 "Who is in the garden?",
@@ -5356,6 +5311,10 @@ answer:
 image:
 
 "assets/question-7.png",
+
+audio:
+
+"assets/question-7.mp3",
 
 question:
 
@@ -5387,6 +5346,10 @@ image:
 
 "assets/question-8.png",
 
+audio:
+
+"assets/question-8.mp3",
+
 question:
 
 "Where is the cat?",
@@ -5416,6 +5379,10 @@ answer:
 image:
 
 "assets/question-9.png",
+
+audio:
+
+"assets/question-9.mp3",
 
 question:
 
@@ -5447,6 +5414,10 @@ image:
 
 "assets/question-10.png",
 
+audio:
+
+"assets/question-10.mp3",
+
 question:
 
 "Who is riding the bicycle?",
@@ -5475,7 +5446,7 @@ answer:
 
 
 /* =====================================================
-   GAME VARIABLES
+   VARIABLES
 ===================================================== */
 
 let gameQuestions=[];
@@ -5511,9 +5482,12 @@ let confettiAnimation=null;
 let confettiStopTimer=null;
 
 
+let voiceToken=0;
+
+
 
 /* =====================================================
-   ELEMENT REFERENCES
+   ELEMENTS
 ===================================================== */
 
 const logoScreen=
@@ -5561,11 +5535,29 @@ document.getElementById(
 );
 
 
-const questionText=
+const questionSentence=
 
 document.getElementById(
 
-"questionText"
+"questionSentence"
+
+);
+
+
+const speakQuestionButton=
+
+document.getElementById(
+
+"speakQuestionButton"
+
+);
+
+
+const questionSound=
+
+document.getElementById(
+
+"questionSound"
 
 );
 
@@ -5635,7 +5627,7 @@ document.getElementById(
 
 
 /* =====================================================
-   LOGO SCREEN
+   LOGO FOR FIVE SECONDS
 ===================================================== */
 
 setTimeout(
@@ -5664,7 +5656,7 @@ startScreen
 
 
 /* =====================================================
-   SHOW ONE SCREEN
+   SHOW SCREEN
 ===================================================== */
 
 function showScreen(
@@ -5717,7 +5709,7 @@ array
 ){
 
 
-const copiedArray=[
+const copied=[
 
 ...array
 
@@ -5728,7 +5720,7 @@ for(
 
 let i=
 
-copiedArray.length-1;
+copied.length-1;
 
 i>0;
 
@@ -5756,9 +5748,9 @@ i+1
 
 [
 
-copiedArray[i],
+copied[i],
 
-copiedArray[randomIndex]
+copied[randomIndex]
 
 ]
 
@@ -5766,9 +5758,9 @@ copiedArray[randomIndex]
 
 [
 
-copiedArray[randomIndex],
+copied[randomIndex],
 
-copiedArray[i]
+copied[i]
 
 ];
 
@@ -5776,7 +5768,7 @@ copiedArray[i]
 }
 
 
-return copiedArray;
+return copied;
 
 
 }
@@ -5784,10 +5776,7 @@ return copiedArray;
 
 
 /* =====================================================
-   CLEAR OLD DRAGGED OR FLYING WORDS
-
-   This removes any temporary option card before
-   loading another question.
+   CLEAR TEMPORARY WORDS
 ===================================================== */
 
 function clearTemporaryWords(){
@@ -5839,6 +5828,298 @@ element.remove();
 
 
 /* =====================================================
+   QUESTION VOICE
+===================================================== */
+
+function stopQuestionVoice(){
+
+
+voiceToken++;
+
+
+questionSound.pause();
+
+
+questionSound.currentTime=0;
+
+
+questionSound.onerror=null;
+
+
+if(
+
+"speechSynthesis"
+
+in
+
+window
+
+){
+
+
+window
+
+.speechSynthesis
+
+.cancel();
+
+
+}
+
+
+}
+
+
+
+/* Browser voice is used if an MP3 is unavailable */
+
+function useBrowserVoice(
+
+text,
+
+token
+
+){
+
+
+if(
+
+token
+
+!==
+
+voiceToken
+
+){
+
+
+return;
+
+
+}
+
+
+if(
+
+!
+
+(
+
+"speechSynthesis"
+
+in
+
+window
+
+)
+
+){
+
+
+return;
+
+
+}
+
+
+window
+
+.speechSynthesis
+
+.cancel();
+
+
+const speech=
+
+new SpeechSynthesisUtterance(
+
+text
+
+);
+
+
+speech.lang=
+
+"en-GB";
+
+
+speech.rate=
+
+0.82;
+
+
+speech.pitch=
+
+1.05;
+
+
+speech.volume=
+
+1;
+
+
+window
+
+.speechSynthesis
+
+.speak(
+
+speech
+
+);
+
+
+}
+
+
+
+/* Play the MP3 question voice */
+
+function playQuestionVoice(){
+
+
+if(
+
+!
+
+gameQuestions[
+
+currentQuestion
+
+]
+
+){
+
+
+return;
+
+
+}
+
+
+stopQuestionVoice();
+
+
+const data=
+
+gameQuestions[
+
+currentQuestion
+
+];
+
+
+const currentToken=
+
+++voiceToken;
+
+
+let fallbackStarted=false;
+
+
+
+function startFallback(){
+
+
+if(
+
+fallbackStarted
+
+||
+
+currentToken
+
+!==
+
+voiceToken
+
+){
+
+
+return;
+
+
+}
+
+
+fallbackStarted=true;
+
+
+useBrowserVoice(
+
+data.question,
+
+currentToken
+
+);
+
+
+}
+
+
+
+questionSound.onerror=
+
+startFallback;
+
+
+questionSound.src=
+
+data.audio;
+
+
+questionSound.load();
+
+
+const playRequest=
+
+questionSound.play();
+
+
+if(
+
+playRequest
+
+&&
+
+typeof playRequest.catch
+
+===
+
+"function"
+
+){
+
+
+playRequest.catch(
+
+startFallback
+
+);
+
+
+}
+
+
+}
+
+
+
+/* Replay voice button */
+
+speakQuestionButton
+
+.addEventListener(
+
+"click",
+
+playQuestionVoice
+
+);
+
+
+
+/* =====================================================
    START GAME
 ===================================================== */
 
@@ -5861,6 +6142,9 @@ startGame
 
 
 function startGame(){
+
+
+stopQuestionVoice();
 
 
 clearTemporaryWords();
@@ -5917,7 +6201,8 @@ loadQuestion();
 function loadQuestion(){
 
 
-/* Remove anything left from the previous question */
+stopQuestionVoice();
+
 
 clearTemporaryWords();
 
@@ -5925,13 +6210,11 @@ clearTemporaryWords();
 answerLocked=false;
 
 
-selectedCard=null;
-
-
 attempts=0;
 
 
-/* Reset monster animation */
+selectedCard=null;
+
 
 monster.className=
 
@@ -5945,14 +6228,12 @@ monsterMouth.classList.remove(
 );
 
 
-/* Reset feedback */
-
 feedbackMessage.textContent=
 
 "I am hungry! Feed me the correct answer.";
 
 
-const currentData=
+const data=
 
 gameQuestions[
 
@@ -5961,42 +6242,36 @@ currentQuestion
 ];
 
 
-/* Update picture */
-
 questionImage.src=
 
-currentData.image;
+data.image;
 
 
 questionImage.alt=
 
-currentData.question;
+data.question;
 
 
-/* Update question */
+questionSentence.textContent=
 
-questionText.textContent=
-
-currentData.question;
+data.question;
 
 
-/* Completely remove previous option cards */
+/* Remove all previous cards */
 
 wordBank.replaceChildren();
 
 
-const shuffledOptions=
+const options=
 
 shuffleArray(
 
-currentData.options
+data.options
 
 );
 
 
-/* Create new clean option cards */
-
-shuffledOptions.forEach(
+options.forEach(
 
 option=>{
 
@@ -6065,12 +6340,17 @@ card
 updateProgress();
 
 
+/* Read every new question aloud */
+
+playQuestionVoice();
+
+
 }
 
 
 
 /* =====================================================
-   UPDATE SCORE AND PROGRESS
+   PROGRESS
 ===================================================== */
 
 function updateProgress(){
@@ -6129,7 +6409,7 @@ gameQuestions.length
 
 
 /* =====================================================
-   WORD CARD CONTROLS
+   WORD CONTROLS
 ===================================================== */
 
 function addCardControls(
@@ -6177,18 +6457,11 @@ dragGhost=null;
 dragging=false;
 
 
-card.classList.remove(
-
-"dragging"
-
-);
-
-
 }
 
 
 
-/* Prevent browser image-style dragging */
+/* Prevent normal browser drag */
 
 card.addEventListener(
 
@@ -6226,8 +6499,6 @@ return;
 }
 
 
-/* Clear an unfinished drag from another card */
-
 clearTemporaryWords();
 
 
@@ -6249,15 +6520,6 @@ event.clientY;
 dragging=false;
 
 
-card.classList.add(
-
-"dragging"
-
-);
-
-
-/* Capture the pointer */
-
 try{
 
 
@@ -6274,13 +6536,11 @@ pointerId
 catch(error){
 
 
-/* Pointer capture fallback */
+/* Browser fallback */
 
 
 }
 
-
-/* Make this card's cleanup available globally */
 
 activeDragCleanup=
 
@@ -6321,7 +6581,7 @@ return;
 }
 
 
-const movementX=
+const moveX=
 
 Math.abs(
 
@@ -6334,7 +6594,7 @@ startX
 );
 
 
-const movementY=
+const moveY=
 
 Math.abs(
 
@@ -6347,15 +6607,13 @@ startY
 );
 
 
-/* Start dragging only after a small movement */
-
 if(
 
-movementX>10
+moveX>10
 
 ||
 
-movementY>10
+moveY>10
 
 ){
 
@@ -6379,8 +6637,6 @@ if(
 
 ){
 
-
-/* Remove any other ghost before creating a new one */
 
 document
 
@@ -6491,7 +6747,7 @@ monsterMouth
 .getBoundingClientRect();
 
 
-const droppedInsideMouth=
+const insideMouth=
 
 
 event.clientX
@@ -6531,8 +6787,6 @@ event.clientY
 mouthBox.bottom;
 
 
-/* Remove the temporary dragged option immediately */
-
 removeDragGhost();
 
 
@@ -6542,11 +6796,9 @@ pointerId=null;
 activeDragCleanup=null;
 
 
-/* Check answer only when dropped inside mouth */
-
 if(
 
-droppedInsideMouth
+insideMouth
 
 ){
 
@@ -6561,10 +6813,19 @@ card
 }
 
 
+else{
+
+
+feedbackMessage.textContent=
+
+"Drop the word into my mouth!";
+
+
 }
 
 
-/* A normal tap selects the word */
+}
+
 
 else{
 
@@ -6687,7 +6948,7 @@ card
 
 
 /* =====================================================
-   SELECT WORD BY TAP
+   TAP A WORD
 ===================================================== */
 
 function selectWord(
@@ -6709,8 +6970,6 @@ return;
 
 }
 
-
-/* Remove selection from every other option */
 
 document
 
@@ -6737,8 +6996,6 @@ word.classList.remove(
 );
 
 
-/* Select only the newly tapped card */
-
 selectedCard=
 
 card;
@@ -6750,8 +7007,6 @@ card.classList.add(
 
 );
 
-
-/* Highlight monster's mouth */
 
 monsterMouth.classList.add(
 
@@ -6770,10 +7025,12 @@ feedbackMessage.textContent=
 
 
 /* =====================================================
-   TAP MONSTER MOUTH
+   TAP THE MOUTH
 ===================================================== */
 
-monsterMouth.addEventListener(
+monsterMouth
+
+.addEventListener(
 
 "click",
 
@@ -6807,7 +7064,9 @@ selectedCard
 
 
 
-monsterMouth.addEventListener(
+monsterMouth
+
+.addEventListener(
 
 "keydown",
 
@@ -6890,7 +7149,8 @@ return;
 }
 
 
-/* Remove any temporary dragged cards */
+stopQuestionVoice();
+
 
 clearTemporaryWords();
 
@@ -6902,7 +7162,7 @@ monsterMouth.classList.remove(
 );
 
 
-const currentData=
+const data=
 
 gameQuestions[
 
@@ -6911,7 +7171,7 @@ currentQuestion
 ];
 
 
-const chosenAnswer=
+const selectedAnswer=
 
 card.dataset.answer;
 
@@ -6920,17 +7180,15 @@ attempts++;
 
 
 
-/* =================================================
-   CORRECT ANSWER
-================================================= */
+/* CORRECT */
 
 if(
 
-chosenAnswer
+selectedAnswer
 
 ===
 
-currentData.answer
+data.answer
 
 ){
 
@@ -7011,13 +7269,7 @@ updateProgress();
 
 setTimeout(
 
-()=>{
-
-
-goToNextQuestion();
-
-
-},
+goToNextQuestion,
 
 1500
 
@@ -7027,9 +7279,8 @@ goToNextQuestion();
 }
 
 
-/* =================================================
-   WRONG ANSWER
-================================================= */
+
+/* WRONG */
 
 else{
 
@@ -7079,8 +7330,6 @@ monster.classList.add(
 
 
 
-/* First wrong attempt */
-
 if(
 
 attempts
@@ -7126,8 +7375,6 @@ monster.classList.remove(
 }
 
 
-/* Second wrong attempt */
-
 else{
 
 
@@ -7138,7 +7385,7 @@ feedbackMessage.textContent=
 
 `The correct answer is "${
 
-currentData.answer
+data.answer
 
 }".`;
 
@@ -7167,13 +7414,7 @@ showCorrectAnswer();
 
 setTimeout(
 
-()=>{
-
-
-goToNextQuestion();
-
-
-},
+goToNextQuestion,
 
 2200
 
@@ -7191,13 +7432,13 @@ goToNextQuestion();
 
 
 /* =====================================================
-   SHOW CORRECT ANSWER
+   REVEAL CORRECT ANSWER
 ===================================================== */
 
 function showCorrectAnswer(){
 
 
-const correctAnswer=
+const answer=
 
 gameQuestions[
 
@@ -7234,7 +7475,7 @@ card.dataset.answer
 
 ===
 
-correctAnswer
+answer
 
 ){
 
@@ -7259,7 +7500,7 @@ card.classList.add(
 
 
 /* =====================================================
-   FLY WORD INTO MONSTER
+   FLY WORD
 ===================================================== */
 
 function flyWordToMonster(
@@ -7268,8 +7509,6 @@ card
 
 ){
 
-
-/* Remove any old flying words */
 
 document
 
@@ -7304,7 +7543,7 @@ monsterMouth
 .getBoundingClientRect();
 
 
-const flyingWord=
+const word=
 
 document.createElement(
 
@@ -7313,39 +7552,39 @@ document.createElement(
 );
 
 
-flyingWord.className=
+word.className=
 
 "flying-word";
 
 
-flyingWord.textContent=
+word.textContent=
 
 card.textContent;
 
 
-flyingWord.style.left=
+word.style.left=
 
 `${cardBox.left}px`;
 
 
-flyingWord.style.top=
+word.style.top=
 
 `${cardBox.top}px`;
 
 
-flyingWord.style.width=
+word.style.width=
 
 `${cardBox.width}px`;
 
 
-flyingWord.style.height=
+word.style.height=
 
 `${cardBox.height}px`;
 
 
 document.body.appendChild(
 
-flyingWord
+word
 
 );
 
@@ -7355,7 +7594,7 @@ requestAnimationFrame(
 ()=>{
 
 
-flyingWord.style.left=
+word.style.left=
 
 `${
 
@@ -7372,7 +7611,7 @@ mouthBox.width/2
 }px`;
 
 
-flyingWord.style.top=
+word.style.top=
 
 `${
 
@@ -7389,22 +7628,22 @@ mouthBox.height/2
 }px`;
 
 
-flyingWord.style.width=
+word.style.width=
 
 "50px";
 
 
-flyingWord.style.height=
+word.style.height=
 
 "30px";
 
 
-flyingWord.style.opacity=
+word.style.opacity=
 
 "0";
 
 
-flyingWord.style.transform=
+word.style.transform=
 
 "rotate(20deg) scale(0.2)";
 
@@ -7419,7 +7658,7 @@ setTimeout(
 ()=>{
 
 
-flyingWord.remove();
+word.remove();
 
 
 },
@@ -7434,15 +7673,17 @@ flyingWord.remove();
 
 
 /* =====================================================
-   STAR ANIMATION
+   STAR
 ===================================================== */
 
 function showStar(){
 
 
-const monsterBox=
+const box=
 
-monster.getBoundingClientRect();
+monster
+
+.getBoundingClientRect();
 
 
 const star=
@@ -7468,11 +7709,11 @@ star.style.left=
 
 `${
 
-monsterBox.left
+box.left
 
 +
 
-monsterBox.width/2
+box.width/2
 
 }px`;
 
@@ -7481,11 +7722,11 @@ star.style.top=
 
 `${
 
-monsterBox.top
+box.top
 
 +
 
-monsterBox.height/2
+box.height/2
 
 }px`;
 
@@ -7523,12 +7764,11 @@ star.remove();
 function goToNextQuestion(){
 
 
-/* Remove all temporary cards */
+stopQuestionVoice();
+
 
 clearTemporaryWords();
 
-
-/* Remove any old selection */
 
 selectedCard=null;
 
@@ -7572,7 +7812,7 @@ loadQuestion();
 
 function playSound(
 
-audioId
+id
 
 ){
 
@@ -7581,7 +7821,7 @@ const audio=
 
 document.getElementById(
 
-audioId
+id
 
 );
 
@@ -7605,28 +7845,32 @@ audio.pause();
 audio.currentTime=0;
 
 
-const audioPromise=
+const request=
 
 audio.play();
 
 
 if(
 
-audioPromise
+request
 
-!==
+&&
 
-undefined
+typeof request.catch
+
+===
+
+"function"
 
 ){
 
 
-audioPromise.catch(
+request.catch(
 
 ()=>{
 
 
-/* Prevent browser audio errors */
+/* Prevent audio errors */
 
 
 }
@@ -7648,10 +7892,10 @@ audioPromise.catch(
 function showEndScreen(){
 
 
+stopQuestionVoice();
+
+
 clearTemporaryWords();
-
-
-selectedCard=null;
 
 
 showScreen(
@@ -7786,7 +8030,7 @@ else{
 
 remark=
 
-"Good effort! Look carefully and try the game again! 💛";
+"Good effort! Look carefully and play again! 💛";
 
 
 }
@@ -7841,9 +8085,6 @@ document
 stopConfetti();
 
 
-clearTemporaryWords();
-
-
 startGame();
 
 
@@ -7854,59 +8095,12 @@ startGame();
 
 
 /* =====================================================
-   EXTRA DRAG CLEANUP
-
-   These safeguards remove dragged cards if the
-   pointer is released outside the game area.
+   CLEANUP
 ===================================================== */
 
-window.addEventListener(
+window
 
-"pointerup",
-
-()=>{
-
-
-setTimeout(
-
-()=>{
-
-
-document
-
-.querySelectorAll(
-
-".drag-ghost"
-
-)
-
-.forEach(
-
-element=>{
-
-
-element.remove();
-
-
-}
-
-);
-
-
-},
-
-0
-
-);
-
-
-}
-
-);
-
-
-
-window.addEventListener(
+.addEventListener(
 
 "pointercancel",
 
@@ -7916,7 +8110,9 @@ clearTemporaryWords
 
 
 
-window.addEventListener(
+window
+
+.addEventListener(
 
 "blur",
 
@@ -7926,7 +8122,9 @@ clearTemporaryWords
 
 
 
-document.addEventListener(
+document
+
+.addEventListener(
 
 "visibilitychange",
 
@@ -7938,6 +8136,9 @@ if(
 document.hidden
 
 ){
+
+
+stopQuestionVoice();
 
 
 clearTemporaryWords();
@@ -8005,7 +8206,7 @@ const colours=[
 const pieces=[];
 
 
-const numberOfPieces=
+const amount=
 
 window.innerWidth
 
@@ -8015,18 +8216,18 @@ window.innerWidth
 
 ?
 
-80
+75
 
 :
 
-140;
+135;
 
 
 for(
 
 let i=0;
 
-i<numberOfPieces;
+i<amount;
 
 i++
 
@@ -8147,7 +8348,7 @@ colours.length
 
 
 
-function animateConfetti(){
+function animate(){
 
 
 context.clearRect(
@@ -8284,7 +8485,7 @@ confettiAnimation=
 
 requestAnimationFrame(
 
-animateConfetti
+animate
 
 );
 
@@ -8292,7 +8493,7 @@ animateConfetti
 }
 
 
-animateConfetti();
+animate();
 
 
 confettiStopTimer=
@@ -8393,7 +8594,7 @@ canvas.height
 
 
 /* =====================================================
-   RESIZE CONFETTI
+   RESIZE
 ===================================================== */
 
 function resizeCanvas(){
@@ -8422,21 +8623,37 @@ window.innerHeight;
 
 
 
-window.addEventListener(
+window
+
+.addEventListener(
 
 "resize",
 
-resizeCanvas
+()=>{
+
+
+resizeCanvas();
+
+
+clearTemporaryWords();
+
+
+}
 
 );
 
 
 
-window.addEventListener(
+window
+
+.addEventListener(
 
 "orientationchange",
 
 ()=>{
+
+
+stopQuestionVoice();
 
 
 clearTemporaryWords();
@@ -8457,7 +8674,6 @@ resizeCanvas,
 
 
 </script>
-
 
 </body>
 
