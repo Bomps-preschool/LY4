@@ -32,7 +32,7 @@ font-family:"Comic Sans MS","Trebuchet MS",sans-serif;
 
 
 
-/* ---------------- LOGO ---------------- */
+/* ================= LOGO SCREEN ================= */
 
 
 #logoScreen{
@@ -53,7 +53,7 @@ justify-content:center;
 
 align-items:center;
 
-z-index:1000;
+z-index:9999;
 
 }
 
@@ -68,7 +68,9 @@ max-width:70%;
 
 
 
-/* ---------------- ALL SCREENS ---------------- */
+
+
+/* ================= SCREENS ================= */
 
 
 .screen{
@@ -87,8 +89,7 @@ display:none;
 
 
 
-
-/* ---------------- INTRO ---------------- */
+/* ================= INTRO SCREEN ================= */
 
 
 #introScreen{
@@ -184,11 +185,10 @@ cursor:pointer;
 
 
 
-/* ---------------- GAME ---------------- */
+/* ================= GAME SCREEN ================= */
 
 
 #gameScreen{
-
 
 background:url("assets/background.png");
 
@@ -201,6 +201,8 @@ padding:10px;
 flex-direction:column;
 
 }
+
+
 
 
 
@@ -238,6 +240,7 @@ font-weight:bold;
 }
 
 
+
 .score{
 
 font-size:25px;
@@ -245,7 +248,6 @@ font-size:25px;
 color:#51438b;
 
 }
-
 
 
 
@@ -261,19 +263,15 @@ color:#51438b;
 
 
 
-.questionBox{
-
-display:none;
-
-}
-
+/* Removed question box completely */
 
 
 
 .mainArea{
 
 
-flex:1;
+height:calc(100vh - 150px);
+
 
 display:flex;
 
@@ -281,14 +279,18 @@ justify-content:center;
 
 align-items:center;
 
-gap:25px;
+gap:20px;
+
+overflow:hidden;
 
 }
 
 
 
 
-/* ---------------- PICTURE ---------------- */
+
+/* ================= IMAGE AREA ================= */
+
 
 
 .pictureArea{
@@ -296,7 +298,9 @@ gap:25px;
 
 width:55%;
 
-height:85%;
+height:90%;
+
+max-height:520px;
 
 
 background:white;
@@ -319,12 +323,16 @@ align-items:center;
 
 
 
+
+
 .pictureArea img{
 
 
-width:85%;
+width:80%;
 
-height:75%;
+height:65%;
+
+max-height:300px;
 
 object-fit:contain;
 
@@ -360,7 +368,7 @@ border-bottom:5px solid #d84f91;
 
 
 
-/* ---------------- HOUSE ---------------- */
+/* ================= HOUSE AREA ================= */
 
 
 
@@ -369,7 +377,9 @@ border-bottom:5px solid #d84f91;
 
 width:40%;
 
-height:85%;
+height:90%;
+
+max-height:520px;
 
 
 background:white;
@@ -389,7 +399,6 @@ align-items:center;
 
 
 }
-
 
 
 
@@ -414,11 +423,13 @@ transition:.3s;
 }
 
 
+
 .house:hover{
 
 transform:scale(1.08);
 
 }
+
 
 
 .correctHouse{
@@ -431,11 +442,13 @@ animation:bounce .7s;
 
 @keyframes bounce{
 
+
 50%{
 
 transform:translateY(-20px);
 
 }
+
 
 }
 
@@ -510,7 +523,9 @@ margin-top:20px;
 
 
 
-/* ---------------- CHILD ---------------- */
+
+/* ================= CHILD ================= */
+
 
 
 .movingChild{
@@ -559,7 +574,7 @@ left:70%;
 
 
 
-/* ---------------- END SCREEN ---------------- */
+/* ================= END SCREEN ================= */
 
 
 #endScreen{
@@ -572,6 +587,8 @@ justify-content:center;
 align-items:center;
 
 text-align:center;
+
+z-index:999;
 
 
 }
@@ -660,17 +677,66 @@ pointer-events:none;
 
 
 
-/* MOBILE */
 
 
-@media(max-width:800px){
+
+/* ================= RESPONSIVE ================= */
+
+
+
+@media(max-width:1100px){
+
+
+.mainArea{
+
+height:calc(100vh - 170px);
+
+}
+
+
+
+.pictureArea img{
+
+max-height:220px;
+
+}
+
+
+
+.house{
+
+width:130px;
+
+}
+
+
+
+.word{
+
+font-size:24px;
+
+padding:12px 25px;
+
+}
+
+
+}
+
+
+
+
+
+@media(max-width:700px){
 
 
 .mainArea{
 
 flex-direction:column;
 
+overflow:hidden;
+
 }
+
 
 
 .pictureArea,
@@ -686,7 +752,7 @@ height:45%;
 
 .pictureArea img{
 
-width:75%;
+height:55%;
 
 }
 
@@ -694,9 +760,20 @@ width:75%;
 
 .house{
 
-width:110px;
+width:100px;
 
 }
+
+
+
+.word{
+
+font-size:20px;
+
+padding:10px 20px;
+
+}
+
 
 
 .sentence{
@@ -704,6 +781,15 @@ width:110px;
 font-size:24px;
 
 }
+
+
+
+.title{
+
+font-size:35px;
+
+}
+
 
 
 }
@@ -727,7 +813,6 @@ font-size:24px;
 
 
 <!-- INTRO -->
-
 
 <div id="introScreen" class="screen">
 
@@ -777,109 +862,6 @@ Start Game
 
 
 </div>
-
-</div>
-
-
-
-<!-- GAME -->
-
-
-<div id="gameScreen" class="screen">
-
-
-<div class="header">
-
-
-<div class="gameTitle">
-
-🏡 Has-Have House
-
-</div>
-
-
-<div class="score">
-
-⭐ <span id="score">0</span>/10
-
-</div>
-
-
-</div>
-
-
-<div class="progress">
-
-Question <span id="qNo">1</span> of 10
-
-</div>
-
-
-
-
-<div class="mainArea">
-
-
-<div class="pictureArea">
-
-
-<img id="picture">
-
-
-<div id="sentence" class="sentence"></div>
-
-
-</div>
-
-
-
-<div class="houseArea">
-
-
-<div class="houseContainer">
-
-
-<img id="hasHouse" class="house" src="assets/has-house.png">
-
-
-<img id="haveHouse" class="house" src="assets/have-house.png">
-
-
-</div>
-
-
-<div class="wordArea">
-
-
-<div class="word" id="word1">
-
-has
-
-</div>
-
-
-<div class="word" id="word2">
-
-have
-
-</div>
-
-
-</div>
-
-
-<div id="message" class="message"></div>
-
-
-</div>
-
-
-</div>
-
-
-
-<img id="movingChild" class="movingChild" src="assets/happy-child.png">
-
 
 </div>
 <script>
@@ -950,7 +932,6 @@ answer:"have"
 ];
 
 
-
 let current=0;
 
 let score=0;
@@ -961,14 +942,12 @@ let gameQuestions=[];
 
 
 
-
-/* LOGO TIMER */
+/* LOGO SCREEN */
 
 setTimeout(()=>{
 
 
 document.getElementById("logoScreen").style.display="none";
-
 
 document.getElementById("introScreen").style.display="flex";
 
@@ -1003,7 +982,6 @@ current=0;
 score=0;
 
 
-
 loadQuestion();
 
 
@@ -1023,7 +1001,6 @@ function loadQuestion(){
 let q=gameQuestions[current];
 
 
-
 document.getElementById("qNo").innerHTML=current+1;
 
 
@@ -1033,7 +1010,6 @@ document.getElementById("score").innerHTML=score;
 
 document.getElementById("picture").src=
 "assets/"+q.img;
-
 
 
 
@@ -1081,7 +1057,8 @@ h.classList.remove("correctHouse");
 
 
 
-/* SELECT WORD */
+
+/* WORD SELECT */
 
 
 document.getElementById("word1").onclick=function(){
@@ -1091,12 +1068,12 @@ selectWord("has");
 };
 
 
-
 document.getElementById("word2").onclick=function(){
 
 selectWord("have");
 
 };
+
 
 
 
@@ -1117,7 +1094,7 @@ w.classList.remove("selected");
 
 
 
-if(word=="has"){
+if(word==="has"){
 
 
 document.getElementById("word1")
@@ -1148,6 +1125,7 @@ document.getElementById("message").innerHTML=
 
 
 
+
 /* HOUSE CLICK */
 
 
@@ -1170,13 +1148,15 @@ checkAnswer("have");
 
 
 
+
+
 /* CHECK ANSWER */
 
 
 function checkAnswer(choice){
 
 
-if(selectedWord==""){
+if(selectedWord===""){
 
 return;
 
@@ -1190,7 +1170,9 @@ gameQuestions[current].answer;
 
 
 
-if(choice==correct){
+// WORD AND HOUSE BOTH MUST MATCH
+
+if(choice===correct && selectedWord===correct){
 
 
 
@@ -1202,26 +1184,22 @@ document.getElementById("score").innerHTML=score;
 
 
 
-document.getElementById("correctSound")
-.play();
+document.getElementById("correctSound").play();
 
 
 
 
-let house;
+let house =
 
+correct==="has"
 
-if(correct=="has"){
+?
 
-house=document.getElementById("hasHouse");
+document.getElementById("hasHouse")
 
-}
+:
 
-else{
-
-house=document.getElementById("haveHouse");
-
-}
+document.getElementById("haveHouse");
 
 
 
@@ -1254,8 +1232,7 @@ nextQuestion();
 else{
 
 
-document.getElementById("wrongSound")
-.play();
+document.getElementById("wrongSound").play();
 
 
 
@@ -1285,7 +1262,7 @@ w.classList.remove("selected");
 
 
 
-/* CHILD ANIMATION */
+/* CHILD WALK */
 
 
 function walkChild(){
@@ -1294,17 +1271,13 @@ function walkChild(){
 let child=document.getElementById("movingChild");
 
 
-
 child.style.display="block";
-
 
 
 child.classList.remove("walk");
 
 
-
 void child.offsetWidth;
-
 
 
 child.classList.add("walk");
@@ -1315,6 +1288,9 @@ setTimeout(()=>{
 
 
 child.style.display="none";
+
+
+child.classList.remove("walk");
 
 
 },1500);
@@ -1363,7 +1339,7 @@ loadQuestion();
 
 
 
-/* END */
+/* FINISH GAME */
 
 
 function finishGame(){
@@ -1371,6 +1347,7 @@ function finishGame(){
 
 document.getElementById("gameScreen")
 .style.display="none";
+
 
 
 document.getElementById("endScreen")
@@ -1400,7 +1377,7 @@ launchConfetti();
 
 
 
-/* RESTART */
+/* PLAY AGAIN */
 
 
 function restartGame(){
@@ -1408,6 +1385,7 @@ function restartGame(){
 
 document.getElementById("endScreen")
 .style.display="none";
+
 
 
 document.getElementById("gameScreen")
@@ -1479,7 +1457,6 @@ speed:Math.random()*3+2
 
 
 
-
 function draw(){
 
 
@@ -1528,7 +1505,6 @@ requestAnimationFrame(draw);
 }
 
 
-
 draw();
 
 
@@ -1537,6 +1513,7 @@ draw();
 
 </script>
 <!-- END SCREEN -->
+
 
 <div id="endScreen" class="screen">
 
@@ -1591,7 +1568,7 @@ Play Again
 
 
 
-<!-- AUDIO FILES -->
+<!-- AUDIO -->
 
 
 <audio id="correctSound" src="assets/correct.mp3"></audio>
@@ -1604,7 +1581,6 @@ Play Again
 
 
 <!-- CONFETTI -->
-
 
 <canvas id="confetti"></canvas>
 
