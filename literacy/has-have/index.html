@@ -1,2785 +1,1085 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+ 
 <title>Build the Has-Have House</title>
-
-
+ 
 <style>
-
+ 
 *{
 box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
 }
-
-
+ 
 html,body{
-
 margin:0;
 padding:0;
-
 width:100%;
 height:100%;
-
+min-height:100%;
 overflow:hidden;
-
 font-family:"Comic Sans MS","Trebuchet MS",sans-serif;
-
+-webkit-text-size-adjust:100%;
 }
-
-
-
+ 
+body{
+position:fixed;
+inset:0;
+}
+ 
+button,
+.word,
+.house{
+touch-action:manipulation;
+}
+ 
 /* ---------------- LOGO ---------------- */
-
-
+ 
 #logoScreen{
-
 position:fixed;
-
-top:0;
-left:0;
-
-width:100%;
+inset:0;
+width:100vw;
 height:100vh;
-
+height:100dvh;
 background:white;
-
 display:flex;
-
 justify-content:center;
-
 align-items:center;
-
 z-index:1000;
-
+overflow:hidden;
 }
-
-
+ 
 #logoScreen img{
-
-width:260px;
-
+width:clamp(150px,28vw,260px);
 max-width:70%;
-
-}
-
-
-
-/* ---------------- ALL SCREENS ---------------- */
-
-
-.screen{
-
-position:fixed;
-
-top:0;
-left:0;
-
-width:100%;
-height:100vh;
-
-display:none;
-
-}
-
-
-
-
-/* ---------------- INTRO ---------------- */
-
-
-#introScreen{
-
-background:white;
-
-justify-content:center;
-
-align-items:center;
-
-text-align:center;
-
-padding:20px;
-
-}
-
-
-
-.introBox{
-
-width:90%;
-
-max-width:950px;
-
-background:white;
-
-border:4px solid #e6a3c2;
-
-border-radius:30px;
-
-padding:30px;
-
-}
-
-
-
-.title{
-
-font-size:48px;
-
-color:#d84f91;
-
-}
-
-
-
-.subtitle{
-
-font-size:26px;
-
-color:#51438b;
-
-}
-
-
-
-.instructionBox{
-
-border:3px solid #e6a3c2;
-
-border-radius:25px;
-
-padding:20px;
-
-font-size:22px;
-
-color:#51438b;
-
-}
-
-
-
-.startBtn{
-
-margin-top:25px;
-
-background:#7bbf8c;
-
-border:none;
-
-color:white;
-
-font-size:28px;
-
-padding:15px 45px;
-
-border-radius:30px;
-
-cursor:pointer;
-
-}
-
-
-
-
-/* ---------------- GAME ---------------- */
-
-
-#gameScreen{
-
-
-background:url("assets/background.png");
-
-background-size:cover;
-
-background-position:center;
-
-padding:10px;
-
-flex-direction:column;
-
-}
-
-
-
-.header{
-
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-
-background:white;
-
-border:3px solid #e6a3c2;
-
-border-radius:20px;
-
-padding:10px 20px;
-
-
-}
-
-
-
-.gameTitle{
-
-font-size:32px;
-
-color:#d84f91;
-
-font-weight:bold;
-
-}
-
-
-.score{
-
-font-size:25px;
-
-color:#51438b;
-
-}
-
-
-
-
-.progress{
-
-text-align:center;
-
-font-size:22px;
-
-color:#51438b;
-
-}
-
-
-
-.questionBox{
-
-display:none;
-
-}
-
-
-
-
-.mainArea{
-
-
-flex:1;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:25px;
-
-}
-
-
-
-
-/* ---------------- PICTURE ---------------- */
-
-
-.pictureArea{
-
-
-width:55%;
-
-height:85%;
-
-
-background:white;
-
-border:4px solid #e6a3c2;
-
-border-radius:30px;
-
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-
-}
-
-
-
-.pictureArea img{
-
-
-width:85%;
-
-height:75%;
-
+max-height:70%;
 object-fit:contain;
-
-
 }
-
-
-
-
-.sentence{
-
-
-font-size:34px;
-
-color:#51438b;
-
-margin-top:15px;
-
-}
-
-
-
-.blank{
-
-
-display:inline-block;
-
-width:120px;
-
-border-bottom:5px solid #d84f91;
-
-}
-
-
-
-/* ---------------- HOUSE ---------------- */
-
-
-
-.houseArea{
-
-
-width:40%;
-
-height:85%;
-
-
-background:white;
-
-border:4px solid #e6a3c2;
-
-border-radius:30px;
-
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-
-}
-
-
-
-
-.houseContainer{
-
-display:flex;
-
-gap:20px;
-
-}
-
-
-
-.house{
-
-width:180px;
-
-cursor:pointer;
-
-transition:.3s;
-
-}
-
-
-.house:hover{
-
-transform:scale(1.08);
-
-}
-
-
-.correctHouse{
-
-animation:bounce .7s;
-
-}
-
-
-
-@keyframes bounce{
-
-50%{
-
-transform:translateY(-20px);
-
-}
-
-}
-
-
-
-
-.wordArea{
-
-
-display:flex;
-
-gap:20px;
-
-margin-top:30px;
-
-
-}
-
-
-
-.word{
-
-
-background:#ffe89c;
-
-border:3px solid #dcae35;
-
-border-radius:20px;
-
-
-padding:15px 35px;
-
-
-font-size:30px;
-
-font-weight:bold;
-
-color:#51438b;
-
-
-cursor:pointer;
-
-
-}
-
-
-
-.selected{
-
-
-transform:scale(1.1);
-
-background:#ffd45a;
-
-}
-
-
-
-
-.message{
-
-font-size:28px;
-
-color:#d84f91;
-
-font-weight:bold;
-
-margin-top:20px;
-
-}
-
-
-
-
-/* ---------------- CHILD ---------------- */
-
-
-.movingChild{
-
-
-position:absolute;
-
-width:90px;
-
-display:none;
-
-
-}
-
-
-
-.walk{
-
-
-animation:walk 1.5s forwards;
-
-}
-
-
-
-@keyframes walk{
-
-
-from{
-
-left:5%;
-
-}
-
-
-to{
-
-left:70%;
-
-}
-
-
-}
-
-
-
-
-
-/* ---------------- END SCREEN ---------------- */
-
-
-#endScreen{
-
-
-background:white;
-
-justify-content:center;
-
-align-items:center;
-
-text-align:center;
-
-
-}
-
-
-
-.endBox{
-
-
-border:4px solid #e6a3c2;
-
-border-radius:30px;
-
-padding:40px;
-
-
-}
-
-
-
-.endBox h1{
-
-
-font-size:60px;
-
-color:#d84f91;
-
-
-}
-
-
-
-.badge{
-
-
-background:#ffe89c;
-
-border:4px solid #dcae35;
-
-border-radius:40px;
-
-padding:20px;
-
-font-size:35px;
-
-color:#51438b;
-
-
-}
-
-
-
-.playAgain{
-
-
-margin-top:30px;
-
-padding:15px 45px;
-
-font-size:28px;
-
-border:none;
-
-border-radius:30px;
-
-background:#7bbf8c;
-
-color:white;
-
-
-}
-
-
-
-
-canvas{
-
+ 
+/* ---------------- ALL SCREENS ---------------- */
+ 
+.screen{
 position:fixed;
-
-top:0;
-left:0;
-
-pointer-events:none;
-
-}
-
-
-
-/* MOBILE */
-
-
-@media(max-width:800px){
-
-
-.mainArea{
-
-flex-direction:column;
-
-}
-
-
-.pictureArea,
-.houseArea{
-
-width:95%;
-
-height:45%;
-
-}
-
-
-
-.pictureArea img{
-
-width:75%;
-
-}
-
-
-
-.house{
-
-width:110px;
-
-}
-
-
-.sentence{
-
-font-size:24px;
-
-}
-
-
-}
-
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<!-- LOGO -->
-
-<div id="logoScreen">
-
-<img src="assets/innovine-logo.png">
-
-</div>
-
-
-<!-- INTRO -->
-
-
-<div id="introScreen" class="screen">
-
-
-<div class="introBox">
-
-
-<h1 class="title">
-
-🏡 Build the Has-Have House
-
-</h1>
-
-
-<div class="subtitle">
-
-Help the children find the correct grammar house!
-
-</div>
-
-
-
-<div class="instructionBox">
-
-
-<h2>How to Play</h2>
-
-
-<p>👀 Look at the picture and read the sentence.</p>
-
-<p>🏠 Choose HAS or HAVE.</p>
-
-<p>✨ Send the character to the correct house.</p>
-
-<p>📱 Tap the word and then choose the house.</p>
-
-
-</div>
-
-
-
-<button class="startBtn" onclick="startGame()">
-
-Start Game
-
-</button>
-
-
-</div>
-
-</div>
-
-
-
-<!-- GAME -->
-
-
-<div id="gameScreen" class="screen">
-
-
-<div class="header">
-
-
-<div class="gameTitle">
-
-🏡 Has-Have House
-
-</div>
-
-
-<div class="score">
-
-⭐ <span id="score">0</span>/10
-
-</div>
-
-
-</div>
-
-
-<div class="progress">
-
-Question <span id="qNo">1</span> of 10
-
-</div>
-
-
-
-
-<div class="mainArea">
-
-
-<div class="pictureArea">
-
-
-<img id="picture">
-
-
-<div id="sentence" class="sentence"></div>
-
-
-</div>
-
-
-
-<div class="houseArea">
-
-
-<div class="houseContainer">
-
-
-<img id="hasHouse" class="house" src="assets/has-house.png">
-
-
-<img id="haveHouse" class="house" src="assets/have-house.png">
-
-
-</div>
-
-
-<div class="wordArea">
-
-
-<div class="word" id="word1">
-
-has
-
-</div>
-
-
-<div class="word" id="word2">
-
-have
-
-</div>
-
-
-</div>
-
-
-<div id="message" class="message"></div>
-
-
-</div>
-
-
-</div>
-
-
-
-<img id="movingChild" class="movingChild" src="assets/happy-child.png">
-
-
-</div>
-<script>
-
-
-const questions=[
-
-{
-img:"cat-ball.png",
-sentence:"The cat ___ a blue ball.",
-answer:"has"
-},
-
-{
-img:"girl-flowers.png",
-sentence:"She ___ beautiful flowers.",
-answer:"has"
-},
-
-{
-img:"children-playground.png",
-sentence:"They ___ a big playground.",
-answer:"have"
-},
-
-{
-img:"family-car.png",
-sentence:"We ___ a new car.",
-answer:"have"
-},
-
-{
-img:"bird-wings.png",
-sentence:"It ___ small wings.",
-answer:"has"
-},
-
-{
-img:"girl-storybook.png",
-sentence:"She ___ an interesting book.",
-answer:"has"
-},
-
-{
-img:"boy-crayons.png",
-sentence:"He ___ many crayons.",
-answer:"has"
-},
-
-{
-img:"children-balloons.png",
-sentence:"They ___ colourful balloons.",
-answer:"have"
-},
-
-{
-img:"teacher-books.png",
-sentence:"She ___ many books.",
-answer:"has"
-},
-
-{
-img:"child-toys.png",
-sentence:"I ___ three toys.",
-answer:"have"
-}
-
-];
-
-
-
-let current=0;
-
-let score=0;
-
-let selectedWord="";
-
-let gameQuestions=[];
-
-
-
-
-/* LOGO TIMER */
-
-setTimeout(()=>{
-
-
-document.getElementById("logoScreen").style.display="none";
-
-
-document.getElementById("introScreen").style.display="flex";
-
-
-},5000);
-
-
-
-
-
-
-/* START GAME */
-
-
-function startGame(){
-
-
-document.getElementById("introScreen").style.display="none";
-
-
-document.getElementById("gameScreen").style.display="flex";
-
-
-
-gameQuestions=[...questions]
-.sort(()=>Math.random()-0.5);
-
-
-
-current=0;
-
-score=0;
-
-
-
-loadQuestion();
-
-
-}
-
-
-
-
-
-
-/* LOAD QUESTION */
-
-
-function loadQuestion(){
-
-
-let q=gameQuestions[current];
-
-
-
-document.getElementById("qNo").innerHTML=current+1;
-
-
-document.getElementById("score").innerHTML=score;
-
-
-
-document.getElementById("picture").src=
-"assets/"+q.img;
-
-
-
-
-let parts=q.sentence.split("___");
-
-
-
-document.getElementById("sentence").innerHTML=
-
-parts[0]+
-" <span class='blank'></span> "+
-parts[1];
-
-
-
-document.getElementById("message").innerHTML="";
-
-
-
-selectedWord="";
-
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
-w.classList.remove("selected");
-
-});
-
-
-
-document.querySelectorAll(".house")
-.forEach(h=>{
-
-h.classList.remove("correctHouse");
-
-});
-
-
-}
-
-
-
-
-
-
-/* SELECT WORD */
-
-
-document.getElementById("word1").onclick=function(){
-
-selectWord("has");
-
-};
-
-
-
-document.getElementById("word2").onclick=function(){
-
-selectWord("have");
-
-};
-
-
-
-
-function selectWord(word){
-
-
-selectedWord=word;
-
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
-w.classList.remove("selected");
-
-});
-
-
-
-if(word=="has"){
-
-
-document.getElementById("word1")
-.classList.add("selected");
-
-
-}
-
-else{
-
-
-document.getElementById("word2")
-.classList.add("selected");
-
-
-}
-
-
-
-document.getElementById("message").innerHTML=
-"Choose the correct house 🏠";
-
-
-}
-
-
-
-
-
-
-/* HOUSE CLICK */
-
-
-document.getElementById("hasHouse").onclick=function(){
-
-checkAnswer("has");
-
-};
-
-
-
-document.getElementById("haveHouse").onclick=function(){
-
-checkAnswer("have");
-
-};
-
-
-
-
-
-
-/* CHECK ANSWER */
-
-
-function checkAnswer(choice){
-
-
-if(selectedWord==""){
-
-return;
-
-}
-
-
-
-let correct =
-gameQuestions[current].answer;
-
-
-
-
-if(choice==correct){
-
-
-
-score++;
-
-
-
-document.getElementById("score").innerHTML=score;
-
-
-
-document.getElementById("correctSound")
-.play();
-
-
-
-
-let house;
-
-
-if(correct=="has"){
-
-house=document.getElementById("hasHouse");
-
-}
-
-else{
-
-house=document.getElementById("haveHouse");
-
-}
-
-
-
-
-house.classList.add("correctHouse");
-
-
-
-document.getElementById("message").innerHTML=
-"⭐ Great Job!";
-
-
-
-walkChild();
-
-
-
-setTimeout(()=>{
-
-
-nextQuestion();
-
-
-},1600);
-
-
-
-}
-
-else{
-
-
-document.getElementById("wrongSound")
-.play();
-
-
-
-document.getElementById("message").innerHTML=
-"Oops! Try Again 😊";
-
-
-}
-
-
-
-selectedWord="";
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
-w.classList.remove("selected");
-
-});
-
-
-}
-
-
-
-
-
-
-/* CHILD ANIMATION */
-
-
-function walkChild(){
-
-
-let child=document.getElementById("movingChild");
-
-
-
-child.style.display="block";
-
-
-
-child.classList.remove("walk");
-
-
-
-void child.offsetWidth;
-
-
-
-child.classList.add("walk");
-
-
-
-setTimeout(()=>{
-
-
-child.style.display="none";
-
-
-},1500);
-
-
-
-}
-
-
-
-
-
-
-/* NEXT QUESTION */
-
-
-function nextQuestion(){
-
-
-current++;
-
-
-
-if(current>=gameQuestions.length){
-
-
-finishGame();
-
-
-}
-
-else{
-
-
-loadQuestion();
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-/* END */
-
-
-function finishGame(){
-
-
-document.getElementById("gameScreen")
-.style.display="none";
-
-
-document.getElementById("endScreen")
-.style.display="flex";
-
-
-
-document.getElementById("finalScore")
-.innerHTML=
-"⭐ Score: "+score+"/10";
-
-
-
-document.getElementById("clapSound")
-.play();
-
-
-
-launchConfetti();
-
-
-}
-
-
-
-
-
-
-
-/* RESTART */
-
-
-function restartGame(){
-
-
-document.getElementById("endScreen")
-.style.display="none";
-
-
-document.getElementById("gameScreen")
-.style.display="flex";
-
-
-
-current=0;
-
-score=0;
-
-
-
-gameQuestions=[...questions]
-.sort(()=>Math.random()-0.5);
-
-
-
-loadQuestion();
-
-
-}
-
-
-
-
-
-
-/* CONFETTI */
-
-
-function launchConfetti(){
-
-
-let canvas=document.getElementById("confetti");
-
-let ctx=canvas.getContext("2d");
-
-
-
-canvas.width=window.innerWidth;
-
-canvas.height=window.innerHeight;
-
-
-
-let pieces=[];
-
-
-
-for(let i=0;i<100;i++){
-
-
-pieces.push({
-
-x:Math.random()*canvas.width,
-
-y:Math.random()*canvas.height,
-
-size:Math.random()*8+3,
-
-speed:Math.random()*3+2
-
-});
-
-
-}
-
-
-
-
-
-function draw(){
-
-
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
-pieces.forEach(p=>{
-
-
-ctx.fillStyle="#d84f91";
-
-
-ctx.fillRect(
-p.x,
-p.y,
-p.size,
-p.size
-);
-
-
-
-p.y+=p.speed;
-
-
-
-if(p.y>canvas.height){
-
-p.y=0;
-
-}
-
-
-});
-
-
-
-requestAnimationFrame(draw);
-
-
-}
-
-
-
-draw();
-
-
-}
-
-
-</script>
-<!-- END SCREEN -->
-
-<div id="endScreen" class="screen">
-
-
-<div class="endBox">
-
-
-<h1>
-
-🎉 Well Done!
-
-</h1>
-
-
-
-<div class="badge">
-
-🏆 Has-Have Hero
-
-</div>
-
-
-
-<h2 id="finalScore"></h2>
-
-
-
-<p style="
-font-size:28px;
-color:#51438b;
-">
-
-Excellent Grammar Explorer! ⭐
-
-</p>
-
-
-
-<button class="playAgain" onclick="restartGame()">
-
-Play Again
-
-</button>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- AUDIO FILES -->
-
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-
-<audio id="clapSound" src="assets/claps.mp3"></audio>
-
-
-
-
-<!-- CONFETTI -->
-
-
-<canvas id="confetti"></canvas>
-
-
-
-</body>
-
-</html>
-
-/* ---------------- CHILD ---------------- */
-
-
-.movingChild{
-
-
-position:absolute;
-
-width:90px;
-
+inset:0;
+width:100vw;
+height:100vh;
+height:100dvh;
 display:none;
-
-
+overflow:hidden;
 }
-
-
-
-.walk{
-
-
-animation:walk 1.5s forwards;
-
-}
-
-
-
-@keyframes walk{
-
-
-from{
-
-left:5%;
-
-}
-
-
-to{
-
-left:70%;
-
-}
-
-
-}
-
-
-
-
-
-/* ---------------- END SCREEN ---------------- */
-
-
-#endScreen{
-
-
+ 
+/* ---------------- INTRO ---------------- */
+ 
+#introScreen{
 background:white;
-
 justify-content:center;
-
 align-items:center;
-
 text-align:center;
-
-
+padding:
+max(10px,env(safe-area-inset-top))
+max(10px,env(safe-area-inset-right))
+max(10px,env(safe-area-inset-bottom))
+max(10px,env(safe-area-inset-left));
 }
-
-
-
-.endBox{
-
-
-border:4px solid #e6a3c2;
-
-border-radius:30px;
-
-padding:40px;
-
-
+ 
+.introBox{
+width:min(92%,950px);
+max-height:94%;
+background:white;
+border:clamp(3px,.35vw,4px) solid #e6a3c2;
+border-radius:clamp(18px,2vw,30px);
+padding:clamp(12px,2.4vh,30px);
+overflow:hidden;
 }
-
-
-
-.endBox h1{
-
-
-font-size:60px;
-
+ 
+.title{
+font-size:clamp(28px,4.2vw,48px);
+line-height:1.1;
 color:#d84f91;
-
-
+margin:0 0 clamp(6px,1.3vh,14px);
 }
-
-
-
-.badge{
-
-
-background:#ffe89c;
-
-border:4px solid #dcae35;
-
-border-radius:40px;
-
-padding:20px;
-
-font-size:35px;
-
+ 
+.subtitle{
+font-size:clamp(16px,2.2vw,26px);
+line-height:1.2;
 color:#51438b;
-
-
+margin-bottom:clamp(8px,1.7vh,18px);
 }
-
-
-
-.playAgain{
-
-
-margin-top:30px;
-
-padding:15px 45px;
-
-font-size:28px;
-
-border:none;
-
-border-radius:30px;
-
+ 
+.instructionBox{
+border:clamp(2px,.28vw,3px) solid #e6a3c2;
+border-radius:clamp(16px,1.8vw,25px);
+padding:clamp(8px,1.5vh,20px);
+font-size:clamp(14px,1.8vw,22px);
+line-height:1.2;
+color:#51438b;
+}
+ 
+.instructionBox h2{
+margin:0 0 clamp(4px,.8vh,10px);
+font-size:clamp(20px,2.5vw,30px);
+}
+ 
+.instructionBox p{
+margin:clamp(3px,.65vh,8px) 0;
+}
+ 
+.startBtn{
+margin-top:clamp(10px,2vh,25px);
 background:#7bbf8c;
-
+border:none;
 color:white;
-
-
+font-size:clamp(20px,2.3vw,28px);
+padding:clamp(10px,1.4vh,15px) clamp(28px,4vw,45px);
+border-radius:30px;
+cursor:pointer;
+font-family:inherit;
+font-weight:bold;
 }
-
-
-
-
-canvas{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-pointer-events:none;
-
-}
-
-
-
-/* RESPONSIVE */
-
-
-@media(max-width:1100px){
-
-
-.mainArea{
-
-height:calc(100vh - 160px);
-
-}
-
-
-.pictureArea img{
-
-max-height:220px;
-
-}
-
-
-.house{
-
-width:140px;
-
-}
-
-
-.word{
-
-font-size:24px;
-
-padding:12px 25px;
-
-}
-
-
-}
-
-
-
-
-@media(max-width:800px){
-
-
-.mainArea{
-
+ 
+/* ---------------- GAME ---------------- */
+ 
+#gameScreen{
+background:url("assets/background.png");
+background-size:cover;
+background-position:center;
+padding:
+max(5px,env(safe-area-inset-top))
+max(5px,env(safe-area-inset-right))
+max(5px,env(safe-area-inset-bottom))
+max(5px,env(safe-area-inset-left));
 flex-direction:column;
-
-height:calc(100vh - 160px);
-
+gap:clamp(3px,.7vh,8px);
+}
+ 
+.header{
+flex:0 0 auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
 gap:10px;
-
+background:white;
+border:clamp(2px,.25vw,3px) solid #e6a3c2;
+border-radius:clamp(14px,1.4vw,20px);
+padding:clamp(6px,1vh,10px) clamp(10px,1.5vw,20px);
+min-height:clamp(48px,8vh,76px);
 }
-
-
+ 
+.gameTitle{
+font-size:clamp(20px,2.5vw,32px);
+line-height:1;
+color:#d84f91;
+font-weight:bold;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+ 
+.score{
+font-size:clamp(18px,2vw,25px);
+line-height:1;
+color:#51438b;
+white-space:nowrap;
+}
+ 
+.progress{
+flex:0 0 auto;
+text-align:center;
+font-size:clamp(17px,1.8vw,22px);
+line-height:1.1;
+color:#51438b;
+padding:0;
+}
+ 
+.questionBox{
+display:none;
+}
+ 
+.mainArea{
+flex:1 1 auto;
+min-height:0;
+display:flex;
+justify-content:center;
+align-items:stretch;
+gap:clamp(8px,1.4vw,25px);
+}
+ 
+/* ---------------- PICTURE ---------------- */
+ 
+.pictureArea{
+width:56%;
+height:100%;
+min-width:0;
+min-height:0;
+background:white;
+border:clamp(3px,.35vw,4px) solid #e6a3c2;
+border-radius:clamp(18px,2vw,30px);
+padding:clamp(7px,1.2vw,16px);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+}
+ 
+.pictureArea img{
+flex:1 1 auto;
+width:100%;
+height:0;
+min-height:0;
+object-fit:contain;
+}
+ 
+.sentence{
+flex:0 0 auto;
+width:100%;
+font-size:clamp(18px,2.15vw,34px);
+line-height:1.15;
+text-align:center;
+color:#51438b;
+margin-top:clamp(4px,.9vh,12px);
+padding:0 6px clamp(2px,.4vh,6px);
+}
+ 
+.blank{
+display:inline-block;
+width:clamp(70px,8vw,120px);
+height:.85em;
+border-bottom:clamp(3px,.3vw,5px) solid #d84f91;
+vertical-align:baseline;
+}
+ 
+/* ---------------- HOUSE ---------------- */
+ 
+.houseArea{
+width:42%;
+height:100%;
+min-width:0;
+min-height:0;
+background:white;
+border:clamp(3px,.35vw,4px) solid #e6a3c2;
+border-radius:clamp(18px,2vw,30px);
+padding:clamp(8px,1.3vw,18px);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+}
+ 
+.houseContainer{
+flex:1 1 auto;
+min-height:0;
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:clamp(8px,1.4vw,20px);
+}
+ 
+.house{
+width:min(43%,180px);
+height:100%;
+max-height:38vh;
+object-fit:contain;
+cursor:pointer;
+transition:transform .2s ease;
+}
+ 
+.house:hover{
+transform:scale(1.05);
+}
+ 
+.correctHouse{
+animation:bounce .7s;
+}
+ 
+@keyframes bounce{
+50%{
+transform:translateY(-16px);
+}
+}
+ 
+.wordArea{
+flex:0 0 auto;
+display:flex;
+justify-content:center;
+width:100%;
+gap:clamp(8px,1.3vw,20px);
+margin-top:clamp(5px,1.2vh,16px);
+}
+ 
+.word{
+flex:0 1 42%;
+max-width:190px;
+background:#ffe89c;
+border:clamp(2px,.28vw,3px) solid #dcae35;
+border-radius:clamp(14px,1.4vw,20px);
+padding:clamp(8px,1.35vh,15px) clamp(12px,2vw,35px);
+font-size:clamp(21px,2.4vw,30px);
+line-height:1;
+text-align:center;
+font-weight:bold;
+color:#51438b;
+cursor:pointer;
+transition:transform .18s ease,background .18s ease;
+}
+ 
+.selected{
+transform:scale(1.06);
+background:#ffd45a;
+}
+ 
+.message{
+flex:0 0 clamp(30px,4.2vh,48px);
+min-height:30px;
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+font-size:clamp(17px,2vw,28px);
+line-height:1.05;
+color:#d84f91;
+font-weight:bold;
+margin-top:clamp(3px,.8vh,10px);
+}
+ 
+/* ---------------- CHILD ---------------- */
+ 
+.movingChild{
+position:absolute;
+bottom:clamp(8px,2vh,24px);
+left:5%;
+width:clamp(50px,7vw,90px);
+display:none;
+z-index:5;
+pointer-events:none;
+}
+ 
+.walk{
+animation:walk 1.5s forwards;
+}
+ 
+@keyframes walk{
+from{
+left:5%;
+}
+to{
+left:70%;
+}
+}
+ 
+/* ---------------- END SCREEN ---------------- */
+ 
+#endScreen{
+background:white;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:
+max(10px,env(safe-area-inset-top))
+max(10px,env(safe-area-inset-right))
+max(10px,env(safe-area-inset-bottom))
+max(10px,env(safe-area-inset-left));
+z-index:100;
+}
+ 
+.endBox{
+position:relative;
+z-index:2;
+width:min(92%,700px);
+max-height:94%;
+border:clamp(3px,.35vw,4px) solid #e6a3c2;
+border-radius:clamp(20px,2vw,30px);
+padding:clamp(18px,4vh,40px);
+overflow:hidden;
+}
+ 
+.endBox h1{
+font-size:clamp(36px,5vw,60px);
+line-height:1.05;
+color:#d84f91;
+margin:0 0 clamp(14px,2.3vh,24px);
+}
+ 
+.badge{
+background:#ffe89c;
+border:clamp(3px,.35vw,4px) solid #dcae35;
+border-radius:40px;
+padding:clamp(12px,2vh,20px);
+font-size:clamp(24px,3vw,35px);
+line-height:1.1;
+color:#51438b;
+}
+ 
+#finalScore{
+font-size:clamp(24px,3vw,36px);
+color:#51438b;
+margin:clamp(14px,2vh,24px) 0 clamp(8px,1.4vh,15px);
+}
+ 
+.endMessage{
+font-size:clamp(20px,2.5vw,28px);
+line-height:1.2;
+color:#51438b;
+margin:0;
+}
+ 
+.playAgain{
+margin-top:clamp(16px,2.5vh,30px);
+padding:clamp(11px,1.5vh,15px) clamp(30px,4vw,45px);
+font-size:clamp(21px,2.4vw,28px);
+border:none;
+border-radius:30px;
+background:#7bbf8c;
+color:white;
+font-family:inherit;
+font-weight:bold;
+cursor:pointer;
+}
+ 
+canvas{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:101;
+}
+ 
+/* ---------------- PORTRAIT MOBILE / TABLET ---------------- */
+ 
+@media (max-width:800px) and (orientation:portrait){
+ 
+#gameScreen{
+gap:3px;
+}
+ 
+.header{
+min-height:44px;
+padding:5px 9px;
+}
+ 
+.gameTitle{
+font-size:clamp(18px,5vw,26px);
+}
+ 
+.score{
+font-size:clamp(17px,4.5vw,23px);
+}
+ 
+.progress{
+font-size:clamp(15px,4vw,20px);
+}
+ 
+.mainArea{
+flex-direction:column;
+gap:6px;
+}
+ 
 .pictureArea,
 .houseArea{
-
-width:95%;
-
-height:45%;
-
+width:100%;
+height:auto;
 }
-
-
-
+ 
+.pictureArea{
+flex:1.05 1 0;
+padding:5px 7px;
+}
+ 
+.houseArea{
+flex:.95 1 0;
+padding:5px 7px;
+}
+ 
 .pictureArea img{
-
-width:70%;
-
-height:55%;
-
-max-height:150px;
-
+height:0;
 }
-
-
-
-.house{
-
-width:100px;
-
-}
-
-
+ 
 .sentence{
-
-font-size:24px;
-
+font-size:clamp(16px,4.4vw,24px);
+margin-top:2px;
+padding-bottom:0;
 }
-
-
+ 
+.house{
+width:min(40%,125px);
+max-height:19vh;
+}
+ 
+.wordArea{
+margin-top:2px;
+gap:8px;
+}
+ 
 .word{
-
-font-size:20px;
-
-padding:10px 20px;
-
+max-width:145px;
+padding:7px 12px;
+font-size:clamp(20px,5vw,27px);
 }
-
-
+ 
+.message{
+flex-basis:28px;
+font-size:clamp(15px,4vw,20px);
+margin-top:1px;
 }
-
-
-
+ 
+}
+ 
+/* ---------------- SHORT LANDSCAPE PHONES ---------------- */
+ 
+@media (max-height:560px) and (orientation:landscape){
+ 
+#gameScreen{
+padding:4px;
+gap:2px;
+}
+ 
+.header{
+min-height:38px;
+padding:4px 9px;
+border-radius:12px;
+}
+ 
+.gameTitle{
+font-size:clamp(17px,2.3vw,24px);
+}
+ 
+.score{
+font-size:clamp(16px,2vw,21px);
+}
+ 
+.progress{
+font-size:clamp(14px,1.7vw,18px);
+}
+ 
+.mainArea{
+gap:6px;
+}
+ 
+.pictureArea,
+.houseArea{
+border-radius:15px;
+padding:5px;
+}
+ 
+.sentence{
+font-size:clamp(15px,2vw,22px);
+margin-top:2px;
+padding-bottom:0;
+}
+ 
+.house{
+max-height:34vh;
+}
+ 
+.wordArea{
+margin-top:2px;
+}
+ 
+.word{
+padding:6px 12px;
+font-size:clamp(18px,2.2vw,24px);
+}
+ 
+.message{
+flex-basis:24px;
+min-height:24px;
+font-size:clamp(14px,1.7vw,19px);
+margin-top:1px;
+}
+ 
+}
+ 
+/* ---------------- VERY SMALL SCREENS ---------------- */
+ 
+@media (max-width:380px){
+ 
+.gameTitle{
+font-size:17px;
+}
+ 
+.score{
+font-size:16px;
+}
+ 
+.house{
+width:min(39%,100px);
+}
+ 
+.word{
+font-size:19px;
+}
+ 
+}
+ 
 </style>
-
 </head>
-
-
+ 
 <body>
-
-
+ 
 <!-- LOGO -->
-
 <div id="logoScreen">
-
-<img src="assets/innovine-logo.png">
-
+<img src="assets/innovine-logo.png" alt="Innovine logo">
 </div>
-
-
-
+ 
 <!-- INTRO -->
-
-
 <div id="introScreen" class="screen">
-
-
 <div class="introBox">
-
-
-<h1 class="title">
-
-🏡 Build the Has-Have House
-
-</h1>
-
-
+<h1 class="title">🏡 Build the Has-Have House</h1>
+ 
 <div class="subtitle">
-
 Help the children find the correct grammar house!
-
 </div>
-
-
-
+ 
 <div class="instructionBox">
-
-
 <h2>How to Play</h2>
-
-
 <p>👀 Look at the picture and read the sentence.</p>
-
 <p>🏠 Choose HAS or HAVE.</p>
-
 <p>✨ Send the character to the correct house.</p>
-
 <p>📱 Tap the word and then choose the house.</p>
-
-
 </div>
-
-
-
-<button class="startBtn" onclick="startGame()">
-
+ 
+<button class="startBtn" type="button" onclick="startGame()">
 Start Game
-
 </button>
-
-
 </div>
-
 </div>
-
-
-
-
-
+ 
 <!-- GAME -->
-
-
 <div id="gameScreen" class="screen">
-
-
+ 
 <div class="header">
-
-
-<div class="gameTitle">
-
-🏡 Has-Have House
-
+<div class="gameTitle">🏡 Has-Have House</div>
+<div class="score">⭐ <span id="score">0</span>/10</div>
 </div>
-
-
-<div class="score">
-
-⭐ <span id="score">0</span>/10
-
-</div>
-
-
-</div>
-
-
+ 
 <div class="progress">
-
 Question <span id="qNo">1</span> of 10
-
 </div>
-
-
-
-
+ 
 <div class="mainArea">
-
-
+ 
 <div class="pictureArea">
-
-
-<img id="picture">
-
-
+<img id="picture" alt="Question picture">
 <div id="sentence" class="sentence"></div>
-
-
 </div>
-
-
-
+ 
 <div class="houseArea">
-
-
+ 
 <div class="houseContainer">
-
-
-<img id="hasHouse" class="house" src="assets/has-house.png">
-
-
-<img id="haveHouse" class="house" src="assets/have-house.png">
-
-
+<img id="hasHouse" class="house" src="assets/has-house.png" alt="Has House">
+<img id="haveHouse" class="house" src="assets/have-house.png" alt="Have House">
 </div>
-
-
+ 
 <div class="wordArea">
-
-
-<div class="word" id="word1">
-
-has
-
+<div class="word" id="word1" role="button" tabindex="0">has</div>
+<div class="word" id="word2" role="button" tabindex="0">have</div>
 </div>
-
-
-<div class="word" id="word2">
-
-have
-
-</div>
-
-
-</div>
-
-
+ 
 <div id="message" class="message"></div>
-
-
+ 
 </div>
-
-
 </div>
-
-
-
-<img id="movingChild" class="movingChild" src="assets/happy-child.png">
-
-
+ 
+<img id="movingChild" class="movingChild" src="assets/happy-child.png" alt="Happy child">
+ 
 </div>
-
-
-
+ 
+<!-- END SCREEN -->
+<div id="endScreen" class="screen">
+<div class="endBox">
+<h1>🎉 Well Done!</h1>
+ 
+<div class="badge">
+🏆 Has-Have Hero
+</div>
+ 
+<h2 id="finalScore"></h2>
+ 
+<p class="endMessage">
+Excellent Grammar Explorer! ⭐
+</p>
+ 
+<button class="playAgain" type="button" onclick="restartGame()">
+Play Again
+</button>
+</div>
+</div>
+ 
+<!-- AUDIO FILES -->
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/claps.mp3" preload="auto"></audio>
+ 
+<!-- CONFETTI -->
+<canvas id="confetti"></canvas>
+ 
 <script>
-
-
+ 
 const questions=[
-
 {
 img:"cat-ball.png",
-sentence:"The cat ___ a blue ball.",
 answer:"has"
 },
-
 {
 img:"girl-flowers.png",
-sentence:"She ___ beautiful flowers.",
 answer:"has"
 },
-
 {
 img:"children-playground.png",
-sentence:"They ___ a big playground.",
 answer:"have"
 },
-
 {
 img:"family-car.png",
-sentence:"We ___ a new car.",
 answer:"have"
 },
-
 {
 img:"bird-wings.png",
-sentence:"It ___ small wings.",
 answer:"has"
 },
-
 {
 img:"girl-storybook.png",
-sentence:"She ___ an interesting book.",
 answer:"has"
 },
-
 {
 img:"boy-crayons.png",
-sentence:"He ___ many crayons.",
 answer:"has"
 },
-
 {
 img:"children-balloons.png",
-sentence:"They ___ colourful balloons.",
 answer:"have"
 },
-
 {
 img:"teacher-books.png",
-sentence:"She ___ many books.",
 answer:"has"
 },
-
 {
 img:"child-toys.png",
-sentence:"I ___ three toys.",
 answer:"have"
 }
-
 ];
-
-
+ 
 let current=0;
-
 let score=0;
-
 let selectedWord="";
-
 let gameQuestions=[];
-
-
-
-
+let isLocked=false;
+let confettiAnimationId=null;
+ 
 /* LOGO TIMER */
-
-
 setTimeout(()=>{
-
-
 document.getElementById("logoScreen").style.display="none";
-
-
 document.getElementById("introScreen").style.display="flex";
-
-
 },5000);
-
-
-
-
-
-
+ 
 /* START GAME */
-
-
 function startGame(){
-
-
+stopConfetti();
 document.getElementById("introScreen").style.display="none";
-
-
+document.getElementById("endScreen").style.display="none";
 document.getElementById("gameScreen").style.display="flex";
-
-
-
-gameQuestions=[...questions]
-.sort(()=>Math.random()-0.5);
-
-
-
+ 
+gameQuestions=shuffleQuestions([...questions]);
 current=0;
-
 score=0;
-
-
-
+isLocked=false;
+ 
 loadQuestion();
-
-
 }
-  function loadQuestion(){
-
-
+ 
+/* SHUFFLE */
+function shuffleQuestions(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+return array;
+}
+ 
+/* LOAD QUESTION */
+function loadQuestion(){
 let q=gameQuestions[current];
-
-
-
-document.getElementById("qNo").innerHTML=current+1;
-
-
-document.getElementById("score").innerHTML=score;
-
-
-
-document.getElementById("picture").src=
-"assets/"+q.img;
-
-
-
-
+ 
+isLocked=false;
+selectedWord="";
+ 
+document.getElementById("qNo").textContent=current+1;
+document.getElementById("score").textContent=score;
+document.getElementById("picture").src="assets/"+q.img;
+ 
 let parts=q.sentence.split("___");
-
-
-
 document.getElementById("sentence").innerHTML=
-
-parts[0]+
-" <span class='blank'></span> "+
-parts[1];
-
-
-
-document.getElementById("message").innerHTML="";
-
-
-
-selectedWord="";
-
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
+parts[0]+" <span class='blank'></span> "+parts[1];
+ 
+document.getElementById("message").textContent="";
+ 
+document.querySelectorAll(".word").forEach(w=>{
 w.classList.remove("selected");
-
 });
-
-
-
-document.querySelectorAll(".house")
-.forEach(h=>{
-
+ 
+document.querySelectorAll(".house").forEach(h=>{
 h.classList.remove("correctHouse");
-
 });
-
-
 }
-
-
-
-
-
-
-
+ 
 /* SELECT WORD */
-
-
 document.getElementById("word1").onclick=function(){
-
 selectWord("has");
-
 };
-
-
-
+ 
 document.getElementById("word2").onclick=function(){
-
 selectWord("have");
-
 };
-
-
-
-
-
+ 
+document.getElementById("word1").onkeydown=function(event){
+if(event.key==="Enter" || event.key===" "){
+event.preventDefault();
+selectWord("has");
+}
+};
+ 
+document.getElementById("word2").onkeydown=function(event){
+if(event.key==="Enter" || event.key===" "){
+event.preventDefault();
+selectWord("have");
+}
+};
+ 
 function selectWord(word){
-
-
-selectedWord=word;
-
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
-w.classList.remove("selected");
-
-});
-
-
-
-if(word=="has"){
-
-
-document.getElementById("word1")
-.classList.add("selected");
-
-
-}
-
-else{
-
-
-document.getElementById("word2")
-.classList.add("selected");
-
-
-}
-
-
-
-document.getElementById("message").innerHTML=
-"Choose the correct house 🏠";
-
-
-}
-
-
-
-
-
-
-/* HOUSE CLICK */
-
-
-document.getElementById("hasHouse").onclick=function(){
-
-checkAnswer("has");
-
-};
-
-
-
-document.getElementById("haveHouse").onclick=function(){
-
-checkAnswer("have");
-
-};
-
-
-
-
-
-
-/* CHECK ANSWER - FIXED */
-
-
-function checkAnswer(choice){
-
-
-if(selectedWord==""){
-
+if(isLocked){
 return;
-
 }
-
-
-
-let correct =
-gameQuestions[current].answer;
-
-
-
-// WORD AND HOUSE BOTH MUST MATCH
-
-if(selectedWord==correct && choice==correct){
-
-
-
-score++;
-
-
-
-document.getElementById("score").innerHTML=score;
-
-
-
-document.getElementById("correctSound").play();
-
-
-
-
-let house;
-
-
-if(correct=="has"){
-
-house=document.getElementById("hasHouse");
-
-}
-
-else{
-
-house=document.getElementById("haveHouse");
-
-}
-
-
-
-
-house.classList.add("correctHouse");
-
-
-
-document.getElementById("message").innerHTML=
-"⭐ Great Job!";
-
-
-
-walkChild();
-
-
-
-setTimeout(()=>{
-
-
-nextQuestion();
-
-
-},1600);
-
-
-
-}
-
-else{
-
-
-document.getElementById("wrongSound").play();
-
-
-
-document.getElementById("message").innerHTML=
-"Oops! Try Again 😊";
-
-
-}
-
-
-
-selectedWord="";
-
-
-document.querySelectorAll(".word")
-.forEach(w=>{
-
+ 
+selectedWord=word;
+ 
+document.querySelectorAll(".word").forEach(w=>{
 w.classList.remove("selected");
-
 });
-
-
+ 
+if(word==="has"){
+document.getElementById("word1").classList.add("selected");
 }
-
-
-
-
-
-
-/* CHILD ANIMATION */
-
-
-function walkChild(){
-
-
-let child=document.getElementById("movingChild");
-
-
-
-child.style.display="block";
-
-
-
-child.classList.remove("walk");
-
-
-
-void child.offsetWidth;
-
-
-
-child.classList.add("walk");
-
-
-
-setTimeout(()=>{
-
-
-child.style.display="none";
-
-
-},1500);
-
-
-
-}
-
-
-
-
-
-
-/* NEXT QUESTION */
-
-
-function nextQuestion(){
-
-
-current++;
-
-
-
-if(current>=gameQuestions.length){
-
-
-finishGame();
-
-
-}
-
 else{
-
-
+document.getElementById("word2").classList.add("selected");
+}
+ 
+document.getElementById("message").textContent="Choose the correct house 🏠";
+}
+ 
+/* HOUSE CLICK */
+document.getElementById("hasHouse").onclick=function(){
+checkAnswer("has");
+};
+ 
+document.getElementById("haveHouse").onclick=function(){
+checkAnswer("have");
+};
+ 
+/* CHECK ANSWER */
+function checkAnswer(choice){
+if(isLocked){
+return;
+}
+ 
+if(selectedWord===""){
+document.getElementById("message").textContent="Choose a word first 😊";
+return;
+}
+ 
+let correct=gameQuestions[current].answer;
+ 
+/*
+The answer is correct only when BOTH are correct:
+1. The selected word matches the answer.
+2. The selected house matches the answer.
+*/
+let wordIsCorrect=selectedWord===correct;
+let houseIsCorrect=choice===correct;
+ 
+if(wordIsCorrect && houseIsCorrect){
+isLocked=true;
+score++;
+document.getElementById("score").textContent=score;
+playSound("correctSound");
+ 
+let house=correct==="has"
+? document.getElementById("hasHouse")
+: document.getElementById("haveHouse");
+ 
+house.classList.add("correctHouse");
+document.getElementById("message").textContent="⭐ Great Job!";
+ 
+walkChild();
+ 
+setTimeout(()=>{
+nextQuestion();
+},1600);
+}
+else{
+playSound("wrongSound");
+document.getElementById("message").textContent="Oops! Try Again 😊";
+ 
+selectedWord="";
+document.querySelectorAll(".word").forEach(w=>{
+w.classList.remove("selected");
+});
+}
+}
+ 
+/* SAFE AUDIO PLAY */
+function playSound(id){
+const audio=document.getElementById(id);
+if(!audio){
+return;
+}
+ 
+audio.currentTime=0;
+const playPromise=audio.play();
+ 
+if(playPromise!==undefined){
+playPromise.catch(()=>{});
+}
+}
+ 
+/* CHILD ANIMATION */
+function walkChild(){
+let child=document.getElementById("movingChild");
+ 
+child.style.display="block";
+child.classList.remove("walk");
+void child.offsetWidth;
+child.classList.add("walk");
+ 
+setTimeout(()=>{
+child.style.display="none";
+child.classList.remove("walk");
+},1500);
+}
+ 
+/* NEXT QUESTION */
+function nextQuestion(){
+current++;
+ 
+if(current>=gameQuestions.length){
+finishGame();
+}
+else{
 loadQuestion();
-
-
 }
-
-
 }
-
-
-
-
-
-
-
-/* END SCREEN FIX */
-
-
+ 
+/* END */
 function finishGame(){
-
-
-document.getElementById("gameScreen")
-.style.display="none";
-
-
-document.getElementById("endScreen")
-.style.display="flex";
-
-
-
-document.getElementById("endScreen")
-.style.zIndex="2000";
-
-
-
-document.getElementById("finalScore")
-.innerHTML=
-"⭐ Score: "+score+"/10";
-
-
-
-document.getElementById("clapSound")
-.play();
-
-
-
+isLocked=true;
+document.getElementById("gameScreen").style.display="none";
+document.getElementById("endScreen").style.display="flex";
+document.getElementById("finalScore").textContent="⭐ Score: "+score+"/10";
+ 
+playSound("clapSound");
 launchConfetti();
-
-
+ 
+/* No timer is used here. The end screen stays visible
+  until the learner clicks the Play Again button. */
 }
-
-
-
-
-
-
-
+ 
 /* RESTART */
-
-
 function restartGame(){
-
-
-document.getElementById("endScreen")
-.style.display="none";
-
-
-document.getElementById("gameScreen")
-.style.display="flex";
-
-
-
+stopConfetti();
+document.getElementById("endScreen").style.display="none";
+document.getElementById("gameScreen").style.display="flex";
+ 
 current=0;
-
 score=0;
-
-
-
-gameQuestions=[...questions]
-.sort(()=>Math.random()-0.5);
-
-
-
+selectedWord="";
+isLocked=false;
+gameQuestions=shuffleQuestions([...questions]);
+ 
 loadQuestion();
-
-
 }
-
-
-
-
-
-
+ 
 /* CONFETTI */
-
-
 function launchConfetti(){
-
-
+stopConfetti();
+ 
 let canvas=document.getElementById("confetti");
-
 let ctx=canvas.getContext("2d");
-
-
-
-canvas.width=window.innerWidth;
-
-canvas.height=window.innerHeight;
-
-
-
+ 
+resizeConfettiCanvas();
+ 
 let pieces=[];
-
-
-
+ 
 for(let i=0;i<100;i++){
-
-
 pieces.push({
-
 x:Math.random()*canvas.width,
-
 y:Math.random()*canvas.height,
-
 size:Math.random()*8+3,
-
 speed:Math.random()*3+2
-
 });
-
-
 }
-
-
-
-
-
-function draw(){
-
-
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
+ 
+const startTime=performance.now();
+ 
+function draw(now){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ 
 pieces.forEach(p=>{
-
-
 ctx.fillStyle="#d84f91";
-
-
-ctx.fillRect(
-p.x,
-p.y,
-p.size,
-p.size
-);
-
-
-
+ctx.fillRect(p.x,p.y,p.size,p.size);
 p.y+=p.speed;
-
-
-
+ 
 if(p.y>canvas.height){
-
 p.y=0;
-
+p.x=Math.random()*canvas.width;
 }
-
-
 });
-
-
-
-requestAnimationFrame(draw);
-
-
+ 
+/* Confetti ends after 6 seconds, but the end screen remains. */
+if(now-startTime<6000){
+confettiAnimationId=requestAnimationFrame(draw);
 }
-
-
-
-draw();
-
-
+else{
+ctx.clearRect(0,0,canvas.width,canvas.height);
+confettiAnimationId=null;
 }
-
-
+}
+ 
+confettiAnimationId=requestAnimationFrame(draw);
+}
+ 
+function resizeConfettiCanvas(){
+const canvas=document.getElementById("confetti");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+canvas.style.width=window.innerWidth+"px";
+canvas.style.height=window.innerHeight+"px";
+}
+ 
+function stopConfetti(){
+if(confettiAnimationId!==null){
+cancelAnimationFrame(confettiAnimationId);
+confettiAnimationId=null;
+}
+ 
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+ 
+window.addEventListener("resize",()=>{
+const endVisible=document.getElementById("endScreen").style.display==="flex";
+if(endVisible){
+resizeConfettiCanvas();
+}
+});
+ 
 </script>
-
-
-
-
-
-<!-- END SCREEN -->
-
-
-<div id="endScreen" class="screen">
-
-
-<div class="endBox">
-
-
-<h1>
-
-🎉 Well Done!
-
-</h1>
-
-
-
-<div class="badge">
-
-🏆 Has-Have Hero
-
-</div>
-
-
-
-<h2 id="finalScore"></h2>
-
-
-
-<p style="
-font-size:28px;
-color:#51438b;
-">
-
-Excellent Grammar Explorer! ⭐
-
-</p>
-
-
-
-<button class="playAgain" onclick="restartGame()">
-
-Play Again
-
-</button>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- AUDIO FILES -->
-
-
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
-
-<audio id="clapSound" src="assets/claps.mp3"></audio>
-
-
-
-
-<!-- CONFETTI -->
-
-
-<canvas id="confetti"></canvas>
-
-
-
+ 
 </body>
-
 </html>
+ 
