@@ -3,122 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hungry Crocodile River Adventure</title>
+<title>Pop the Bubble Symbol - Bubble Sky Adventure</title>
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Comic Sans MS","Trebuchet MS",sans-serif}
 
-.screen{
-position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;
+html,body{
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:"Comic Sans MS","Trebuchet MS",sans-serif;
 }
 
-#logo{display:flex;background:white;z-index:5}
-#logo img{width:260px;max-width:70%}
+.screen{
+position:fixed;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+#logo{
+display:flex;
+background:white;
+}
+
+#logo img{
+width:260px;
+max-width:70%;
+}
+
+/* SKY THEME */
 
 #intro,#game,#end{
-background:linear-gradient(135deg,#dff8ff,#fff2d8,#eaffdf);
+background:linear-gradient(#8edcff,#dff8ff,#fff5d8);
 padding:20px;
 }
 
+.cloud{
+position:absolute;
+font-size:70px;
+opacity:.7;
+}
+
+.cloud1{top:20px;left:10%}
+.cloud2{top:80px;right:10%}
+.cloud3{bottom:20px;left:15%}
+
 .box{
-background:white;
-border:4px solid #e6a3c2;
-border-radius:30px;
-padding:30px;
+background:rgba(255,255,255,.9);
+border-radius:40px;
+padding:35px;
 width:90%;
 max-width:900px;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
-h1{color:#d84f91;font-size:42px}
-p{color:#51438b;font-size:22px}
+h1{
+font-size:45px;
+color:#6750a4;
+}
 
-button{
-border:none;
-border-radius:25px;
-padding:15px 35px;
-font-size:28px;
-background:#7bbf8c;
+p{
+font-size:24px;
+color:#394867;
+}
+
+.start{
+background:#ff8fab;
 color:white;
-cursor:pointer;
+border:none;
+padding:16px 45px;
+border-radius:35px;
+font-size:28px;
 }
+
+/* GAME */
 
 .header{
 position:absolute;
-top:10px;left:10px;right:10px;
+top:15px;
+left:15px;
+right:15px;
 display:flex;
 justify-content:space-between;
 background:white;
-padding:12px 20px;
-border-radius:20px;
-border:3px solid #e6a3c2;
-color:#51438b;
+border-radius:30px;
+padding:12px 25px;
 font-size:25px;
+color:#6750a4;
+box-shadow:0 5px 15px #aaa;
 }
 
-.river{
-width:90%;
-height:70%;
-background:linear-gradient(#8ee7ff,#36bde8);
-border-radius:40px;
+.titleBubble{
+font-size:32px;
+color:#6750a4;
+}
+
+.numberArea{
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-border:5px solid #45a36b;
+gap:25px;
+margin-top:80px;
 }
 
-.objects{
+.numberCard{
+width:160px;
+height:130px;
+background:#fff;
+border-radius:50%;
 display:flex;
-justify-content:space-around;
-width:90%;
-font-size:55px;
-}
-
-.numbers{
-font-size:45px;
-color:#51438b;
+align-items:center;
+justify-content:center;
+font-size:65px;
 font-weight:bold;
-margin:15px;
+color:#ff6f91;
+box-shadow:0 8px 20px #aaa;
 }
 
-.croc{
-font-size:75px;
-transition:.5s;
+.answerBubble{
+width:120px;
+height:120px;
+border-radius:50%;
+border:5px dashed #6750a4;
+background:#ffffff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:55px;
+color:#6750a4;
 }
 
-.eatLeft{transform:rotateY(180deg) scale(1.2)}
-.eatRight{transform:scale(1.2)}
+.options{
+display:flex;
+justify-content:center;
+gap:25px;
+margin-top:40px;
+}
 
-.options button{
-background:#ffe89c;
-color:#51438b;
-border:3px solid #dcae35;
-margin:8px;
+.bubbleBtn{
+width:120px;
+height:120px;
+border-radius:50%;
+border:5px solid white;
+font-size:55px;
+color:#394867;
+box-shadow:0 8px 20px #999;
+cursor:pointer;
+}
+
+.more{background:#b9fbc0}
+.less{background:#a9def9}
+.equal{background:#e4c1f9}
+
+.pop{
+animation:pop .5s;
+}
+
+@keyframes pop{
+50%{transform:scale(1.3)}
+100%{transform:scale(1)}
 }
 
 .msg{
-font-size:28px;
-color:#d84f91;
+font-size:30px;
+color:#ff6f91;
 font-weight:bold;
-}
-
-.shake{animation:shake .4s}
-@keyframes shake{
-25%{transform:translateX(-15px)}
-50%{transform:translateX(15px)}
-75%{transform:translateX(-15px)}
+margin-top:20px;
 }
 
 @media(max-width:700px){
-h1{font-size:32px}
-p{font-size:18px}
-.river{height:65%}
-.objects{font-size:40px}
-.croc{font-size:55px}
-.numbers{font-size:32px}
-.options button{font-size:22px;padding:10px 25px}
+
+.numberCard{
+width:100px;
+height:100px;
+font-size:45px;
 }
+
+.answerBubble,.bubbleBtn{
+width:85px;
+height:85px;
+font-size:38px;
+}
+
+.options{
+gap:10px;
+}
+
+h1{font-size:32px}
+
+p{font-size:18px}
+
+}
+
 </style>
 </head>
 
@@ -128,58 +208,78 @@ p{font-size:18px}
 <img src="assets/innovine-logo.png">
 </div>
 
+
 <div id="intro" class="screen">
+
+<div class="cloud cloud1">☁️</div>
+<div class="cloud cloud2">☁️</div>
+
 <div class="box">
-<h1>🐊 Hungry Crocodile River Adventure</h1>
-<p>Help the hungry crocodile choose the correct sign!</p>
-<p>Look at the numbers and choose:</p>
-<p><b>&gt; &nbsp;&nbsp; &lt; &nbsp;&nbsp; =</b></p>
-<button onclick="startGame()">Start Game</button>
+<h1>🫧 Pop the Bubble Symbol 🫧</h1>
+<p>Compare the numbers and pop the correct symbol bubble!</p>
+<p>Choose: &gt; &nbsp; &lt; &nbsp; =</p>
+<button class="start" onclick="startGame()">Start Game</button>
 </div>
+
 </div>
 
 
 <div id="game" class="screen">
 
+<div class="cloud cloud1">☁️</div>
+<div class="cloud cloud2">☁️</div>
+
 <div class="header">
-<div>🐊 Crocodile Adventure</div>
+<div>🫧 Bubble Sky Adventure</div>
 <div>⭐ <span id="score">0</span>/10</div>
 </div>
 
-<div class="river">
 
-<div class="objects">
-<div id="food1">🍎</div>
-<div id="food2">🍎</div>
+<div>
+
+<div class="numberArea">
+
+<div class="numberCard" id="left"></div>
+
+<div class="answerBubble" id="answer">?</div>
+
+<div class="numberCard" id="right"></div>
+
 </div>
 
-<div class="numbers">
-<span id="leftNum"></span>
-&nbsp; ? &nbsp;
-<span id="rightNum"></span>
-</div>
-
-<div id="croc" class="croc">🐊</div>
 
 <div class="options">
-<button onclick="check('>')">&gt;</button>
-<button onclick="check('<')">&lt;</button>
-<button onclick="check('=')">=</button>
+
+<button class="bubbleBtn more" onclick="check('>')">&gt;</button>
+
+<button class="bubbleBtn less" onclick="check('<')">&lt;</button>
+
+<button class="bubbleBtn equal" onclick="check('=')">=</button>
+
 </div>
+
 
 <div id="msg" class="msg"></div>
 
 </div>
+
 </div>
 
 
 <div id="end" class="screen">
+
 <div class="box">
-<h1>🎉 Well Done!</h1>
-<h2 style="color:#51438b">🏆 Crocodile Champion</h2>
+
+<h1>🎉 Amazing!</h1>
+
+<p>🏆 Bubble Symbol Champion</p>
+
 <h2 id="final"></h2>
-<button onclick="restart()">Play Again</button>
+
+<button class="start" onclick="restart()">Play Again</button>
+
 </div>
+
 </div>
 
 
@@ -190,12 +290,16 @@ p{font-size:18px}
 
 <script>
 
-const questions=[
-[8,3],[2,7],[5,5],[9,4],[1,6],
-[7,7],[3,8],[10,5],[4,4],[6,2]
+let questions=[
+[7,3],[2,9],[5,5],[8,2],[1,6],
+[4,4],[9,7],[3,10],[6,6],[10,5]
 ];
 
-let qList=[],index=0,score=0,tries=0;
+let q=[];
+let index=0;
+let score=0;
+let attempts=0;
+
 
 setTimeout(()=>{
 logo.style.display="none";
@@ -204,76 +308,121 @@ intro.style.display="flex";
 
 
 function startGame(){
+
 intro.style.display="none";
 game.style.display="flex";
-qList=[...questions].sort(()=>Math.random()-0.5);
+
+q=[...questions].sort(()=>Math.random()-0.5);
+
 index=0;
 score=0;
-load();
+
+loadQuestion();
+
 }
 
 
-function load(){
-tries=0;
-let q=qList[index];
-leftNum.innerHTML=q[0];
-rightNum.innerHTML=q[1];
-document.getElementById("score").innerHTML=score;
+function loadQuestion(){
+
+attempts=0;
+
+left.innerHTML=q[index][0];
+right.innerHTML=q[index][1];
+
+answer.innerHTML="?";
+
 msg.innerHTML="";
-croc.className="croc";
+
+document.getElementById("score").innerHTML=score;
+
 }
 
 
-function check(sign){
+function check(symbol){
 
-let a=qList[index][0];
-let b=qList[index][1];
+let a=q[index][0];
+let b=q[index][1];
 
-let answer=a>b?">":a<b?"<":"=";
+let correctSymbol=a>b?">":a<b?"<":"=";
 
-if(sign==answer){
+
+if(symbol==correctSymbol){
 
 score++;
+
 document.getElementById("score").innerHTML=score;
+
+answer.innerHTML=symbol;
+
+answer.classList.add("pop");
+
 correct.play();
 
-if(answer==">") croc.classList.add("eatLeft");
-if(answer=="<") croc.classList.add("eatRight");
+msg.innerHTML="⭐ Great Job!";
 
-msg.innerHTML="⭐ Yummy! Great Job!";
+setTimeout(nextQuestion,1000);
 
-setTimeout(next,1000);
 
 }else{
 
-tries++;
+attempts++;
+
 wrong.play();
-croc.classList.add("shake");
-msg.innerHTML="Oops! Try Again 😊";
 
-if(tries>=2)setTimeout(next,1200);
+msg.innerHTML="Try Again 😊";
+
+
+if(attempts>=2){
+
+answer.innerHTML=correctSymbol;
+
+msg.innerHTML="⭐ Correct answer: "+a+" "+correctSymbol+" "+b;
+
+setTimeout(nextQuestion,1500);
+
 }
+
+}
+
 }
 
 
-function next(){
+function nextQuestion(){
+
 index++;
-if(index>=qList.length)finish();
-else load();
+
+if(index>=q.length){
+
+finish();
+
+}else{
+
+loadQuestion();
+
+}
+
 }
 
 
 function finish(){
+
 game.style.display="none";
+
 end.style.display="flex";
+
 final.innerHTML="⭐ Score: "+score+"/10";
+
 clap.play();
+
 }
 
 
 function restart(){
+
 end.style.display="none";
+
 startGame();
+
 }
 
 </script>
