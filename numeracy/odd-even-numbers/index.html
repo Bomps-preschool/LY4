@@ -26,6 +26,7 @@ button{font-family:inherit;cursor:pointer}
 .option{padding:15px 35px;border-radius:30px;border:0;font-size:25px}
 .odd{background:#ffd166}.even{background:#a0e7e5}
 .msg{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);font-size:25px;color:#e85d75;font-weight:bold;background:white;padding:10px 25px;border-radius:25px;border:3px solid #d8b4fe;z-index:10}
+
 @media(max-width:700px){
 .main{flex-direction:column;gap:5px;height:75%}
 .left,.right{width:95%}
@@ -36,9 +37,13 @@ button{font-family:inherit;cursor:pointer}
 }
 </style>
 </head>
+
 <body>
 
-<div id="logo" class="screen"><img src="assets/innovine-logo.png"></div>
+<div id="logo" class="screen">
+<img src="assets/innovine-logo.png">
+</div>
+
 
 <div id="intro" class="screen">
 <div class="card">
@@ -50,108 +55,256 @@ button{font-family:inherit;cursor:pointer}
 </div>
 </div>
 
+
 <div id="game" class="screen">
-<div class="header"><b>🔎 Odd Even Number Detective</b><b>⭐ <span id="score">0</span>/10</b></div>
+
+<div class="header">
+<b>🔎 Odd Even Number Detective</b>
+<b>⭐ <span id="score">0</span>/10</b>
+</div>
+
 
 <div class="main">
 
 <div class="left">
+
 <img id="detective" class="detective" src="assets/detective-thinking.png">
-<p>Detective is checking!</p>
+
+<p id="detectiveText">Detective is checking!</p>
+
 </div>
+
 
 <div class="right">
+
 <div id="objects" class="objects"></div>
+
 <div class="countText">Count the objects</div>
+
 </div>
+
 
 <div class="options">
-<button class="option odd" onclick="check('odd')">Odd Number</button>
-<button class="option even" onclick="check('even')">Even Number</button>
+
+<button class="option odd" onclick="check('odd')">
+Odd Number
+</button>
+
+<button class="option even" onclick="check('even')">
+Even Number
+</button>
+
 </div>
 
 </div>
+
+
 <div id="msg" class="msg"></div>
+
 </div>
+
+
 
 <div id="end" class="screen">
+
 <div class="card">
+
 <img class="detective" src="assets/detective-happy.png">
+
 <h1>🎉 Case Solved!</h1>
+
 <h2 id="final"></h2>
-<button class="start" onclick="restart()">Play Again</button>
+
+<button class="start" onclick="restart()">
+Play Again
+</button>
+
 </div>
+
 </div>
+
+
 
 <audio id="correct" src="assets/correct.mp3"></audio>
 <audio id="wrong" src="assets/wrong.mp3"></audio>
 <audio id="clap" src="assets/claps.mp3"></audio>
 
+
+
 <script>
+
 let questions=[
-["⭐",3],["🍎",4],["🎈",5],["🌸",6],["🎁",7],
-["🍪",8],["⭐",9],["🎈",10],["🍎",2],["🌸",3]
+["⭐",3],
+["🍎",4],
+["🎈",5],
+["🌸",6],
+["🎁",7],
+["🍪",8],
+["⭐",9],
+["🎈",10],
+["🍎",2],
+["🌸",3]
 ];
+
+
 let q=[],i=0,score=0,attempts=0;
 
-setTimeout(()=>{logo.style.display="none";intro.style.display="flex"},5000);
+
+setTimeout(()=>{
+logo.style.display="none";
+intro.style.display="flex";
+},5000);
+
+
 
 function startGame(){
+
 intro.style.display="none";
 game.style.display="flex";
+
 q=[...questions].sort(()=>Math.random()-0.5);
-i=0;score=0;
+
+i=0;
+score=0;
+
 load();
+
 }
+
+
 
 function load(){
+
 attempts=0;
+
 objects.innerHTML="";
+
 for(let x=0;x<q[i][1];x++){
+
 objects.innerHTML+="<span>"+q[i][0]+"</span>";
+
 }
+
+
 document.getElementById("score").innerHTML=score;
+
+
 detective.src="assets/detective-thinking.png";
+
+detectiveText.innerHTML="Detective is checking!";
+
 msg.innerHTML="";
+
 }
+
+
 
 function check(ans){
+
 let correctAns=q[i][1]%2==0?"even":"odd";
 
+
 if(ans==correctAns){
+
 score++;
+
 document.getElementById("score").innerHTML=score;
+
+
 correct.play();
+
+
 detective.src="assets/detective-happy.png";
+
+detectiveText.innerHTML="Detective is happy!";
+
+
 msg.innerHTML="⭐ Great! This is an "+correctAns+" number.";
+
+
 setTimeout(next,1200);
-}else{
+
+
+}
+
+else{
+
+
 attempts++;
+
 wrong.play();
+
+
+detectiveText.innerHTML="Detective is checking!";
+
+
 msg.innerHTML="Look carefully again 😊";
+
+
 if(attempts>=2){
+
+
 msg.innerHTML="⭐ This is an "+correctAns+" number.";
+
+
 setTimeout(next,1500);
+
+
 }
+
 }
+
+
 }
+
+
 
 function next(){
+
 i++;
-if(i>=q.length){finish()}else{load()}
+
+if(i>=q.length){
+
+finish();
+
 }
+
+else{
+
+load();
+
+}
+
+}
+
+
 
 function finish(){
+
 game.style.display="none";
+
 end.style.display="flex";
+
+
 final.innerHTML="⭐ Score: "+score+"/10";
+
+
 clap.play();
+
 }
 
+
+
 function restart(){
+
 end.style.display="none";
+
 startGame();
+
 }
+
+
 </script>
+
 </body>
 </html>
