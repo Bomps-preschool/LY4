@@ -660,6 +660,38 @@ max-width:900px;
 }
 
 
+.question-audio-button{
+
+position:absolute;
+
+right:18px;
+
+background:#167db5;
+
+color:white;
+
+border:4px solid white;
+
+border-radius:50%;
+
+width:55px;
+
+height:55px;
+
+font-size:28px;
+
+cursor:pointer;
+
+box-shadow:0 5px 0 rgba(0,0,0,.18);
+
+}
+
+.question-audio-button:active{
+
+transform:translateY(4px);
+
+}
+
 /* MISSION AREA */
 
 .mission-area{
@@ -705,10 +737,6 @@ flex-direction:column;
 justify-content:center;
 
 align-items:center;
-
-padding:
-
-clamp(42px,6vh,58px) 12px 10px;
 
 transition:.2s;
 
@@ -767,21 +795,17 @@ z-index:5;
 
 .answer-placeholder{
 
-width:100%;
+width:88%;
 
-height:100%;
-
-min-height:0;
+height:78%;
 
 display:flex;
 
 flex-direction:column;
 
-justify-content:space-evenly;
+justify-content:center;
 
 align-items:center;
-
-gap:2px;
 
 text-align:center;
 
@@ -797,37 +821,33 @@ font-size:
 
 clamp(
 
-48px,
+65px,
 
-8vh,
+10vw,
 
-100px
+125px
 
 );
 
-line-height:.82;
-
-flex-shrink:1;
+line-height:1;
 
 }
 
 .placeholder-question{
 
-margin-top:-8px;
+margin-top:-18px;
 
 font-size:
 
 clamp(
 
-38px,
+45px,
 
-7vh,
+7vw,
 
-72px
+85px
 
 );
-
-line-height:.85;
 
 font-weight:bold;
 
@@ -837,39 +857,25 @@ text-shadow:
 
 3px 4px 0 white;
 
-flex-shrink:1;
-
 }
 
 .placeholder-text{
-
-max-width:100%;
-
-margin:0;
-
-padding:0 8px;
 
 font-size:
 
 clamp(
 
-14px,
+16px,
 
-2.1vh,
+2vw,
 
-22px
+25px
 
 );
-
-line-height:1.05;
 
 font-weight:bold;
 
 color:#476477;
-
-white-space:normal;
-
-flex-shrink:0;
 
 }
 
@@ -895,11 +901,9 @@ transform:translateY(-7px);
 
 .revealed-answer{
 
-width:100%;
+width:88%;
 
-height:100%;
-
-min-height:0;
+height:79%;
 
 display:none;
 
@@ -908,8 +912,6 @@ flex-direction:column;
 justify-content:center;
 
 align-items:center;
-
-gap:4px;
 
 text-align:center;
 
@@ -1921,10 +1923,6 @@ width:75vw;
 
 height:96%;
 
-padding:
-
-clamp(38px,5.5vh,52px) 8px 7px;
-
 }
 
 .mini-hero{
@@ -2050,128 +2048,6 @@ top:2px;
 padding:
 
 3px 13px;
-
-}
-
-.mission-drop{
-
-padding:
-
-35px 8px 5px;
-
-}
-
-.answer-placeholder{
-
-gap:0;
-
-justify-content:space-evenly;
-
-}
-
-.placeholder-cloud{
-
-font-size:
-
-clamp(
-
-38px,
-
-10vh,
-
-56px
-
-);
-
-line-height:.72;
-
-}
-
-.placeholder-question{
-
-margin-top:-6px;
-
-font-size:
-
-clamp(
-
-31px,
-
-9vh,
-
-48px
-
-);
-
-line-height:.78;
-
-}
-
-.placeholder-text{
-
-padding:0 5px;
-
-font-size:
-
-clamp(
-
-11px,
-
-2.8vh,
-
-15px
-
-);
-
-line-height:1;
-
-}
-
-.revealed-image{
-
-height:66%;
-
-max-height:105px;
-
-}
-
-.revealed-emoji{
-
-font-size:
-
-clamp(
-
-45px,
-
-12vh,
-
-70px
-
-);
-
-}
-
-.revealed-text{
-
-margin-top:0;
-
-padding:
-
-2px 12px;
-
-border-width:3px;
-
-font-size:
-
-clamp(
-
-12px,
-
-3vh,
-
-17px
-
-);
 
 }
 
@@ -2579,6 +2455,11 @@ preload="auto"
 src="assets/wrong.mp3"
 ></audio>
 
+<audio
+id="questionSound"
+preload="auto"
+></audio>
+
 
 
 <script>
@@ -2595,6 +2476,10 @@ const questions=[
 question:
 
 "Which one makes the air dirty?",
+
+audio:
+
+"assets/question-1.mp3",
 
 options:[
 
@@ -2644,6 +2529,10 @@ question:
 
 "What helps clean the air?",
 
+audio:
+
+"assets/question-2.mp3",
+
 options:[
 
 
@@ -2691,6 +2580,10 @@ correct:false
 question:
 
 "What should we use more?",
+
+audio:
+
+"assets/question-3.mp3",
 
 options:[
 
@@ -2740,6 +2633,10 @@ question:
 
 "What should factories do?",
 
+audio:
+
+"assets/question-4.mp3",
+
 options:[
 
 
@@ -2787,6 +2684,10 @@ correct:false
 question:
 
 "Which one causes harmful smoke?",
+
+audio:
+
+"assets/question-5.mp3",
 
 options:[
 
@@ -2836,6 +2737,10 @@ question:
 
 "Which is a smarter way to travel?",
 
+audio:
+
+"assets/question-6.mp3",
+
 options:[
 
 
@@ -2883,6 +2788,10 @@ correct:false
 question:
 
 "What can we plant to help the air?",
+
+audio:
+
+"assets/question-7.mp3",
 
 options:[
 
@@ -2932,6 +2841,10 @@ question:
 
 "Which choice reduces air pollution?",
 
+audio:
+
+"assets/question-8.mp3",
+
 options:[
 
 
@@ -2980,6 +2893,10 @@ question:
 
 "What should we avoid burning?",
 
+audio:
+
+"assets/question-9.mp3",
+
 options:[
 
 
@@ -3027,6 +2944,10 @@ correct:false
 question:
 
 "What can make the city sky smoky?",
+
+audio:
+
+"assets/question-10.mp3",
 
 options:[
 
@@ -3225,6 +3146,22 @@ const wrongSound=
 document.getElementById(
 
 "wrongSound"
+
+);
+
+const questionSound=
+
+document.getElementById(
+
+"questionSound"
+
+);
+
+const questionAudioButton=
+
+document.getElementById(
+
+"questionAudioButton"
 
 );
 
@@ -3432,6 +3369,14 @@ startGame
 
 );
 
+questionAudioButton.addEventListener(
+
+"click",
+
+playQuestionAudio
+
+);
+
 
 
 function startGame(){
@@ -3481,6 +3426,24 @@ gameScreen
 }
 
 
+
+
+
+function playQuestionAudio(){
+
+const current=gameQuestions[questionNumber];
+
+if(!current || !current.audio){return;}
+
+questionSound.pause();
+
+questionSound.currentTime=0;
+
+questionSound.src=current.audio;
+
+questionSound.play().catch(function(){});
+
+}
 
 /* ---------------- LOAD QUESTION ---------------- */
 
@@ -3535,6 +3498,8 @@ questionNumber
 questionText.textContent=
 
 current.question;
+
+setTimeout(playQuestionAudio,350);
 
 
 optionsArea.innerHTML="";
