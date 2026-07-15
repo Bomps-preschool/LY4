@@ -821,31 +821,31 @@ font-size:
 
 clamp(
 
-65px,
+45px,
 
-10vw,
+7vw,
 
-125px
+80px
 
 );
 
-line-height:1;
+line-height:.9;
 
 }
 
 .placeholder-question{
 
-margin-top:-18px;
+margin-top:-8px;
 
 font-size:
 
 clamp(
 
-45px,
+38px,
 
-7vw,
+5vw,
 
-85px
+65px
 
 );
 
@@ -855,7 +855,7 @@ color:#167db5;
 
 text-shadow:
 
-3px 4px 0 white;
+2px 3px 0 white;
 
 }
 
@@ -865,17 +865,21 @@ font-size:
 
 clamp(
 
-16px,
+13px,
 
-2vw,
+1.6vw,
 
-25px
+20px
 
 );
 
 font-weight:bold;
 
 color:#476477;
+
+max-width:90%;
+
+text-align:center;
 
 }
 
@@ -4643,12 +4647,9 @@ clapsSound
 
 
 
-setTimeout(
-
-function(){
+clapsSound.onended = function(){
 
 questionNumber++;
-
 
 if(
 
@@ -4668,11 +4669,7 @@ finishGame();
 
 }
 
-},
-
-1600
-
-);
+};
 
 }
 
