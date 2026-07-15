@@ -2,12 +2,16 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
 <title>Clean the Sky Mission – Air Hero</title>
+
 
 <style>
 
@@ -39,9 +43,7 @@ background:white;
 }
 
 
-/* ------------------------------------------------ */
-/* COMMON */
-/* ------------------------------------------------ */
+/* ---------------- COMMON SCREENS ---------------- */
 
 .screen{
 
@@ -67,9 +69,7 @@ display:flex;
 }
 
 
-/* ------------------------------------------------ */
-/* LOGO SCREEN */
-/* ------------------------------------------------ */
+/* ---------------- LOGO SCREEN ---------------- */
 
 #logoScreen{
 
@@ -95,42 +95,52 @@ animation:logoPop 1.2s ease;
 @keyframes logoPop{
 
 0%{
+
 transform:scale(.65);
+
 opacity:0;
+
 }
 
 70%{
+
 transform:scale(1.07);
+
 }
 
 100%{
+
 transform:scale(1);
+
 opacity:1;
-}
 
 }
 
+}
 
-/* ------------------------------------------------ */
-/* INTRODUCTION SCREEN */
-/* ------------------------------------------------ */
+
+/* ---------------- INTRO SCREEN ---------------- */
 
 #introScreen{
 
 background:
 
 linear-gradient(
-rgba(60,70,80,.28),
-rgba(60,70,80,.40)
+
+rgba(60,70,80,.30),
+
+rgba(60,70,80,.42)
+
 ),
 
 url("assets/polluted-city.png");
 
-background-position:center;
-background-repeat:no-repeat;
 background-size:cover;
 
+background-position:center;
+
 justify-content:center;
+
 align-items:center;
 
 padding:15px;
@@ -145,19 +155,22 @@ width:min(920px,96%);
 
 height:min(640px,94%);
 
-background:rgba(255,255,255,.91);
+background:rgba(255,255,255,.92);
 
 border:7px solid white;
 
 border-radius:35px;
 
 box-shadow:
+
 0 13px 0 rgba(45,72,89,.20),
+
 0 20px 45px rgba(0,0,0,.25);
 
 display:flex;
 
 align-items:center;
+
 justify-content:space-around;
 
 gap:15px;
@@ -175,9 +188,11 @@ content:"";
 position:absolute;
 
 left:-80px;
+
 top:-100px;
 
 width:270px;
+
 height:270px;
 
 border-radius:50%;
@@ -197,6 +212,7 @@ height:90%;
 display:flex;
 
 justify-content:center;
+
 align-items:flex-end;
 
 }
@@ -212,10 +228,14 @@ object-fit:contain;
 filter:
 
 drop-shadow(
+
 0 10px 5px rgba(0,0,0,.18)
+
 );
 
-animation:heroFloat 2.3s ease-in-out infinite;
+animation:
+
+heroFloat 2.3s ease-in-out infinite;
 
 }
 
@@ -249,6 +269,7 @@ display:flex;
 flex-direction:column;
 
 justify-content:center;
+
 align-items:center;
 
 z-index:2;
@@ -259,10 +280,16 @@ z-index:2;
 
 margin:0;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 30px,
+
 4vw,
+
 58px
+
 );
 
 line-height:1.05;
@@ -281,10 +308,16 @@ margin:
 
 20px 0;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 19px,
+
 2.3vw,
+
 31px
+
 );
 
 line-height:1.4;
@@ -307,10 +340,16 @@ border-radius:100px;
 
 font-family:inherit;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 20px,
+
 2.3vw,
+
 30px
+
 );
 
 font-weight:bold;
@@ -320,14 +359,19 @@ color:white;
 background:
 
 linear-gradient(
+
 180deg,
+
 #37c76b,
+
 #13994a
+
 );
 
 box-shadow:
 
 0 8px 0 #087435,
+
 0 13px 20px rgba(0,0,0,.18);
 
 cursor:pointer;
@@ -347,9 +391,7 @@ box-shadow:
 }
 
 
-/* ------------------------------------------------ */
-/* GAME SCREEN */
-/* ------------------------------------------------ */
+/* ---------------- GAME SCREEN ---------------- */
 
 #gameScreen{
 
@@ -360,7 +402,7 @@ background:#caecff;
 }
 
 
-/* CITY BACKGROUND */
+/* CITY */
 
 .city-background{
 
@@ -372,11 +414,11 @@ background-image:
 
 url("assets/polluted-city.png");
 
+background-size:cover;
+
 background-position:center;
 
 background-repeat:no-repeat;
-
-background-size:cover;
 
 z-index:0;
 
@@ -392,11 +434,11 @@ background-image:
 
 url("assets/clean-city.png");
 
+background-size:cover;
+
 background-position:center;
 
 background-repeat:no-repeat;
-
-background-size:cover;
 
 opacity:0;
 
@@ -474,7 +516,7 @@ gap:10px;
 
 background:
 
-rgba(255,255,255,.94);
+rgba(255,255,255,.95);
 
 border:
 
@@ -488,10 +530,16 @@ padding:
 
 font-weight:bold;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 21px,
+
 3vw,
+
 37px
+
 );
 
 color:#087cb7;
@@ -528,10 +576,16 @@ padding:
 
 9px 18px;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 19px,
+
 2.5vw,
+
 31px
+
 );
 
 font-weight:bold;
@@ -567,7 +621,7 @@ padding:3px;
 
 background:
 
-rgba(255,255,255,.96);
+rgba(255,255,255,.97);
 
 border:
 
@@ -583,10 +637,16 @@ box-shadow:
 
 0 7px 0 rgba(33,93,127,.18);
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 21px,
+
 3vw,
+
 37px
+
 );
 
 font-weight:bold;
@@ -620,22 +680,19 @@ align-items:center;
 
 position:relative;
 
-width:min(
-480px,
-62vw
-);
+width:min(480px,62vw);
 
 height:94%;
 
 border:
 
-6px dashed rgba(255,255,255,.94);
+6px dashed rgba(255,255,255,.96);
 
 border-radius:35px;
 
 background:
 
-rgba(255,255,255,.80);
+rgba(255,255,255,.84);
 
 box-shadow:
 
@@ -685,58 +742,256 @@ border-radius:100px;
 
 font-weight:bold;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 13px,
+
 1.5vw,
+
 19px
+
 );
+
+z-index:5;
 
 }
 
-.scene-image{
 
-width:82%;
+/* NO ANSWER SHOWN BEFORE CLICK */
 
-height:76%;
+.answer-placeholder{
+
+width:88%;
+
+height:78%;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+text-align:center;
+
+animation:
+
+placeholderFloat 2s ease-in-out infinite;
+
+}
+
+.placeholder-cloud{
+
+font-size:
+
+clamp(
+
+65px,
+
+10vw,
+
+125px
+
+);
+
+line-height:1;
+
+}
+
+.placeholder-question{
+
+margin-top:-18px;
+
+font-size:
+
+clamp(
+
+45px,
+
+7vw,
+
+85px
+
+);
+
+font-weight:bold;
+
+color:#167db5;
+
+text-shadow:
+
+3px 4px 0 white;
+
+}
+
+.placeholder-text{
+
+font-size:
+
+clamp(
+
+16px,
+
+2vw,
+
+25px
+
+);
+
+font-weight:bold;
+
+color:#476477;
+
+}
+
+@keyframes placeholderFloat{
+
+0%,
+100%{
+
+transform:translateY(4px);
+
+}
+
+50%{
+
+transform:translateY(-7px);
+
+}
+
+}
+
+
+/* ANSWER APPEARS ONLY AFTER CORRECT CLICK */
+
+.revealed-answer{
+
+width:88%;
+
+height:79%;
+
+display:none;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+text-align:center;
+
+}
+
+.revealed-answer.show{
+
+display:flex;
+
+animation:
+
+answerReveal .55s ease;
+
+}
+
+.revealed-image{
+
+width:80%;
+
+height:68%;
 
 object-fit:contain;
 
 filter:
 
 drop-shadow(
-0 8px 5px rgba(0,0,0,.18)
-);
 
-animation:sceneEnter .45s ease;
+0 8px 5px rgba(0,0,0,.18)
+
+);
 
 }
 
-@keyframes sceneEnter{
+.revealed-emoji{
+
+font-size:
+
+clamp(
+
+70px,
+
+11vw,
+
+135px
+
+);
+
+line-height:1;
+
+}
+
+.revealed-text{
+
+margin-top:3px;
+
+padding:
+
+5px 20px;
+
+background:
+
+#dffff0;
+
+border:
+
+4px solid white;
+
+border-radius:100px;
+
+font-size:
+
+clamp(
+
+17px,
+
+2.2vw,
+
+28px
+
+);
+
+font-weight:bold;
+
+color:#08723b;
+
+box-shadow:
+
+0 5px 0 rgba(23,130,65,.18);
+
+}
+
+@keyframes answerReveal{
 
 0%{
 
-transform:
-
-scale(.55)
-rotate(-4deg);
+transform:scale(.25);
 
 opacity:0;
 
 }
 
-80%{
+70%{
 
-transform:
+transform:scale(1.08);
 
-scale(1.05);
+opacity:1;
 
 }
 
 100%{
 
-transform:
-
-scale(1);
+transform:scale(1);
 
 opacity:1;
 
@@ -755,10 +1010,7 @@ right:2%;
 
 bottom:1%;
 
-width:min(
-185px,
-18vw
-);
+width:min(185px,18vw);
 
 height:85%;
 
@@ -779,7 +1031,9 @@ object-fit:contain;
 filter:
 
 drop-shadow(
+
 0 7px 4px rgba(0,0,0,.20)
+
 );
 
 }
@@ -798,6 +1052,7 @@ top:50%;
 transform:
 
 translate(-50%,-50%)
+
 scale(0);
 
 min-width:270px;
@@ -828,10 +1083,16 @@ box-shadow:
 
 0 11px 30px rgba(0,0,0,.25);
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 23px,
+
 3vw,
+
 38px
+
 );
 
 font-weight:bold;
@@ -863,6 +1124,7 @@ feedbackPop 1.3s ease forwards;
 transform:
 
 translate(-50%,-50%)
+
 scale(.25);
 
 opacity:0;
@@ -874,6 +1136,7 @@ opacity:0;
 transform:
 
 translate(-50%,-50%)
+
 scale(1.12);
 
 opacity:1;
@@ -885,6 +1148,7 @@ opacity:1;
 transform:
 
 translate(-50%,-50%)
+
 scale(1);
 
 opacity:1;
@@ -896,6 +1160,7 @@ opacity:1;
 transform:
 
 translate(-50%,-50%)
+
 scale(.82);
 
 opacity:0;
@@ -905,7 +1170,7 @@ opacity:0;
 }
 
 
-/* OPTION AREA */
+/* OPTIONS */
 
 .options-area{
 
@@ -920,9 +1185,13 @@ align-items:center;
 gap:
 
 clamp(
+
 8px,
+
 2vw,
+
 25px
+
 );
 
 padding-top:7px;
@@ -933,10 +1202,7 @@ padding-top:7px;
 
 position:relative;
 
-width:min(
-280px,
-30.5%
-);
+width:min(280px,30.5%);
 
 height:93%;
 
@@ -948,7 +1214,7 @@ border-radius:28px;
 
 background:
 
-rgba(255,255,255,.96);
+rgba(255,255,255,.97);
 
 box-shadow:
 
@@ -973,7 +1239,9 @@ cursor:pointer;
 transition:
 
 transform .15s,
+
 box-shadow .15s,
+
 background .2s;
 
 touch-action:none;
@@ -1004,10 +1272,16 @@ pointer-events:none;
 
 .option-emoji{
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 36px,
+
 6vh,
+
 67px
+
 );
 
 line-height:1;
@@ -1016,10 +1290,16 @@ line-height:1;
 
 .option-text{
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 16px,
+
 2vw,
+
 27px
+
 );
 
 font-weight:bold;
@@ -1060,6 +1340,7 @@ transform:translateX(0);
 transform:
 
 translateX(-13px)
+
 rotate(-2deg);
 
 }
@@ -1069,6 +1350,7 @@ rotate(-2deg);
 transform:
 
 translateX(13px)
+
 rotate(2deg);
 
 }
@@ -1078,6 +1360,7 @@ rotate(2deg);
 transform:
 
 translateX(-9px)
+
 rotate(-1deg);
 
 }
@@ -1087,6 +1370,7 @@ rotate(-1deg);
 transform:
 
 translateX(9px)
+
 rotate(1deg);
 
 }
@@ -1112,6 +1396,7 @@ transform:scale(1);
 box-shadow:
 
 0 8px 0 #49ad55,
+
 0 0 10px #72f279;
 
 }
@@ -1123,6 +1408,7 @@ transform:scale(1.055);
 box-shadow:
 
 0 8px 0 #168b35,
+
 0 0 35px #49ef69;
 
 }
@@ -1140,12 +1426,13 @@ transform:scale(1.04);
 box-shadow:
 
 0 8px 0 #2c9e40,
+
 0 0 28px #4aed67;
 
 }
 
 
-/* TOUCH DRAG GHOST */
+/* DRAG IMAGE */
 
 .drag-ghost{
 
@@ -1164,15 +1451,15 @@ pointer-events:none;
 transform:
 
 translate(-50%,-50%)
+
 rotate(3deg)
+
 scale(.9);
 
 }
 
 
-/* ------------------------------------------------ */
-/* END SCREEN */
-/* ------------------------------------------------ */
+/* ---------------- END SCREEN ---------------- */
 
 #endScreen{
 
@@ -1210,19 +1497,13 @@ position:relative;
 
 z-index:3;
 
-width:min(
-760px,
-94%
-);
+width:min(760px,94%);
 
-height:min(
-590px,
-92%
-);
+height:min(590px,92%);
 
 background:
 
-rgba(255,255,255,.93);
+rgba(255,255,255,.94);
 
 border:
 
@@ -1233,6 +1514,7 @@ border-radius:42px;
 box-shadow:
 
 0 16px 0 rgba(18,104,142,.18),
+
 0 25px 60px rgba(0,0,0,.25);
 
 display:flex;
@@ -1260,7 +1542,9 @@ object-fit:contain;
 filter:
 
 drop-shadow(
+
 0 8px 5px rgba(0,0,0,.18)
+
 );
 
 animation:
@@ -1276,6 +1560,7 @@ from{
 transform:
 
 rotate(-3deg)
+
 translateY(3px);
 
 }
@@ -1285,6 +1570,7 @@ to{
 transform:
 
 rotate(3deg)
+
 translateY(-10px);
 
 }
@@ -1293,14 +1579,18 @@ translateY(-10px);
 
 .end-title{
 
-margin:
+margin:5px 0;
 
-5px 0;
+font-size:
 
-font-size:clamp(
+clamp(
+
 34px,
+
 5vw,
+
 66px
+
 );
 
 color:#087ebc;
@@ -1339,10 +1629,16 @@ border:
 
 border-radius:100px;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 25px,
+
 3.7vw,
+
 43px
+
 );
 
 font-weight:bold;
@@ -1383,10 +1679,16 @@ box-shadow:
 
 font-family:inherit;
 
-font-size:clamp(
+font-size:
+
+clamp(
+
 21px,
+
 2.8vw,
+
 33px
+
 );
 
 font-weight:bold;
@@ -1408,9 +1710,7 @@ box-shadow:
 }
 
 
-/* ------------------------------------------------ */
-/* CONFETTI */
-/* ------------------------------------------------ */
+/* ---------------- CONFETTI ---------------- */
 
 .confetti-piece{
 
@@ -1439,6 +1739,7 @@ confettiFall linear forwards;
 transform:
 
 translateY(-40px)
+
 rotate(0deg);
 
 }
@@ -1448,6 +1749,7 @@ rotate(0deg);
 transform:
 
 translateY(115vh)
+
 rotate(760deg);
 
 }
@@ -1455,21 +1757,15 @@ rotate(760deg);
 }
 
 
-/* ------------------------------------------------ */
-/* PORTRAIT DEVICES */
-/* ------------------------------------------------ */
+/* ---------------- MOBILE ---------------- */
 
-@media(
-max-width:700px
-){
+@media(max-width:700px){
 
 .intro-panel{
 
 flex-direction:column;
 
-padding:
-
-14px;
+padding:14px;
 
 gap:2px;
 
@@ -1501,9 +1797,7 @@ margin:
 
 .game-content{
 
-padding:
-
-7px;
+padding:7px;
 
 }
 
@@ -1524,9 +1818,13 @@ padding:
 font-size:
 
 clamp(
+
 17px,
+
 4.3vw,
+
 24px
+
 );
 
 }
@@ -1540,9 +1838,13 @@ padding:
 font-size:
 
 clamp(
+
 16px,
+
 4vw,
+
 22px
+
 );
 
 }
@@ -1562,9 +1864,13 @@ padding:
 font-size:
 
 clamp(
+
 18px,
+
 4.6vw,
+
 26px
+
 );
 
 }
@@ -1624,9 +1930,13 @@ height:55%;
 font-size:
 
 clamp(
+
 13px,
+
 3.5vw,
+
 19px
+
 );
 
 }
@@ -1634,17 +1944,9 @@ clamp(
 }
 
 
-/* ------------------------------------------------ */
-/* SHORT LANDSCAPE DEVICES */
-/* ------------------------------------------------ */
+/* ---------------- SHORT LANDSCAPE ---------------- */
 
-@media(
-max-height:600px
-)
-and
-(
-orientation:landscape
-){
+@media(max-height:600px) and (orientation:landscape){
 
 .game-content{
 
@@ -1699,10 +2001,7 @@ height:43%;
 
 height:96%;
 
-width:min(
-390px,
-50vw
-);
+width:min(390px,50vw);
 
 }
 
@@ -1743,13 +2042,9 @@ height:56%;
 }
 
 
-/* ------------------------------------------------ */
-/* VERY SMALL DEVICES */
-/* ------------------------------------------------ */
+/* ---------------- VERY SMALL SCREEN ---------------- */
 
-@media(
-max-width:410px
-){
+@media(max-width:410px){
 
 .game-title{
 
@@ -1791,31 +2086,31 @@ font-size:11px;
 <body>
 
 
-<!-- ============================================== -->
-<!-- LOGO SCREEN -->
-<!-- ============================================== -->
+<!-- LOGO -->
 
 <section
 id="logoScreen"
-class="screen active">
+class="screen active"
+>
 
 <img
 
 src="assets/innovine-logo.png"
 
-alt="Innovine">
+alt="Innovine"
+
+>
 
 </section>
 
 
 
-<!-- ============================================== -->
-<!-- INTRO SCREEN -->
-<!-- ============================================== -->
+<!-- INTRO -->
 
 <section
 id="introScreen"
-class="screen">
+class="screen"
+>
 
 <div class="intro-panel">
 
@@ -1826,12 +2121,15 @@ class="screen">
 
 src="assets/air-hero.png"
 
-alt="Air Hero">
+alt="Air Hero"
+
+>
 
 </div>
 
 
 <div class="intro-content">
+
 
 <h1 class="intro-title">
 
@@ -1852,17 +2150,16 @@ Help the Air Hero clean the air!
 
 
 <button
-
 id="startButton"
-
-class="start-button">
+class="start-button"
+>
 
 🚀 Start Mission
 
 </button>
 
-</div>
 
+</div>
 
 </div>
 
@@ -1870,25 +2167,21 @@ class="start-button">
 
 
 
-<!-- ============================================== -->
-<!-- GAME SCREEN -->
-<!-- ============================================== -->
+<!-- GAME -->
 
 <section
 id="gameScreen"
-class="screen">
+class="screen"
+>
 
 
 <div class="city-background"></div>
 
 
 <div
-
 id="cleanLayer"
-
-class="clean-layer">
-
-</div>
+class="clean-layer"
+></div>
 
 
 <div class="city-shade"></div>
@@ -1931,10 +2224,9 @@ class="clean-layer">
 
 
 <div
-
 id="questionText"
-
-class="question-box">
+class="question-box"
+>
 
 Which choice will help clean the sky?
 
@@ -1949,10 +2241,9 @@ Which choice will help clean the sky?
 
 
 <div
-
 id="missionDrop"
-
-class="mission-drop">
+class="mission-drop"
+>
 
 
 <div class="mission-label">
@@ -1962,15 +2253,44 @@ Tap or drag your answer here
 </div>
 
 
-<img
 
-id="sceneImage"
+<div
+id="answerPlaceholder"
+class="answer-placeholder"
+>
 
-class="scene-image"
 
-src="assets/car-smoke.png"
+<div class="placeholder-cloud">
 
-alt="Mission picture">
+☁️
+
+</div>
+
+
+<div class="placeholder-question">
+
+?
+
+</div>
+
+
+<div class="placeholder-text">
+
+Choose the correct answer
+
+</div>
+
+
+</div>
+
+
+
+<div
+id="revealedAnswer"
+class="revealed-answer"
+>
+
+</div>
 
 
 </div>
@@ -1984,7 +2304,9 @@ alt="Mission picture">
 
 src="assets/air-hero.png"
 
-alt="Air Hero">
+alt="Air Hero"
+
+>
 
 
 </div>
@@ -1992,10 +2314,9 @@ alt="Air Hero">
 
 
 <div
-
 id="feedback"
-
-class="feedback">
+class="feedback"
+>
 
 ✅ Great Job, Air Hero!
 
@@ -2007,10 +2328,9 @@ class="feedback">
 
 
 <div
-
 id="optionsArea"
-
-class="options-area">
+class="options-area"
+>
 
 </div>
 
@@ -2021,15 +2341,12 @@ class="options-area">
 
 
 
-<!-- ============================================== -->
-<!-- FINAL SCREEN -->
-<!-- ============================================== -->
+<!-- END -->
 
 <section
-
 id="endScreen"
-
-class="screen">
+class="screen"
+>
 
 
 <div class="end-overlay"></div>
@@ -2044,7 +2361,9 @@ class="end-hero"
 
 src="assets/air-hero.png"
 
-alt="Air Hero">
+alt="Air Hero"
+
+>
 
 
 <h1 class="end-title">
@@ -2070,10 +2389,9 @@ alt="Air Hero">
 
 
 <button
-
 id="playAgain"
-
-class="play-again">
+class="play-again"
+>
 
 🔄 Play Again
 
@@ -2082,55 +2400,31 @@ class="play-again">
 
 </div>
 
-
 </section>
 
 
 
-<!-- ============================================== -->
 <!-- AUDIO -->
-<!-- ============================================== -->
 
 <audio
-
 id="clapsSound"
-
 preload="auto"
-
-src="assets/claps.mp3">
-
-</audio>
+src="assets/claps.mp3"
+></audio>
 
 
 <audio
-
 id="wrongSound"
-
 preload="auto"
-
-src="assets/wrong.mp3">
-
-</audio>
-
-
-<audio
-
-id="correctSound"
-
-preload="auto"
-
-src="assets/correct.mp3">
-
-</audio>
+src="assets/wrong.mp3"
+></audio>
 
 
 
 <script>
 
 
-/* ================================================= */
-/* GAME QUESTIONS */
-/* ================================================= */
+/* ---------------- QUESTIONS ---------------- */
 
 
 const questions=[
@@ -2141,10 +2435,6 @@ const questions=[
 question:
 
 "Which one makes the air dirty?",
-
-scene:
-
-"assets/car-smoke.png",
 
 options:[
 
@@ -2194,10 +2484,6 @@ question:
 
 "What helps clean the air?",
 
-scene:
-
-"assets/tree.png",
-
 options:[
 
 
@@ -2245,10 +2531,6 @@ correct:false
 question:
 
 "What should we use more?",
-
-scene:
-
-"assets/bicycle.png",
 
 options:[
 
@@ -2298,10 +2580,6 @@ question:
 
 "What should factories do?",
 
-scene:
-
-"assets/factory-smoke.png",
-
 options:[
 
 
@@ -2349,10 +2627,6 @@ correct:false
 question:
 
 "Which one causes harmful smoke?",
-
-scene:
-
-"assets/burning-garbage.png",
 
 options:[
 
@@ -2402,10 +2676,6 @@ question:
 
 "Which is a smarter way to travel?",
 
-scene:
-
-"assets/bus.png",
-
 options:[
 
 
@@ -2453,10 +2723,6 @@ correct:false
 question:
 
 "What can we plant to help the air?",
-
-scene:
-
-"assets/tree.png",
 
 options:[
 
@@ -2506,10 +2772,6 @@ question:
 
 "Which choice reduces air pollution?",
 
-scene:
-
-"assets/bicycle.png",
-
 options:[
 
 
@@ -2557,10 +2819,6 @@ correct:false
 question:
 
 "What should we avoid burning?",
-
-scene:
-
-"assets/burning-garbage.png",
 
 options:[
 
@@ -2610,10 +2868,6 @@ question:
 
 "What can make the city sky smoky?",
 
-scene:
-
-"assets/factory-smoke.png",
-
 options:[
 
 
@@ -2659,134 +2913,164 @@ correct:false
 
 
 
-/* ================================================= */
-/* ELEMENTS */
-/* ================================================= */
+/* ---------------- ELEMENTS ---------------- */
 
 
 const logoScreen=
 
 document.getElementById(
+
 "logoScreen"
+
 );
 
 
 const introScreen=
 
 document.getElementById(
+
 "introScreen"
+
 );
 
 
 const gameScreen=
 
 document.getElementById(
+
 "gameScreen"
+
 );
 
 
 const endScreen=
 
 document.getElementById(
+
 "endScreen"
+
 );
 
 
 const startButton=
 
 document.getElementById(
+
 "startButton"
+
 );
 
 
 const playAgain=
 
 document.getElementById(
+
 "playAgain"
+
 );
 
 
 const questionText=
 
 document.getElementById(
+
 "questionText"
+
 );
 
 
 const optionsArea=
 
 document.getElementById(
+
 "optionsArea"
-);
 
-
-const sceneImage=
-
-document.getElementById(
-"sceneImage"
 );
 
 
 const scoreText=
 
 document.getElementById(
+
 "score"
+
 );
 
 
 const finalScore=
 
 document.getElementById(
+
 "finalScore"
+
 );
 
 
 const feedback=
 
 document.getElementById(
+
 "feedback"
+
 );
 
 
 const cleanLayer=
 
 document.getElementById(
+
 "cleanLayer"
+
 );
 
 
 const missionDrop=
 
 document.getElementById(
+
 "missionDrop"
+
+);
+
+
+const answerPlaceholder=
+
+document.getElementById(
+
+"answerPlaceholder"
+
+);
+
+
+const revealedAnswer=
+
+document.getElementById(
+
+"revealedAnswer"
+
 );
 
 
 const clapsSound=
 
 document.getElementById(
+
 "clapsSound"
+
 );
 
 
 const wrongSound=
 
 document.getElementById(
+
 "wrongSound"
-);
 
-
-const correctSound=
-
-document.getElementById(
-"correctSound"
 );
 
 
 
-/* ================================================= */
-/* GAME VARIABLES */
-/* ================================================= */
+/* ---------------- VARIABLES ---------------- */
 
 
 let gameQuestions=[];
@@ -2813,65 +3097,81 @@ let touchMoved=false;
 
 
 
-/* ================================================= */
-/* SCREEN FUNCTIONS */
-/* ================================================= */
+/* ---------------- SCREEN ---------------- */
 
 
 function showScreen(
+
 screen
+
 ){
 
 logoScreen.classList.remove(
+
 "active"
+
 );
+
 
 introScreen.classList.remove(
+
 "active"
+
 );
+
 
 gameScreen.classList.remove(
+
 "active"
+
 );
 
+
 endScreen.classList.remove(
+
 "active"
+
 );
 
 
 screen.classList.add(
+
 "active"
+
 );
 
 }
 
 
 
-/* ================================================= */
-/* SPLASH SCREEN */
-/* ================================================= */
+/* ---------------- LOGO TIMER ---------------- */
 
 
 setTimeout(
+
 function(){
 
 showScreen(
+
 introScreen
+
 );
 
 },
+
 2400
+
 );
 
 
 
-/* ================================================= */
-/* SHUFFLE */
-/* ================================================= */
+/* ---------------- SHUFFLE ---------------- */
 
 
 function shuffle(
+
 array
+
 ){
 
 let copied=
@@ -2882,6 +3182,7 @@ array.slice();
 for(
 
 let i=
+
 copied.length-1;
 
 i>0;
@@ -2924,13 +3225,13 @@ return copied;
 
 
 
-/* ================================================= */
-/* AUDIO */
-/* ================================================= */
+/* ---------------- AUDIO ---------------- */
 
 
 function playAudio(
+
 audio
+
 ){
 
 try{
@@ -2951,9 +3252,7 @@ catch(error){
 
 
 
-/* ================================================= */
-/* START GAME */
-/* ================================================= */
+/* ---------------- START ---------------- */
 
 
 startButton.addEventListener(
@@ -2983,7 +3282,9 @@ removeConfetti();
 gameQuestions=
 
 shuffle(
+
 questions
+
 );
 
 
@@ -3006,20 +3307,22 @@ cleanLayer.style.opacity=
 "0";
 
 
-showScreen(
-gameScreen
-);
-
+/* LOAD QUESTION BEFORE SHOWING GAME */
 
 loadQuestion();
+
+
+showScreen(
+
+gameScreen
+
+);
 
 }
 
 
 
-/* ================================================= */
-/* LOAD QUESTION */
-/* ================================================= */
+/* ---------------- LOAD QUESTION ---------------- */
 
 
 function loadQuestion(){
@@ -3030,19 +3333,42 @@ wrongAttempts=0;
 
 
 feedback.classList.remove(
+
 "show"
+
 );
 
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
+
+
+/* CLEAR OLD ANSWER BEFORE NEXT QUESTION */
+
+revealedAnswer.classList.remove(
+
+"show"
+
+);
+
+
+revealedAnswer.innerHTML="";
+
+
+answerPlaceholder.style.display=
+
+"flex";
 
 
 const current=
 
 gameQuestions[
+
 questionNumber
+
 ];
 
 
@@ -3051,44 +3377,32 @@ questionText.textContent=
 current.question;
 
 
-sceneImage.style.animation=
-
-"none";
-
-
-sceneImage.offsetHeight;
-
-
-sceneImage.src=
-
-current.scene;
-
-
-sceneImage.style.animation=
-
-"sceneEnter .45s ease";
-
-
 optionsArea.innerHTML="";
 
 
 const mixedOptions=
 
 shuffle(
+
 current.options
+
 );
 
 
 mixedOptions.forEach(
 
 function(
+
 option
+
 ){
 
 const card=
 
 document.createElement(
+
 "div"
+
 );
 
 
@@ -3111,6 +3425,7 @@ card.optionData=
 option;
 
 
+
 if(
 
 option.image
@@ -3120,7 +3435,9 @@ option.image
 const image=
 
 document.createElement(
+
 "img"
+
 );
 
 
@@ -3140,7 +3457,9 @@ option.text;
 
 
 card.appendChild(
+
 image
+
 );
 
 }
@@ -3151,7 +3470,9 @@ else{
 const emoji=
 
 document.createElement(
+
 "div"
+
 );
 
 
@@ -3166,16 +3487,21 @@ option.emoji;
 
 
 card.appendChild(
+
 emoji
+
 );
 
 }
 
 
+
 const text=
 
 document.createElement(
+
 "div"
+
 );
 
 
@@ -3190,7 +3516,9 @@ option.text;
 
 
 card.appendChild(
+
 text
+
 );
 
 
@@ -3231,7 +3559,7 @@ option
 
 
 
-/* DESKTOP DRAG */
+/* COMPUTER DRAG */
 
 
 card.addEventListener(
@@ -3239,7 +3567,9 @@ card.addEventListener(
 "dragstart",
 
 function(
+
 event
+
 ){
 
 if(
@@ -3276,6 +3606,7 @@ card.style.opacity=
 },
 
 0
+
 );
 
 }
@@ -3298,7 +3629,9 @@ draggedCard=null;
 
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
 
 }
@@ -3356,20 +3689,20 @@ passive:false
 
 
 optionsArea.appendChild(
+
 card
-);
-
-}
 
 );
 
 }
 
+);
+
+}
 
 
-/* ================================================= */
-/* DESKTOP DROP */
-/* ================================================= */
+
+/* ---------------- COMPUTER DROP ---------------- */
 
 
 missionDrop.addEventListener(
@@ -3377,7 +3710,9 @@ missionDrop.addEventListener(
 "dragover",
 
 function(
+
 event
+
 ){
 
 event.preventDefault();
@@ -3390,7 +3725,9 @@ if(
 ){
 
 missionDrop.classList.add(
+
 "drag-over"
+
 );
 
 }
@@ -3407,7 +3744,9 @@ missionDrop.addEventListener(
 function(){
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
 
 }
@@ -3420,14 +3759,18 @@ missionDrop.addEventListener(
 "drop",
 
 function(
+
 event
+
 ){
 
 event.preventDefault();
 
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
 
 
@@ -3453,13 +3796,13 @@ draggedCard.optionData
 
 
 
-/* ================================================= */
-/* TOUCH DRAG */
-/* ================================================= */
+/* ---------------- TOUCH DRAG ---------------- */
 
 
 function touchDragStart(
+
 event
+
 ){
 
 if(
@@ -3500,7 +3843,9 @@ touchMoved=false;
 
 
 function touchDragMove(
+
 event
+
 ){
 
 if(
@@ -3566,17 +3911,23 @@ if(
 dragGhost=
 
 touchCard.cloneNode(
+
 true
+
 );
 
 
 dragGhost.classList.add(
+
 "drag-ghost"
+
 );
 
 
 document.body.appendChild(
+
 dragGhost
+
 );
 
 
@@ -3590,12 +3941,14 @@ touchCard.style.opacity=
 dragGhost.style.left=
 
 touch.clientX+
+
 "px";
 
 
 dragGhost.style.top=
 
 touch.clientY+
+
 "px";
 
 
@@ -3623,7 +3976,9 @@ touch.clientY<=rectangle.bottom
 ){
 
 missionDrop.classList.add(
+
 "drag-over"
+
 );
 
 }
@@ -3631,7 +3986,9 @@ missionDrop.classList.add(
 else{
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
 
 }
@@ -3641,7 +3998,9 @@ missionDrop.classList.remove(
 
 
 function touchDragEnd(
+
 event
+
 ){
 
 if(
@@ -3723,13 +4082,16 @@ dragGhost
 
 dragGhost.remove();
 
+
 dragGhost=null;
 
 }
 
 
 missionDrop.classList.remove(
+
 "drag-over"
+
 );
 
 
@@ -3745,20 +4107,22 @@ touchMoved=false;
 },
 
 100
+
 );
 
 }
 
 
 
-/* ================================================= */
-/* CHECK ANSWER */
-/* ================================================= */
+/* ---------------- CHECK ---------------- */
 
 
 function checkAnswer(
+
 card,
+
 option
+
 ){
 
 if(
@@ -3779,7 +4143,11 @@ option.correct
 ){
 
 correctAnswer(
-card
+
+card,
+
+option
+
 );
 
 }
@@ -3787,7 +4155,9 @@ card
 else{
 
 wrongAnswer(
+
 card
+
 );
 
 }
@@ -3796,25 +4166,29 @@ card
 
 
 
-/* ================================================= */
-/* WRONG ANSWER */
-/* ================================================= */
+/* ---------------- WRONG ---------------- */
 
 
 function wrongAnswer(
+
 card
+
 ){
 
 wrongAttempts++;
 
 
 playAudio(
+
 wrongSound
+
 );
 
 
 card.classList.remove(
+
 "wrong"
+
 );
 
 
@@ -3822,7 +4196,9 @@ card.offsetHeight;
 
 
 card.classList.add(
+
 "wrong"
+
 );
 
 
@@ -3831,12 +4207,15 @@ setTimeout(
 function(){
 
 card.classList.remove(
+
 "wrong"
+
 );
 
 },
 
 520
+
 );
 
 
@@ -3850,14 +4229,18 @@ wrongAttempts>=2
 const cards=
 
 document.querySelectorAll(
+
 ".option-card"
+
 );
 
 
 cards.forEach(
 
 function(
+
 item
+
 ){
 
 if(
@@ -3867,7 +4250,9 @@ item.optionData.correct
 ){
 
 item.classList.add(
+
 "hint"
+
 );
 
 }
@@ -3893,7 +4278,9 @@ feedback.style.color=
 
 
 feedback.classList.remove(
+
 "show"
+
 );
 
 
@@ -3901,7 +4288,9 @@ feedback.offsetHeight;
 
 
 feedback.classList.add(
+
 "show"
+
 );
 
 }
@@ -3910,25 +4299,165 @@ feedback.classList.add(
 
 
 
-/* ================================================= */
-/* CORRECT ANSWER */
-/* ================================================= */
+/* ---------------- SHOW CORRECT ANSWER ---------------- */
+
+
+function revealCorrectAnswer(
+
+option
+
+){
+
+answerPlaceholder.style.display=
+
+"none";
+
+
+revealedAnswer.innerHTML="";
+
+
+if(
+
+option.image
+
+){
+
+const image=
+
+document.createElement(
+
+"img"
+
+);
+
+
+image.className=
+
+"revealed-image";
+
+
+image.src=
+
+option.image;
+
+
+image.alt=
+
+option.text;
+
+
+revealedAnswer.appendChild(
+
+image
+
+);
+
+}
+
+
+else{
+
+const emoji=
+
+document.createElement(
+
+"div"
+
+);
+
+
+emoji.className=
+
+"revealed-emoji";
+
+
+emoji.textContent=
+
+option.emoji;
+
+
+revealedAnswer.appendChild(
+
+emoji
+
+);
+
+}
+
+
+
+const answerText=
+
+document.createElement(
+
+"div"
+
+);
+
+
+answerText.className=
+
+"revealed-text";
+
+
+answerText.textContent=
+
+"✅ "+
+
+option.text;
+
+
+revealedAnswer.appendChild(
+
+answerText
+
+);
+
+
+revealedAnswer.classList.add(
+
+"show"
+
+);
+
+}
+
+
+
+/* ---------------- CORRECT ---------------- */
 
 
 function correctAnswer(
-card
+
+card,
+
+option
+
 ){
 
 questionLocked=true;
 
 
 card.classList.remove(
+
 "hint"
+
 );
 
 
 card.classList.add(
+
 "correct"
+
+);
+
+
+/* ANSWER IS SHOWN ONLY NOW */
+
+revealCorrectAnswer(
+
+option
+
 );
 
 
@@ -3940,22 +4469,13 @@ scoreText.textContent=
 score;
 
 
-
-/* CLEAN CITY PROGRESS */
-
-
 cleanLayer.style.opacity=
 
 String(
 
-score/
-10
+score/10
 
 );
-
-
-
-/* CORRECT FEEDBACK */
 
 
 feedback.innerHTML=
@@ -3974,7 +4494,9 @@ feedback.style.color=
 
 
 feedback.classList.remove(
+
 "show"
+
 );
 
 
@@ -3982,49 +4504,18 @@ feedback.offsetHeight;
 
 
 feedback.classList.add(
+
 "show"
+
 );
-
-
-
-/* AUDIO */
 
 
 playAudio(
+
 clapsSound
+
 );
 
-
-
-/* OBJECT SUCCESS ANIMATION */
-
-
-sceneImage.style.transition=
-
-"transform .6s ease, opacity .6s ease";
-
-
-sceneImage.style.transform=
-
-"scale(1.14)";
-
-
-setTimeout(
-
-function(){
-
-sceneImage.style.transform=
-
-"scale(1)";
-
-},
-
-500
-);
-
-
-
-/* NEXT QUESTION */
 
 
 setTimeout(
@@ -4054,16 +4545,15 @@ finishGame();
 
 },
 
-1450
+1600
+
 );
 
 }
 
 
 
-/* ================================================= */
-/* FINISH GAME */
-/* ================================================= */
+/* ---------------- FINISH ---------------- */
 
 
 function finishGame(){
@@ -4074,12 +4564,16 @@ score;
 
 
 showScreen(
+
 endScreen
+
 );
 
 
 playAudio(
+
 clapsSound
+
 );
 
 
@@ -4089,9 +4583,7 @@ createConfetti();
 
 
 
-/* ================================================= */
-/* CONFETTI */
-/* ================================================= */
+/* ---------------- CONFETTI ---------------- */
 
 
 function createConfetti(){
@@ -4129,7 +4621,9 @@ i++
 const piece=
 
 document.createElement(
+
 "div"
+
 );
 
 
@@ -4141,6 +4635,7 @@ piece.className=
 piece.style.left=
 
 Math.random()*100+
+
 "vw";
 
 
@@ -4183,17 +4678,10 @@ Math.random()*2.4
 "s";
 
 
-piece.style.transform=
-
-"rotate("+
-
-Math.random()*360+
-
-"deg)";
-
-
 document.body.appendChild(
+
 piece
+
 );
 
 }
@@ -4211,7 +4699,9 @@ document.querySelectorAll(
 ).forEach(
 
 function(
+
 piece
+
 ){
 
 piece.remove();
@@ -4221,41 +4711,6 @@ piece.remove();
 );
 
 }
-
-
-
-/* ================================================= */
-/* IMAGE FALLBACK */
-/* ================================================= */
-
-
-document.addEventListener(
-
-"error",
-
-function(
-event
-){
-
-if(
-
-event.target.tagName===
-
-"IMG"
-
-){
-
-event.target.style.opacity=
-
-".25";
-
-}
-
-},
-
-true
-
-);
 
 
 </script>
