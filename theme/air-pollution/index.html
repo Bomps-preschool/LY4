@@ -617,6 +617,34 @@ padding:3px;
 
 }
 
+
+.question-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+}
+
+.question-audio-button{
+    border:none;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    background:#167db5;
+    color:white;
+    font-size:28px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 5px 0 rgba(0,102,155,.25);
+}
+
+.question-audio-button:active{
+    transform:translateY(4px);
+    box-shadow:none;
+}
 .question-box{
 
 background:
@@ -2268,7 +2296,13 @@ id="questionText"
 class="question-box"
 >
 
-Which choice will help clean the sky?
+<button
+id="questionAudioButton"
+class="question-audio-button"
+aria-label="Play question audio"
+>🔊</button>
+
+<span id="questionTextContent">Which choice will help clean the sky?</span>
 
 </div>
 
@@ -3499,7 +3533,7 @@ questionNumber
 ];
 
 
-questionText.textContent=
+document.getElementById("questionTextContent").textContent=
 
 current.question;
 
