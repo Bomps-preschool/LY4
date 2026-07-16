@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#f3b63f" />
+  <title>Build the Construction Road</title>
+
+  <style>
+    :root{
+      --yellow:#f7bd3d;
+      --yellow-dark:#d99000;
+      --orange:#ef7d28;
+      --navy:#15324b;
+      --blue:#dff2ff;
+      --cream:#fff8e7;
+      --green:#2d9b5b;
+      --red:#d94b48;
+      --white:#ffffff;
+      --shadow:0 8px 18px rgba(20,40,60,.16);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#eef8ff;
+      color:var(--navy);
+    }
+
+    button{
+      font:inherit;
+      border:0;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+
+    img{
+      -webkit-user-drag:none;
+      user-drag:none;
+      pointer-events:none;
+    }
+
+    .screen{
+      position:fixed;
+      inset:0;
+      display:none;
+      width:100%;
+      height:100dvh;
+      overflow:hidden;
+    }
+
+    .screen.active{
+      display:flex;
+    }
+
+    /* ---------- SPLASH ---------- */
+    #splashScreen{
+      background:#fff;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .logo-wrap{
+      width:min(58vw,340px);
+      height:min(35vh,210px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo-wrap img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+
+    .loading-dots{
+      display:flex;
+      gap:8px;
+      margin-top:6px;
+    }
+
+    .loading-dots span{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--orange);
+      animation:dot 1s infinite ease-in-out;
+    }
+
+    .loading-dots span:nth-child(2){animation-delay:.15s}
+    .loading-dots span:nth-child(3){animation-delay:.3s}
+
+    @keyframes dot{
+      0%,100%{transform:translateY(0);opacity:.45}
+      50%{transform:translateY(-7px);opacity:1}
+    }
+
+    /* ---------- START ---------- */
+    #startScreen{
+      background:
+        linear-gradient(rgba(255,255,255,.36),rgba(255,255,255,.36)),
+        url("assets/construction-site.png") center/cover no-repeat,
+        linear-gradient(#dff3ff,#fff3c8);
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    .start-card{
+      width:min(92vw,760px);
+      background:rgba(255,255,255,.96);
+      border:5px solid var(--yellow);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:clamp(20px,4vw,38px);
+      text-align:center;
+      position:relative;
+    }
+
+    .helmet-icon{
+      font-size:clamp(42px,8vw,72px);
+      line-height:1;
+      margin-bottom:5px;
+    }
+
+    .start-card h1{
+      margin:4px 0 10px;
+      font-size:clamp(29px,5.7vw,56px);
+      color:var(--navy);
+      line-height:1.05;
+    }
+
+    .start-card p{
+      margin:8px auto;
+      max-width:650px;
+      font-size:clamp(17px,2.7vw,25px);
+      line-height:1.35;
+    }
+
+    .mission-box{
+      margin:18px auto;
+      padding:13px 16px;
+      max-width:590px;
+      background:#fff6cb;
+      border:2px dashed var(--orange);
+      border-radius:16px;
+      font-weight:700;
+    }
+
+    .primary-btn{
+      min-width:190px;
+      min-height:56px;
+      padding:12px 26px;
+      border-radius:18px;
+      background:linear-gradient(#ffbd38,#ef8f18);
+      color:#18314a;
+      font-size:clamp(20px,3vw,27px);
+      font-weight:900;
+      box-shadow:0 7px 0 #b76609, var(--shadow);
+      transition:transform .1s;
+    }
+
+    .primary-btn:active{
+      transform:translateY(5px);
+      box-shadow:0 2px 0 #b76609;
+    }
+
+    /* ---------- GAME ---------- */
+    #gameScreen{
+      flex-direction:column;
+      background:linear-gradient(#dff3ff 0 34%, #f8e6b7 34% 100%);
+    }
+
+    .topbar{
+      height:64px;
+      min-height:64px;
+      background:var(--navy);
+      color:#fff;
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      align-items:center;
+      gap:10px;
+      padding:8px 14px;
+      box-shadow:0 3px 10px rgba(0,0,0,.22);
+      z-index:20;
+    }
+
+    .game-title{
+      font-weight:900;
+      font-size:clamp(16px,2.6vw,24px);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .round-pill,.score-pill{
+      background:#fff;
+      color:var(--navy);
+      border-radius:999px;
+      padding:8px 13px;
+      font-weight:900;
+      font-size:clamp(13px,2vw,17px);
+      white-space:nowrap;
+    }
+
+    .game-main{
+      flex:1;
+      min-height:0;
+      display:grid;
+      grid-template-rows:minmax(190px,42%) auto minmax(170px,1fr);
+      gap:8px;
+      padding:8px clamp(8px,1.8vw,18px) 10px;
+    }
+
+    /* Scene */
+    .scene{
+      position:relative;
+      overflow:hidden;
+      border:4px solid #bd7c2c;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      background:
+        linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)),
+        url("assets/road-before.png") center/cover no-repeat,
+        #d7b06c;
+    }
+
+    .scene.complete{
+      background:
+        url("assets/road-after.png") center/cover no-repeat,
+        #8ebc70;
+    }
+
+    .scene::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      box-shadow:inset 0 0 25px rgba(55,35,15,.18);
+    }
+
+    .worker{
+      position:absolute;
+      right:2.5%;
+      bottom:4%;
+      height:min(45%,140px);
+      max-width:26%;
+      object-fit:contain;
+      filter:drop-shadow(0 5px 4px rgba(0,0,0,.2));
+      z-index:5;
+    }
+
+    .cones{
+      position:absolute;
+      left:2%;
+      bottom:4%;
+      display:flex;
+      gap:5px;
+      z-index:4;
+    }
+
+    .cones img{
+      height:clamp(35px,7vh,62px);
+      filter:drop-shadow(0 4px 3px rgba(0,0,0,.2));
+    }
+
+    .job-bubble{
+      position:absolute;
+      top:7%;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:6;
+      max-width:84%;
+      padding:8px 15px;
+      border-radius:16px;
+      background:rgba(255,255,255,.94);
+      border:3px solid var(--yellow);
+      font-size:clamp(15px,2.4vw,22px);
+      font-weight:900;
+      text-align:center;
+      box-shadow:0 5px 10px rgba(0,0,0,.15);
+    }
+
+    .vehicle-stage{
+      position:absolute;
+      inset:0;
+      z-index:7;
+      pointer-events:none;
+    }
+
+    .animated-vehicle{
+      position:absolute;
+      left:-38%;
+      bottom:7%;
+      width:clamp(115px,27vw,250px);
+      max-height:62%;
+      object-fit:contain;
+      filter:drop-shadow(0 7px 5px rgba(0,0,0,.28));
+      animation:driveIn 1.1s ease-out forwards;
+    }
+
+    @keyframes driveIn{
+      to{left:30%}
+    }
+
+    .animated-vehicle.dig{animation:driveIn .9s ease-out forwards, digMove .45s 1s 4 alternate}
+    @keyframes digMove{
+      from{transform:rotate(0deg)}
+      to{transform:rotate(-3deg) translateY(5px)}
+    }
+
+    .animated-vehicle.push{animation:driveIn .9s ease-out forwards, pushMove .35s 1s 4 alternate}
+    @keyframes pushMove{
+      from{transform:translateX(0)}
+      to{transform:translateX(18px)}
+    }
+
+    .animated-vehicle.mix{animation:driveIn .9s ease-out forwards}
+    .animated-vehicle.lift{animation:driveIn .9s ease-out forwards, craneBob .65s 1s 3 alternate}
+    @keyframes craneBob{
+      to{transform:translateY(-8px)}
+    }
+
+    .dust{
+      position:absolute;
+      left:45%;
+      bottom:11%;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#d9bf8a;
+      box-shadow:
+        25px 4px 0 8px #e3cd9c,
+        50px -4px 0 2px #cfb47e,
+        72px 6px 0 7px #e0c896;
+      opacity:0;
+      animation:dustCloud 1.5s .7s ease-out forwards;
+    }
+
+    @keyframes dustCloud{
+      0%{opacity:0;transform:scale(.3)}
+      35%{opacity:.9}
+      100%{opacity:0;transform:scale(1.8) translateY(-18px)}
+    }
+
+    .material-drop{
+      position:absolute;
+      left:47%;
+      bottom:3%;
+      width:clamp(70px,15vw,135px);
+      max-height:30%;
+      object-fit:contain;
+      opacity:0;
+      animation:dropMaterial .8s 1s forwards;
+    }
+
+    @keyframes dropMaterial{
+      from{opacity:0;transform:translateY(-45px) scale(.7)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+
+    .cement-pour{
+      position:absolute;
+      left:45%;
+      bottom:0;
+      width:clamp(85px,17vw,155px);
+      max-height:32%;
+      object-fit:contain;
+      opacity:0;
+      animation:pour .9s 1s forwards;
+    }
+
+    @keyframes pour{
+      from{opacity:0;transform:scale(.3)}
+      to{opacity:1;transform:scale(1)}
+    }
+
+    .hole-mark{
+      position:absolute;
+      left:43%;
+      bottom:5%;
+      width:clamp(85px,19vw,170px);
+      height:clamp(25px,5vw,48px);
+      border-radius:50%;
+      background:rgba(70,49,28,.72);
+      box-shadow:inset 0 5px 8px rgba(0,0,0,.38);
+      opacity:0;
+      animation:holeAppear .5s 1.25s forwards;
+    }
+
+    @keyframes holeAppear{to{opacity:1}}
+
+    .success-stamp{
+      position:absolute;
+      left:50%;
+      top:52%;
+      transform:translate(-50%,-50%) scale(.4) rotate(-8deg);
+      z-index:10;
+      padding:8px 15px;
+      border:4px solid var(--green);
+      border-radius:12px;
+      background:rgba(255,255,255,.93);
+      color:var(--green);
+      font-size:clamp(19px,4vw,36px);
+      font-weight:1000;
+      opacity:0;
+      animation:stamp .45s .8s forwards;
+      white-space:nowrap;
+    }
+
+    @keyframes stamp{
+      to{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-4deg)}
+    }
+
+    /* Question */
+    .question-panel{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:9px;
+      background:rgba(255,255,255,.97);
+      border:3px solid var(--yellow);
+      border-radius:17px;
+      padding:8px 12px;
+      box-shadow:var(--shadow);
+      min-height:72px;
+    }
+
+    .job-icon{
+      font-size:clamp(28px,4vw,42px);
+    }
+
+    .question-text{
+      margin:0;
+      font-size:clamp(18px,3vw,28px);
+      line-height:1.15;
+      text-align:center;
+      font-weight:900;
+    }
+
+    .audio-btn{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:#dff2ff;
+      border:3px solid #5a9eca;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      box-shadow:0 4px 0 #4c7d9e;
+    }
+
+    .audio-btn:active{
+      transform:translateY(3px);
+      box-shadow:0 1px 0 #4c7d9e;
+    }
+
+    /* Options */
+    .options{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:clamp(7px,1.4vw,14px);
+      min-height:0;
+    }
+
+    .option-card{
+      min-width:0;
+      min-height:0;
+      border-radius:18px;
+      border:4px solid #fff;
+      background:rgba(255,255,255,.97);
+      box-shadow:var(--shadow);
+      padding:7px;
+      display:grid;
+      grid-template-rows:minmax(0,1fr) auto;
+      align-items:center;
+      justify-items:center;
+      transition:transform .15s,border-color .15s,background .15s;
+      overflow:hidden;
+    }
+
+    .option-card:active{
+      transform:scale(.97);
+    }
+
+    .option-card img{
+      width:100%;
+      height:100%;
+      max-height:125px;
+      object-fit:contain;
+      filter:drop-shadow(0 5px 4px rgba(0,0,0,.18));
+    }
+
+    .option-name{
+      width:100%;
+      margin-top:3px;
+      padding:7px 4px;
+      border-radius:12px;
+      background:#fff1b8;
+      color:var(--navy);
+      font-size:clamp(14px,2.2vw,20px);
+      font-weight:900;
+      text-align:center;
+      line-height:1.05;
+    }
+
+    .option-card.correct{
+      border-color:#2fa865;
+      background:#e6faee;
+      animation:correctPulse .5s ease;
+    }
+
+    .option-card.wrong{
+      border-color:var(--red);
+      background:#ffe9e8;
+      animation:jiggle .35s ease;
+    }
+
+    .option-card.reveal{
+      border-color:#2fa865;
+      box-shadow:0 0 0 5px rgba(47,168,101,.22), var(--shadow);
+      animation:glow 1s infinite alternate;
+    }
+
+    .option-card.disabled{
+      pointer-events:none;
+    }
+
+    @keyframes jiggle{
+      0%,100%{transform:translateX(0)}
+      25%{transform:translateX(-8px)}
+      50%{transform:translateX(8px)}
+      75%{transform:translateX(-5px)}
+    }
+
+    @keyframes correctPulse{
+      50%{transform:scale(1.04)}
+    }
+
+    @keyframes glow{
+      to{box-shadow:0 0 0 7px rgba(47,168,101,.3),0 0 24px rgba(47,168,101,.5)}
+    }
+
+    .feedback{
+      position:absolute;
+      left:50%;
+      bottom:12px;
+      transform:translateX(-50%) translateY(20px);
+      z-index:50;
+      width:min(90%,650px);
+      padding:10px 16px;
+      border-radius:14px;
+      text-align:center;
+      font-size:clamp(16px,2.5vw,21px);
+      font-weight:900;
+      color:#fff;
+      opacity:0;
+      pointer-events:none;
+      transition:.22s ease;
+      box-shadow:var(--shadow);
+    }
+
+    .feedback.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    .feedback.good{background:var(--green)}
+    .feedback.bad{background:var(--red)}
+    .feedback.info{background:#405e7c}
+
+    /* ---------- END ---------- */
+    #endScreen{
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      background:
+        linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,.18)),
+        url("assets/road-after.png") center/cover no-repeat,
+        linear-gradient(#9ed7ff,#9bc579);
+    }
+
+    .end-card{
+      width:min(92vw,680px);
+      max-height:94vh;
+      overflow:hidden;
+      background:rgba(255,255,255,.96);
+      border:5px solid var(--yellow);
+      border-radius:28px;
+      box-shadow:0 14px 30px rgba(0,0,0,.25);
+      text-align:center;
+      padding:clamp(18px,3vw,32px);
+      position:relative;
+      z-index:10;
+    }
+
+    .end-card h2{
+      margin:0 0 7px;
+      font-size:clamp(31px,6vw,58px);
+      color:var(--navy);
+    }
+
+    .end-worker{
+      height:clamp(95px,21vh,175px);
+      max-width:55%;
+      object-fit:contain;
+      filter:drop-shadow(0 6px 5px rgba(0,0,0,.2));
+    }
+
+    .final-score{
+      margin:5px auto 8px;
+      width:max-content;
+      padding:9px 20px;
+      border-radius:999px;
+      background:#fff2b9;
+      border:3px solid var(--orange);
+      font-size:clamp(22px,4vw,34px);
+      font-weight:1000;
+    }
+
+    .end-message{
+      margin:8px 0 18px;
+      font-size:clamp(19px,3vw,27px);
+      font-weight:900;
+    }
+
+    .confetti{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:5;
+    }
+
+    .confetti-piece{
+      position:absolute;
+      top:-20px;
+      width:10px;
+      height:18px;
+      border-radius:3px;
+      animation:fall linear forwards;
+    }
+
+    @keyframes fall{
+      to{transform:translateY(115vh) rotate(720deg)}
+    }
+
+    /* ---------- SMALL DEVICES ---------- */
+    @media (max-width:620px){
+      .topbar{
+        height:55px;
+        min-height:55px;
+        padding:6px 8px;
+      }
+
+      .round-pill,.score-pill{
+        padding:6px 9px;
+      }
+
+      .game-main{
+        grid-template-rows:minmax(165px,39%) auto minmax(158px,1fr);
+        padding:6px;
+        gap:6px;
+      }
+
+      .scene{
+        border-width:3px;
+        border-radius:15px;
+      }
+
+      .question-panel{
+        min-height:62px;
+        padding:6px 8px;
+        border-radius:14px;
+      }
+
+      .audio-btn{
+        width:42px;
+        height:42px;
+        font-size:21px;
+      }
+
+      .option-card{
+        border-radius:14px;
+        border-width:3px;
+        padding:5px;
+      }
+
+      .option-name{
+        padding:6px 2px;
+      }
+    }
+
+    @media (max-height:610px) and (orientation:landscape){
+      .topbar{
+        height:48px;
+        min-height:48px;
+      }
+
+      .game-main{
+        grid-template-columns:1.15fr 1fr;
+        grid-template-rows:auto 1fr;
+        grid-template-areas:
+          "scene question"
+          "scene options";
+        padding:6px;
+      }
+
+      .scene{grid-area:scene}
+      .question-panel{grid-area:question}
+      .options{grid-area:options}
+
+      .worker{height:42%}
+      .option-card img{max-height:82px}
+      .feedback{bottom:7px}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SPLASH SCREEN -->
+  <section id="splashScreen" class="screen active" aria-label="Innovine splash screen">
+    <div class="logo-wrap">
+      <img id="brandLogo"
+           src="assets/innovine-logo.png"
+           alt="Innovine"
+           onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='assets/logo.png';}" />
+    </div>
+    <div class="loading-dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </section>
+
+  <!-- START SCREEN -->
+  <section id="startScreen" class="screen">
+    <div class="start-card">
+      <div class="helmet-icon">🚧</div>
+      <h1>Build the Construction Road</h1>
+      <p>Help the construction workers build a new road!</p>
+      <div class="mission-box">
+        Look at each job and choose the correct construction vehicle.
+      </div>
+      <button id="startBtn" class="primary-btn" type="button">Start Mission</button>
+    </div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="gameScreen" class="screen">
+    <header class="topbar">
+      <div class="game-title">🚧 Build the Road</div>
+      <div id="roundPill" class="round-pill">Round 1/10</div>
+      <div id="scorePill" class="score-pill">⭐ 0</div>
+    </header>
+
+    <main class="game-main">
+      <section id="scene" class="scene" aria-label="Construction site">
+        <div id="jobBubble" class="job-bubble">Who can help?</div>
+
+        <img class="worker" src="assets/worker.png" alt="" />
+        <div class="cones" aria-hidden="true">
+          <img src="assets/cone.png" alt="" />
+          <img src="assets/cone.png" alt="" />
+        </div>
+
+        <div id="vehicleStage" class="vehicle-stage"></div>
+      </section>
+
+      <section class="question-panel">
+        <div id="jobIcon" class="job-icon" aria-hidden="true">🕳️</div>
+        <h2 id="questionText" class="question-text">Which vehicle will dig a big hole?</h2>
+        <button id="audioBtn" class="audio-btn" type="button" aria-label="Play question audio">🔊</button>
+      </section>
+
+      <section id="options" class="options" aria-label="Answer choices"></section>
+    </main>
+
+    <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- END SCREEN -->
+  <section id="endScreen" class="screen">
+    <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+    <div class="end-card">
+      <h2 id="endHeading">Road Completed!</h2>
+      <img class="end-worker" src="assets/worker.png" alt="Construction worker celebrating" />
+      <div id="finalScore" class="final-score">Score: 0/10</div>
+      <div id="endMessage" class="end-message">Well done!</div>
+      <button id="playAgainBtn" class="primary-btn" type="button">Play Again</button>
+    </div>
+  </section>
+
+  <!-- AUDIO -->
+  <audio id="questionAudio" preload="auto"></audio>
+  <audio id="wrongAudio" src="assets/wrong.mp3" preload="auto"></audio>
+  <audio id="clapsAudio" src="assets/claps.mp3" preload="auto"></audio>
+
+  <script>
+    "use strict";
+
+    const VEHICLES = {
+      excavator: {
+        name: "Excavator",
+        image: "assets/excavator.png"
+      },
+      dumpTruck: {
+        name: "Dump Truck",
+        image: "assets/dump-truck.png"
+      },
+      cementMixer: {
+        name: "Cement Mixer",
+        image: "assets/cement-mixer.png"
+      },
+      bulldozer: {
+        name: "Bulldozer",
+        image: "assets/bulldozer.png"
+      },
+      crane: {
+        name: "Crane",
+        image: "assets/crane.png"
+      }
+    };
+
+    const QUESTIONS = [
+      {
+        icon:"🕳️",
+        bubble:"A big hole is needed!",
+        text:"Which vehicle will dig a big hole?",
+        answer:"excavator",
+        choices:["excavator","dumpTruck","cementMixer"],
+        action:"dig",
+        progress:"Ground prepared",
+        explanation:"An excavator digs deep holes with its large bucket."
+      },
+      {
+        icon:"🪨",
+        bubble:"We need sand and stones!",
+        text:"Which vehicle carries sand and stones?",
+        answer:"dumpTruck",
+        choices:["dumpTruck","excavator","crane"],
+        action:"sand",
+        progress:"Materials delivered",
+        explanation:"A dump truck carries and unloads sand, stones and soil."
+      },
+      {
+        icon:"🧱",
+        bubble:"The road needs cement!",
+        text:"Which vehicle mixes cement?",
+        answer:"cementMixer",
+        choices:["cementMixer","bulldozer","crane"],
+        action:"cement",
+        progress:"Cement ready",
+        explanation:"A cement mixer keeps turning to mix cement evenly."
+      },
+      {
+        icon:"🚧",
+        bubble:"The soil must be pushed flat!",
+        text:"Which vehicle pushes soil?",
+        answer:"bulldozer",
+        choices:["bulldozer","dumpTruck","cementMixer"],
+        action:"push",
+        progress:"Road surface prepared",
+        explanation:"A bulldozer uses its strong front blade to push and level soil."
+      },
+      {
+        icon:"🏗️",
+        bubble:"This material is very heavy!",
+        text:"Which vehicle lifts heavy things?",
+        answer:"crane",
+        choices:["crane","dumpTruck","excavator"],
+        action:"lift",
+        progress:"Heavy materials placed",
+        explanation:"A crane lifts heavy materials high into the air."
+      },
+      {
+        icon:"⛏️",
+        bubble:"Extra soil must be removed!",
+        text:"A worker needs to remove soil. Which vehicle should come?",
+        answer:"excavator",
+        choices:["excavator","crane","cementMixer"],
+        action:"dig",
+        progress:"Extra soil removed",
+        explanation:"The excavator can scoop up and remove loose soil."
+      },
+      {
+        icon:"🪨",
+        bubble:"More rocks are needed!",
+        text:"The team needs to carry rocks. Which vehicle helps?",
+        answer:"dumpTruck",
+        choices:["dumpTruck","bulldozer","crane"],
+        action:"sand",
+        progress:"Rocks delivered",
+        explanation:"A dump truck is designed to carry heavy loose materials."
+      },
+      {
+        icon:"🛣️",
+        bubble:"Add cement to the road!",
+        text:"The road needs cement. Which vehicle should arrive?",
+        answer:"cementMixer",
+        choices:["cementMixer","excavator","bulldozer"],
+        action:"cement",
+        progress:"Road strengthened",
+        explanation:"The cement mixer brings freshly mixed cement to the road."
+      },
+      {
+        icon:"〰️",
+        bubble:"The road has bumps!",
+        text:"The ground has bumps. Which vehicle will make it level?",
+        answer:"bulldozer",
+        choices:["bulldozer","crane","dumpTruck"],
+        action:"push",
+        progress:"Bumps removed",
+        explanation:"The bulldozer pushes uneven soil to make the ground flat."
+      },
+      {
+        icon:"🌉",
+        bubble:"Lift the heavy bridge part!",
+        text:"A heavy bridge part needs lifting. Which vehicle is needed?",
+        answer:"crane",
+        choices:["crane","cementMixer","excavator"],
+        action:"lift",
+        progress:"Construction completed",
+        explanation:"A crane safely lifts and moves very heavy construction parts."
+      }
+    ];
+
+    const splashScreen = document.getElementById("splashScreen");
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const endScreen = document.getElementById("endScreen");
+
+    const startBtn = document.getElementById("startBtn");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const roundPill = document.getElementById("roundPill");
+    const scorePill = document.getElementById("scorePill");
+    const scene = document.getElementById("scene");
+    const jobBubble = document.getElementById("jobBubble");
+    const jobIcon = document.getElementById("jobIcon");
+    const questionText = document.getElementById("questionText");
+    const optionsBox = document.getElementById("options");
+    const audioBtn = document.getElementById("audioBtn");
+    const vehicleStage = document.getElementById("vehicleStage");
+    const feedback = document.getElementById("feedback");
+
+    const questionAudio = document.getElementById("questionAudio");
+    const wrongAudio = document.getElementById("wrongAudio");
+    const clapsAudio = document.getElementById("clapsAudio");
+
+    const finalScore = document.getElementById("finalScore");
+    const endMessage = document.getElementById("endMessage");
+    const endHeading = document.getElementById("endHeading");
+    const confetti = document.getElementById("confetti");
+
+    let currentIndex = 0;
+    let score = 0;
+    let attempts = 0;
+    let locked = false;
+    let audioContext = null;
+
+    function showScreen(screen){
+      [splashScreen,startScreen,gameScreen,endScreen].forEach(s => s.classList.remove("active"));
+      screen.classList.add("active");
+    }
+
+    /* Mandatory 5-second splash */
+    window.addEventListener("load", () => {
+      setTimeout(() => showScreen(startScreen), 5000);
+    });
+
+    startBtn.addEventListener("click", startGame);
+    playAgainBtn.addEventListener("click", startGame);
+    audioBtn.addEventListener("click", playQuestionAudio);
+
+    function startGame(){
+      stopAllAudio();
+      currentIndex = 0;
+      score = 0;
+      attempts = 0;
+      locked = false;
+      confetti.innerHTML = "";
+      scene.classList.remove("complete");
+      showScreen(gameScreen);
+      renderQuestion();
+    }
+
+    function renderQuestion(){
+      locked = false;
+      attempts = 0;
+      vehicleStage.innerHTML = "";
+      hideFeedback();
+
+      const q = QUESTIONS[currentIndex];
+
+      roundPill.textContent = `Round ${currentIndex + 1}/10`;
+      scorePill.textContent = `⭐ ${score}`;
+      jobBubble.textContent = q.bubble;
+      jobIcon.textContent = q.icon;
+      questionText.textContent = q.text;
+
+      questionAudio.src = `assets/question-${currentIndex + 1}.mp3`;
+      questionAudio.load();
+
+      const shuffled = [...q.choices].sort(() => Math.random() - 0.5);
+      optionsBox.innerHTML = "";
+
+      shuffled.forEach(key => {
+        const v = VEHICLES[key];
+        const button = document.createElement("button");
+        button.className = "option-card";
+        button.type = "button";
+        button.dataset.key = key;
+        button.setAttribute("aria-label", v.name);
+
+        button.innerHTML = `
+          <img src="${v.image}" alt="${v.name}">
+          <div class="option-name">${v.name}</div>
+        `;
+
+        button.addEventListener("click", () => checkAnswer(button, key));
+        optionsBox.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, selectedKey){
+      if(locked) return;
+
+      const q = QUESTIONS[currentIndex];
+      attempts += 1;
+
+      if(selectedKey === q.answer){
+        locked = true;
+        score += 1;
+        scorePill.textContent = `⭐ ${score}`;
+        button.classList.add("correct");
+        disableAllOptions();
+        playSuccessChime();
+        showFeedback(`Great job! ${q.progress}.`, "good");
+        runSceneAnimation(q);
+
+        setTimeout(goNext, 2300);
+        return;
+      }
+
+      button.classList.remove("wrong");
+      void button.offsetWidth;
+      button.classList.add("wrong");
+      playWrongSound();
+
+      if(attempts < 2){
+        showFeedback("Try once more. Look carefully!", "bad");
+        setTimeout(() => {
+          button.classList.remove("wrong");
+          hideFeedback();
+        }, 850);
+      }else{
+        locked = true;
+        disableAllOptions();
+
+        const correctButton = optionsBox.querySelector(`[data-key="${q.answer}"]`);
+        if(correctButton) correctButton.classList.add("reveal");
+
+        showFeedback(`The correct answer is ${VEHICLES[q.answer].name}. ${q.explanation}`, "info");
+        runSceneAnimation(q);
+
+        setTimeout(goNext, 3200);
+      }
+    }
+
+    function disableAllOptions(){
+      optionsBox.querySelectorAll(".option-card").forEach(btn => btn.classList.add("disabled"));
+    }
+
+    function goNext(){
+      currentIndex += 1;
+
+      if(currentIndex >= QUESTIONS.length){
+        finishGame();
+      }else{
+        renderQuestion();
+      }
+    }
+
+    function runSceneAnimation(q){
+      vehicleStage.innerHTML = "";
+
+      const vehicle = VEHICLES[q.answer];
+      const img = document.createElement("img");
+      img.src = vehicle.image;
+      img.alt = "";
+      img.className = "animated-vehicle";
+
+      if(q.action === "dig") img.classList.add("dig");
+      if(q.action === "push") img.classList.add("push");
+      if(q.action === "cement") img.classList.add("mix");
+      if(q.action === "lift") img.classList.add("lift");
+
+      vehicleStage.appendChild(img);
+
+      if(q.action === "dig"){
+        const dust = document.createElement("div");
+        dust.className = "dust";
+        vehicleStage.appendChild(dust);
+
+        const hole = document.createElement("div");
+        hole.className = "hole-mark";
+        vehicleStage.appendChild(hole);
+      }
+
+      if(q.action === "sand"){
+        const dust = document.createElement("div");
+        dust.className = "dust";
+        vehicleStage.appendChild(dust);
+
+        const material = document.createElement("img");
+        material.src = "assets/sand.png";
+        material.alt = "";
+        material.className = "material-drop";
+        vehicleStage.appendChild(material);
+      }
+
+      if(q.action === "cement"){
+        const cement = document.createElement("img");
+        cement.src = "assets/cement.png";
+        cement.alt = "";
+        cement.className = "cement-pour";
+        vehicleStage.appendChild(cement);
+      }
+
+      const stamp = document.createElement("div");
+      stamp.className = "success-stamp";
+      stamp.textContent = `✓ ${q.progress}`;
+      vehicleStage.appendChild(stamp);
+
+      if(currentIndex >= 8){
+        scene.classList.add("complete");
+      }
+    }
+
+    function finishGame(){
+      stopAllAudio();
+      scene.classList.add("complete");
+      showScreen(endScreen);
+
+      finalScore.textContent = `Score: ${score}/10`;
+
+      if(score >= 8){
+        endHeading.textContent = "Road Completed!";
+        endMessage.textContent = "Well done, champ! You are a construction vehicle expert.";
+        createConfetti(90);
+        playClaps();
+      }else if(score >= 6){
+        endHeading.textContent = "Good Work!";
+        endMessage.textContent = "The road is ready. You matched many vehicles correctly.";
+        createConfetti(55);
+      }else{
+        endHeading.textContent = "Road Mission Finished!";
+        endMessage.textContent = "Try again and learn what each construction vehicle does.";
+        createConfetti(30);
+      }
+    }
+
+    function showFeedback(message,type){
+      feedback.textContent = message;
+      feedback.className = `feedback ${type} show`;
+    }
+
+    function hideFeedback(){
+      feedback.className = "feedback";
+      feedback.textContent = "";
+    }
+
+    function playQuestionAudio(){
+      stopAudio(questionAudio);
+      questionAudio.currentTime = 0;
+
+      const playPromise = questionAudio.play();
+      if(playPromise){
+        playPromise.catch(() => {
+          /* Fallback speech if an MP3 is missing */
+          speakQuestion();
+        });
+      }
+    }
+
+    function speakQuestion(){
+      if(!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(QUESTIONS[currentIndex].text);
+      utterance.rate = 0.88;
+      utterance.pitch = 1.08;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function playWrongSound(){
+      stopAudio(wrongAudio);
+      wrongAudio.currentTime = 0;
+      wrongAudio.play().catch(() => playTone(150,.18,"sawtooth"));
+    }
+
+    function playClaps(){
+      stopAudio(clapsAudio);
+      clapsAudio.currentTime = 0;
+      clapsAudio.play().catch(() => {});
+    }
+
+    function playSuccessChime(){
+      playTone(660,.12,"sine");
+      setTimeout(() => playTone(880,.16,"sine"),120);
+    }
+
+    function playTone(frequency,duration,type){
+      try{
+        audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        oscillator.type = type || "sine";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.12,audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime + duration);
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + duration);
+      }catch(error){
+        /* Audio is optional; game remains playable */
+      }
+    }
+
+    function stopAudio(audio){
+      try{
+        audio.pause();
+        audio.currentTime = 0;
+      }catch(error){}
+    }
+
+    function stopAllAudio(){
+      [questionAudio,wrongAudio,clapsAudio].forEach(stopAudio);
+      if("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
+    function createConfetti(count){
+      confetti.innerHTML = "";
+      const colors = ["#f7bd3d","#ef7d28","#2d9b5b","#58a9de","#d94b48","#7e57c2"];
+
+      for(let i=0;i<count;i++){
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random()*100}%`;
+        piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.animationDuration = `${2.4 + Math.random()*2.6}s`;
+        piece.style.animationDelay = `${Math.random()*1.2}s`;
+        piece.style.transform = `rotate(${Math.random()*360}deg)`;
+        confetti.appendChild(piece);
+      }
+
+      setTimeout(() => {
+        confetti.innerHTML = "";
+      },6500);
+    }
+
+    /* Prevent unwanted double-tap zoom on older devices */
+    let lastTouchEnd = 0;
+    document.addEventListener("touchend", function(event){
+      const now = Date.now();
+      if(now - lastTouchEnd <= 300) event.preventDefault();
+      lastTouchEnd = now;
+    }, {passive:false});
+
+    /* Pause sound if the browser tab is hidden */
+    document.addEventListener("visibilitychange", () => {
+      if(document.hidden) stopAllAudio();
+    });
+  </script>
+</body>
+</html>
