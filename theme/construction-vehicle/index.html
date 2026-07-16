@@ -735,6 +735,49 @@
         transition-duration:.01ms !important;
       }
     }
+
+    /* Extra device optimisation: Android, iOS, tablets, laptops and desktops */
+    @media (min-width: 1200px){
+      .game-main{
+        max-width:1500px;
+        width:100%;
+        margin:auto;
+      }
+      .option-card img{max-height:170px;}
+    }
+
+    @media (max-width: 900px) and (orientation: portrait){
+      .game-main{
+        grid-template-rows:minmax(180px,38vh) auto minmax(170px,1fr);
+      }
+      .question-text{font-size:clamp(17px,4vw,24px);}
+    }
+
+    @media (max-width: 430px){
+      .topbar{
+        grid-template-columns:1fr auto;
+      }
+      .score-pill{display:none;}
+      .game-main{
+        grid-template-rows:minmax(160px,34vh) auto minmax(150px,1fr);
+      }
+      .options{
+        gap:5px;
+      }
+      .option-card img{
+        max-height:90px;
+      }
+      .option-name{
+        font-size:12px;
+      }
+    }
+
+    @supports (-webkit-touch-callout:none){
+      .screen{
+        height:-webkit-fill-available;
+      }
+    }
+
   </style>
 </head>
 
@@ -1019,6 +1062,7 @@
       questionText.textContent = q.text;
 
       questionAudio.src = `assets/question-${currentIndex + 1}.mp3`;
+      questionAudio.preload = "auto";
       questionAudio.load();
 
       const shuffled = [...q.choices].sort(() => Math.random() - 0.5);
