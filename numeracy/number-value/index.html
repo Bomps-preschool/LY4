@@ -9,14 +9,14 @@
 body, html { margin:0; padding:0; font-family:'Comic Sans MS', cursive,sans-serif; height:100%; width:100%; }
 
 body { 
-  background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb); 
-  background-size: 800% 800%; 
-  animation: gradientAnimate 20s ease infinite; 
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
   align-items:center;
   overflow:hidden;
+  background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+  background-size: 800% 800%;
+  animation: gradientAnimate 20s ease infinite;
 }
 
 @keyframes gradientAnimate {
@@ -30,24 +30,69 @@ body {
 
 #splash img { width:40vw; max-width:250px; height:auto; margin-top:10vh; }
 
-.instruction-top { width:95%; text-align:center; font-size:1.5vw; color:#2e8b57; font-weight:bold; padding:10px; display:none; flex-shrink:0; }
+.instruction-top {
+    width:95%;
+    text-align:center;
+    font-size:4vw;
+    color:#2e8b57;
+    font-weight:bold;
+    padding:10px;
+    display:none;
+    flex-shrink:0;
+}
 
-#game-slides { width:100%; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; overflow:hidden; }
+#game-slides {
+    width:100%;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
 
-.objects-container { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; max-width:95%; gap:2vw; flex-shrink:0; margin-bottom:2vh; }
+.objects-container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    max-width:95%;
+    gap:2vw;
+    margin-bottom:2vh;
+}
 
-.objects-container img { width:10vw; max-width:80px; height:auto; }
+.objects-container img {
+    width:12vw;
+    max-width:90px;
+    height:auto;
+}
 
-canvas.draw-canvas { border:2px solid #2e8b57; background:#fff; touch-action: none; width:90%; max-width:400px; height:20vw; max-height:120px; }
+canvas.draw-canvas {
+    border:2px solid #2e8b57;
+    background:#fff;
+    touch-action: none;
+    width:90%;
+    max-width:400px;
+    height:20vw;
+    max-height:120px;
+}
 
-button { padding:12px 24px; border-radius:8px; font-size:1.2vw; min-font-size:16px; cursor:pointer; transition: all 0.3s; font-weight:bold; }
+button {
+    padding:12px 24px;
+    border-radius:8px;
+    font-size:4vw;
+    min-font-size:16px;
+    cursor:pointer;
+    transition: all 0.3s;
+    font-weight:bold;
+}
 
 button:hover { opacity:0.9; transform: scale(1.05); }
 
 #nextBtn { background: #4CAF50; color: #fff; }
 #clearBtn { background: #FF4500; color: #fff; }
 
-#end { font-size:3vw; color:#2e8b57; text-align:center; display:none; height:100%; width:100%; display:flex; justify-content:center; align-items:center; flex-direction:column; }
+#end { font-size:5vw; color:#2e8b57; text-align:center; display:none; height:100%; width:100%; display:flex; justify-content:center; align-items:center; flex-direction:column; }
 
 canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; width:100%; height:100%; }
 
@@ -55,8 +100,8 @@ canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; width:1
 @media(max-width:768px){
   .objects-container img { width:18vw; max-width:60px; }
   canvas.draw-canvas { height:25vw; max-height:100px; }
-  button { font-size:4vw; min-font-size:14px; }
-  .instruction-top { font-size:4vw; }
+  button { font-size:5vw; min-font-size:14px; }
+  .instruction-top { font-size:5vw; }
 }
 </style>
 </head>
@@ -192,7 +237,7 @@ function launchConfetti(){
       x:Math.random()*canvas.width,
       y:Math.random()*canvas.height,
       r:Math.random()*6+4,
-      d:Math.random()*10+5,
+      d:Math.random()*20+10,
       color:['#ff6666','#ffcc66','#66ff66','#66ccff','#cc66ff'][Math.floor(Math.random()*5)],
       tilt:Math.random()*10-10,
       tiltAngleIncrement:Math.random()*0.07+0.05
@@ -223,7 +268,7 @@ function launchConfetti(){
   draw();
 }
 
-// Responsive canvas resize
+// Adjust canvas on resize and orientation change
 window.addEventListener("resize",()=>{ 
   const canvas=document.getElementById("confetti"); 
   canvas.width=window.innerWidth; 
