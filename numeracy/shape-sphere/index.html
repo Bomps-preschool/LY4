@@ -2,329 +2,880 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+>
+
 <title>Sphere Detective</title>
 
 <style>
-*{box-sizing:border-box}
-
-html,body{
-margin:0;
-width:100%;
-height:100%;
-overflow:hidden;
-font-family:"Comic Sans MS","Trebuchet MS",sans-serif;
+:root {
+    --app-height: 100dvh;
+    --pink: #e6a3c2;
+    --dark-pink: #d84f91;
+    --purple: #51438b;
+    --green: #69b97d;
+    --yellow: #ffe89c;
+    --yellow-border: #dcae35;
 }
 
-.screen{
-display:none;
-position:fixed;
-inset:0;
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-#logo{
-display:flex;
-align-items:center;
-justify-content:center;
-background:white;
-z-index:10;
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: "Comic Sans MS", "Trebuchet MS", Arial, sans-serif;
+    background: #ffffff;
 }
 
-#logo img{
-width:260px;
-max-width:70%;
+body {
+    position: fixed;
+    inset: 0;
+    touch-action: manipulation;
 }
 
-#intro,#game,#end{
-background:linear-gradient(135deg,#dff7ff,#fff1f8,#fff8d8);
-align-items:center;
-justify-content:center;
-text-align:center;
-padding:20px;
+button {
+    font-family: inherit;
 }
 
-.box{
-background:white;
-border:4px solid #e6a3c2;
-border-radius:30px;
-padding:25px;
-width:90%;
-max-width:900px;
-margin:auto;
+/* -------------------- ALL SCREENS -------------------- */
+
+.screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--app-height);
+    min-height: 0;
+    overflow: hidden;
 }
 
-h1{
-font-size:44px;
-color:#d84f91;
+.screen.active {
+    display: flex;
 }
 
-p{
-font-size:22px;
-color:#51438b;
+/* -------------------- LOGO SCREEN -------------------- */
+
+#logo {
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding:
+        max(15px, env(safe-area-inset-top))
+        max(15px, env(safe-area-inset-right))
+        max(15px, env(safe-area-inset-bottom))
+        max(15px, env(safe-area-inset-left));
 }
 
-button{
-border:none;
-border-radius:25px;
-padding:15px 35px;
-font-size:25px;
-background:#7bbf8c;
-color:white;
-cursor:pointer;
+#logo img {
+    display: block;
+    width: min(280px, 65vw);
+    max-height: 55vh;
+    object-fit: contain;
 }
 
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:white;
-border:3px solid #e6a3c2;
-border-radius:20px;
-padding:10px 20px;
-font-size:25px;
-color:#51438b;
+/* -------------------- SHARED BACKGROUND -------------------- */
+
+#intro,
+#game,
+#end {
+    background:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.85) 0 35px, transparent 36px),
+        radial-gradient(circle at 88% 82%, rgba(255,255,255,.75) 0 45px, transparent 46px),
+        linear-gradient(135deg, #dff7ff, #fff1f8, #fff8d8);
+    color: var(--purple);
 }
 
-.area{
-height:calc(100vh - 120px);
-display:flex;
-gap:25px;
-align-items:center;
-justify-content:center;
+/* -------------------- INTRO AND END -------------------- */
+
+#intro,
+#end {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding:
+        max(10px, env(safe-area-inset-top))
+        max(10px, env(safe-area-inset-right))
+        max(10px, env(safe-area-inset-bottom))
+        max(10px, env(safe-area-inset-left));
 }
 
-.card{
-background:white;
-border:4px solid #e6a3c2;
-border-radius:30px;
-width:45%;
-height:80%;
-max-height:80vh;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
+.box {
+    width: min(900px, 94vw);
+    max-height: calc(var(--app-height) - 20px);
+    min-height: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.97);
+    border: clamp(3px, 0.6vw, 5px) solid var(--pink);
+    border-radius: clamp(20px, 4vw, 32px);
+    padding: clamp(14px, 3vw, 28px);
+    box-shadow: 0 12px 30px rgba(81, 67, 139, 0.18);
 }
 
-.card img{
-width:70%;
-height:60%;
-max-width:75%;
-max-height:55vh;
-object-fit:contain;
+h1 {
+    margin: 0 0 clamp(8px, 1.8vh, 18px);
+    font-size: clamp(28px, 5vw, 48px);
+    line-height: 1.1;
+    color: var(--dark-pink);
 }
 
-.question{
-font-size:32px;
-color:#51438b;
+h2 {
+    margin: clamp(7px, 1.5vh, 14px) 0;
+    font-size: clamp(22px, 4vw, 36px);
+    line-height: 1.15;
 }
 
-.option{
-display:block;
-width:230px;
-margin:15px;
-background:#ffe89c;
-color:#51438b;
-border:3px solid #dcae35;
+.instruction {
+    margin: clamp(6px, 1.3vh, 13px) 0;
+    font-size: clamp(16px, 2.8vw, 23px);
+    line-height: 1.25;
+    color: var(--purple);
 }
 
-.msg{
-font-size:28px;
-color:#d84f91;
-font-weight:bold;
+.main-button {
+    min-width: min(250px, 82vw);
+    min-height: 54px;
+    margin-top: clamp(10px, 2vh, 20px);
+    padding: clamp(11px, 2vh, 16px) clamp(24px, 5vw, 42px);
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7cc88e, #58aa6d);
+    color: #ffffff;
+    font-size: clamp(20px, 3.8vw, 27px);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #438c55;
 }
 
-#end{
-display:none;
+.main-button:active {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 #438c55;
 }
 
-#end .box{
-margin:auto;
+/* -------------------- GAME SCREEN -------------------- */
+
+#game {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: clamp(5px, 1vh, 10px);
+    padding:
+        max(7px, env(safe-area-inset-top))
+        max(7px, env(safe-area-inset-right))
+        max(7px, env(safe-area-inset-bottom))
+        max(7px, env(safe-area-inset-left));
 }
 
-@media(max-width:800px){
-
-.area{
-flex-direction:column;
-height:calc(100vh - 150px);
+.header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-height: clamp(48px, 8vh, 70px);
+    padding: clamp(7px, 1.5vh, 13px) clamp(10px, 2.5vw, 22px);
+    background: rgba(255, 255, 255, 0.96);
+    border: clamp(2px, 0.5vw, 4px) solid var(--pink);
+    border-radius: clamp(14px, 2.5vw, 22px);
+    box-shadow: 0 5px 14px rgba(81, 67, 139, 0.12);
+    color: var(--purple);
+    font-size: clamp(16px, 2.8vw, 26px);
+    line-height: 1.1;
 }
 
-.card{
-width:95%;
-height:42vh;
+.game-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.card img{
-height:auto;
-width:auto;
-max-height:22vh;
+.score-box {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
-h1{
-font-size:32px;
+.progress {
+    flex: 0 0 auto;
+    margin: 0;
+    text-align: center;
+    color: var(--purple);
+    font-size: clamp(15px, 2.3vw, 21px);
+    font-weight: 700;
+    line-height: 1.1;
 }
 
-p{
-font-size:18px;
+.area {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(250px, 0.8fr);
+    gap: clamp(8px, 2vw, 22px);
+    align-items: stretch;
 }
 
-.option{
-width:180px;
-font-size:22px;
+.card {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.97);
+    border: clamp(2px, 0.5vw, 4px) solid var(--pink);
+    border-radius: clamp(18px, 3vw, 30px);
+    box-shadow: 0 8px 20px rgba(81, 67, 139, 0.14);
 }
 
+.object-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(5px, 1.5vh, 14px);
+    padding: clamp(8px, 2vw, 20px);
 }
 
-@media(max-width:500px){
-
-.card img{
-max-height:18vh;
+.image-holder {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.question{
-font-size:24px;
+.card img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: min(82%, 440px);
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
+.question {
+    flex: 0 0 auto;
+    margin: 0;
+    color: var(--purple);
+    font-size: clamp(21px, 3.5vw, 34px);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.answer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vh, 18px);
+    padding: clamp(10px, 2.5vw, 24px);
+}
+
+.option {
+    width: min(290px, 90%);
+    min-height: clamp(54px, 10vh, 75px);
+    margin: 0;
+    padding: clamp(9px, 1.8vh, 15px) clamp(10px, 2vw, 20px);
+    border: clamp(2px, 0.4vw, 4px) solid var(--yellow-border);
+    border-radius: clamp(17px, 3vw, 26px);
+    background: linear-gradient(180deg, #fff1b5, var(--yellow));
+    color: var(--purple);
+    font-size: clamp(19px, 3vw, 27px);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #c79a2b;
+}
+
+.option:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c79a2b;
+}
+
+.option:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+.msg {
+    min-height: 1.4em;
+    margin: 0;
+    color: var(--dark-pink);
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.shake {
+    animation: shake 0.35s ease;
+}
+
+.correct-glow {
+    animation: correctGlow 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-5px); }
+}
+
+@keyframes correctGlow {
+    from {
+        box-shadow: 0 0 4px rgba(105, 185, 125, 0.4);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(105, 185, 125, 1);
+        border-color: #69b97d;
+    }
+}
+
+/* -------------------- TABLETS AND PORTRAIT PHONES -------------------- */
+
+@media (max-width: 800px), (orientation: portrait) and (max-width: 1000px) {
+    .area {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: clamp(6px, 1.5vh, 12px);
+    }
+
+    .object-card {
+        padding: clamp(6px, 1.5vh, 12px);
+    }
+
+    .answer-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: clamp(7px, 1.5vw, 12px);
+        padding: clamp(7px, 1.5vh, 12px);
+    }
+
+    .option {
+        width: 100%;
+        min-height: clamp(48px, 7.5vh, 66px);
+    }
+
+    .msg {
+        grid-column: 1 / -1;
+        min-height: 1.2em;
+    }
+
+    .card img {
+        max-width: 78%;
+    }
+}
+
+/* -------------------- SMALL PHONES -------------------- */
+
+@media (max-width: 480px) {
+    #game {
+        gap: 5px;
+        padding:
+            max(5px, env(safe-area-inset-top))
+            max(5px, env(safe-area-inset-right))
+            max(5px, env(safe-area-inset-bottom))
+            max(5px, env(safe-area-inset-left));
+    }
+
+    .header {
+        min-height: 45px;
+        padding: 6px 9px;
+        font-size: clamp(14px, 4vw, 18px);
+    }
+
+    .progress {
+        font-size: clamp(14px, 3.8vw, 17px);
+    }
+
+    .object-card {
+        border-radius: 17px;
+    }
+
+    .answer-card {
+        border-radius: 17px;
+    }
+
+    .question {
+        font-size: clamp(19px, 5.5vw, 25px);
+    }
+
+    .option {
+        min-height: 48px;
+        padding: 7px 5px;
+        border-radius: 16px;
+        font-size: clamp(16px, 4.5vw, 20px);
+    }
+
+    .msg {
+        font-size: clamp(15px, 4.5vw, 19px);
+    }
+}
+
+/* -------------------- SHORT LANDSCAPE SCREENS -------------------- */
+
+@media (orientation: landscape) and (max-height: 600px) {
+    #game {
+        gap: 4px;
+        padding:
+            max(4px, env(safe-area-inset-top))
+            max(6px, env(safe-area-inset-right))
+            max(4px, env(safe-area-inset-bottom))
+            max(6px, env(safe-area-inset-left));
+    }
+
+    .header {
+        min-height: 40px;
+        padding: 5px 12px;
+        border-radius: 14px;
+        font-size: clamp(14px, 2.2vw, 20px);
+    }
+
+    .progress {
+        font-size: clamp(13px, 2vw, 17px);
+    }
+
+    .area {
+        grid-template-columns: minmax(0, 1.25fr) minmax(210px, 0.75fr);
+        grid-template-rows: 1fr;
+        gap: 8px;
+    }
+
+    .card {
+        border-radius: 18px;
+    }
+
+    .object-card,
+    .answer-card {
+        padding: 7px;
+    }
+
+    .answer-card {
+        display: flex;
+        gap: clamp(5px, 1.5vh, 9px);
+    }
+
+    .question {
+        font-size: clamp(18px, 3vw, 25px);
+    }
+
+    .option {
+        width: min(230px, 92%);
+        min-height: 44px;
+        padding: 6px 10px;
+        font-size: clamp(16px, 2.5vw, 21px);
+    }
+
+    .msg {
+        min-height: 1.1em;
+        font-size: clamp(15px, 2.4vw, 20px);
+    }
+
+    .box {
+        width: min(760px, 94vw);
+        padding: 12px 20px;
+    }
+
+    h1 {
+        margin-bottom: 6px;
+        font-size: clamp(25px, 5vw, 38px);
+    }
+
+    .instruction {
+        display: inline-block;
+        margin: 4px 8px;
+        font-size: clamp(14px, 2.2vw, 18px);
+    }
+
+    .main-button {
+        min-height: 44px;
+        margin-top: 7px;
+        padding: 8px 28px;
+        font-size: clamp(17px, 2.5vw, 21px);
+    }
+}
+
+/* Extremely short devices */
+@media (max-height: 430px) {
+    .header {
+        min-height: 36px;
+    }
+
+    .progress {
+        line-height: 1;
+    }
+
+    .option {
+        min-height: 39px;
+    }
+
+    .question {
+        font-size: clamp(17px, 2.8vw, 22px);
+    }
+
+    .msg {
+        font-size: clamp(14px, 2.2vw, 18px);
+    }
+
+    .instruction {
+        margin: 2px 6px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div id="logo" class="screen" style="display:flex">
-<img src="assets/innovine-logo.png">
+<!-- LOGO SCREEN -->
+<div id="logo" class="screen active">
+    <img
+        src="assets/innovine-logo.png"
+        alt="Innovine Logo"
+        draggable="false"
+    >
 </div>
 
-<div id="intro" class="screen" style="display:flex">
-<div class="box">
-<h1>⚪ Sphere Detective</h1>
-<p>Find the objects that are shaped like a sphere!</p>
-<p>👀 Look carefully at the object.</p>
-<p>⚪ Tap Sphere if it is round like a ball.</p>
-<p>🔷 Tap Not a Sphere if it has another shape.</p>
-<button onclick="start()">Start Game</button>
-</div>
+<!-- INTRO SCREEN -->
+<div id="intro" class="screen">
+    <div class="box">
+        <h1>⚪ Sphere Detective</h1>
+
+        <p class="instruction">
+            Find the objects that are shaped like a sphere!
+        </p>
+
+        <p class="instruction">
+            👀 Look carefully at the object.
+        </p>
+
+        <p class="instruction">
+            ⚪ Tap <strong>Sphere</strong> if it is round like a ball.
+        </p>
+
+        <p class="instruction">
+            🔷 Tap <strong>Not a Sphere</strong> if it has another shape.
+        </p>
+
+        <button class="main-button" type="button" onclick="startGame()">
+            Start Game
+        </button>
+    </div>
 </div>
 
+<!-- GAME SCREEN -->
 <div id="game" class="screen">
-<div class="header">
-<b>⚪ Sphere Detective</b>
-<b>⭐ <span id="score">0</span>/10</b>
+
+    <div class="header">
+        <strong class="game-title">⚪ Sphere Detective</strong>
+        <strong class="score-box">
+            ⭐ <span id="score">0</span>/<span id="totalScore">10</span>
+        </strong>
+    </div>
+
+    <p class="progress">
+        Question <span id="questionNumber">1</span>
+        of <span id="totalQuestions">10</span>
+    </p>
+
+    <div class="area">
+
+        <div class="card object-card" id="objectCard">
+            <div class="image-holder">
+                <img id="picture" src="" alt="Object">
+            </div>
+
+            <div class="question">
+                Is this a sphere?
+            </div>
+        </div>
+
+        <div class="card answer-card">
+            <button
+                class="option"
+                type="button"
+                data-answer="sphere"
+                onclick="checkAnswer('sphere', this)"
+            >
+                ⚪ Sphere
+            </button>
+
+            <button
+                class="option"
+                type="button"
+                data-answer="not"
+                onclick="checkAnswer('not', this)"
+            >
+                🔷 Not a Sphere
+            </button>
+
+            <div id="message" class="msg" aria-live="polite"></div>
+        </div>
+
+    </div>
 </div>
 
-<p>Question <span id="q">1</span> of 10</p>
+<!-- END SCREEN -->
+<div id="end" class="screen">
+    <div class="box">
+        <h1>🎉 Well Done!</h1>
+        <h2 style="color:#51438b;">🏆 Sphere Explorer</h2>
+        <h2 id="finalScore" style="color:#d84f91;"></h2>
 
-<div class="area">
-
-<div class="card">
-<img id="pic">
-<div class="question">Is this a sphere?</div>
+        <button class="main-button" type="button" onclick="restartGame()">
+            Play Again
+        </button>
+    </div>
 </div>
 
-<div class="card">
-<button class="option" onclick="check('sphere')">⚪ Sphere</button>
-<button class="option" onclick="check('not')">🔷 Not a Sphere</button>
-<div id="msg" class="msg"></div>
-</div>
+<audio id="correctSound" preload="auto">
+    <source src="assets/correct.mp3" type="audio/mpeg">
+</audio>
 
-</div>
-</div>
+<audio id="wrongSound" preload="auto">
+    <source src="assets/wrong.mp3" type="audio/mpeg">
+</audio>
 
-<div id="end" class="screen" style="display:none">
-<div class="box">
-<h1>🎉 Well Done!</h1>
-<h2 style="color:#51438b">🏆 Sphere Explorer</h2>
-<h2 id="final" style="color:#d84f91"></h2>
-<button onclick="restart()">Play Again</button>
-</div>
-</div>
-
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/claps.mp3"></audio>
+<audio id="clapSound" preload="auto">
+    <source src="assets/claps.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-const data=[
-["football.png","sphere"],
-["orange.png","sphere"],
-["marble.png","sphere"],
-["balloon.png","sphere"],
-["dice.png","not"],
-["cone.png","not"],
-["milk-cartoon.png","not"],
-["book.png","not"],
-["can.png","not"],
-["football.png","sphere"]
+const questions = [
+    ["football.png", "sphere"],
+    ["orange.png", "sphere"],
+    ["marble.png", "sphere"],
+    ["balloon.png", "sphere"],
+    ["dice.png", "not"],
+    ["cone.png", "not"],
+    ["milk-cartoon.png", "not"],
+    ["book.png", "not"],
+    ["can.png", "not"],
+    ["football.png", "sphere"]
 ];
 
-let qs=[],i=0,score=0,tries=0;
+const logoScreen = document.getElementById("logo");
+const introScreen = document.getElementById("intro");
+const gameScreen = document.getElementById("game");
+const endScreen = document.getElementById("end");
 
-setTimeout(()=>{
-logo.style.display="none";
-intro.style.display="flex";
-},5000);
+const picture = document.getElementById("picture");
+const objectCard = document.getElementById("objectCard");
+const scoreText = document.getElementById("score");
+const questionNumberText = document.getElementById("questionNumber");
+const totalQuestionsText = document.getElementById("totalQuestions");
+const totalScoreText = document.getElementById("totalScore");
+const message = document.getElementById("message");
+const finalScore = document.getElementById("finalScore");
 
-function start(){
-intro.style.display="none";
-game.style.display="block";
-qs=[...data].sort(()=>Math.random()-0.5);
-i=0;
-score=0;
-load();
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+
+const optionButtons = document.querySelectorAll(".option");
+
+let shuffledQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+let tries = 0;
+let answerLocked = false;
+let nextTimer = null;
+
+/* Fixes the usable viewport height on iOS and Android browsers */
+function updateViewportHeight() {
+    const viewportHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
+
+    document.documentElement.style.setProperty(
+        "--app-height",
+        `${viewportHeight}px`
+    );
 }
 
-function load(){
-tries=0;
-pic.src="assets/"+qs[i][0];
-q.innerHTML=i+1;
-document.getElementById("score").innerHTML=score;
-msg.innerHTML="";
+updateViewportHeight();
+
+window.addEventListener("resize", updateViewportHeight);
+window.addEventListener("orientationchange", () => {
+    setTimeout(updateViewportHeight, 100);
+    setTimeout(updateViewportHeight, 400);
+});
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateViewportHeight);
 }
 
-function check(ans){
+/* Fisher-Yates shuffle */
+function shuffleArray(array) {
+    const shuffled = [...array];
 
-if(ans==qs[i][1]){
-score++;
-document.getElementById("score").innerHTML=score;
-correct.play();
-msg.innerHTML="⭐ Great Job!";
-setTimeout(next,1000);
+    for (let index = shuffled.length - 1; index > 0; index--) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
 
-}else{
+        [shuffled[index], shuffled[randomIndex]] =
+        [shuffled[randomIndex], shuffled[index]];
+    }
 
-tries++;
-wrong.play();
-msg.innerHTML="Oops! Try Again 😊";
-
-if(tries>=2){
-setTimeout(next,1200);
+    return shuffled;
 }
 
+function showScreen(screen) {
+    document.querySelectorAll(".screen").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    screen.classList.add("active");
+    updateViewportHeight();
 }
 
+function playSound(audio) {
+    audio.pause();
+    audio.currentTime = 0;
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+        playPromise.catch(() => {
+            /* Some browsers may block audio until a user taps. */
+        });
+    }
 }
 
-function next(){
-i++;
-if(i>=qs.length){
-finish();
-}else{
-load();
-}
+/* Show intro after logo */
+setTimeout(() => {
+    showScreen(introScreen);
+}, 5000);
+
+function startGame() {
+    clearTimeout(nextTimer);
+
+    shuffledQuestions = shuffleArray(questions);
+    currentQuestion = 0;
+    score = 0;
+    tries = 0;
+    answerLocked = false;
+
+    totalQuestionsText.textContent = shuffledQuestions.length;
+    totalScoreText.textContent = shuffledQuestions.length;
+    scoreText.textContent = score;
+
+    showScreen(gameScreen);
+    loadQuestion();
 }
 
-function finish(){
-game.style.display="none";
-end.style.display="flex";
-final.innerHTML="⭐ Your Score: "+score+"/10";
-clap.play();
+function loadQuestion() {
+    clearTimeout(nextTimer);
+
+    tries = 0;
+    answerLocked = false;
+
+    objectCard.classList.remove("shake", "correct-glow");
+    message.textContent = "";
+
+    optionButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove("correct-glow");
+    });
+
+    picture.src = "assets/" + shuffledQuestions[currentQuestion][0];
+    questionNumberText.textContent = currentQuestion + 1;
+    scoreText.textContent = score;
 }
 
-function restart(){
-end.style.display="none";
-start();
+function checkAnswer(selectedAnswer, selectedButton) {
+    if (answerLocked) {
+        return;
+    }
+
+    const correctAnswer = shuffledQuestions[currentQuestion][1];
+
+    if (selectedAnswer === correctAnswer) {
+        answerLocked = true;
+        score++;
+
+        scoreText.textContent = score;
+        message.textContent = "⭐ Great job!";
+        selectedButton.classList.add("correct-glow");
+
+        optionButtons.forEach(button => {
+            button.disabled = true;
+        });
+
+        playSound(correctSound);
+
+        nextTimer = setTimeout(nextQuestion, 1100);
+        return;
+    }
+
+    tries++;
+    message.textContent = tries < 2
+        ? "Oops! Try again 😊"
+        : "Let us see the correct answer!";
+
+    playSound(wrongSound);
+
+    objectCard.classList.remove("shake");
+    void objectCard.offsetWidth;
+    objectCard.classList.add("shake");
+
+    if (tries >= 2) {
+        answerLocked = true;
+
+        optionButtons.forEach(button => {
+            button.disabled = true;
+
+            if (button.dataset.answer === correctAnswer) {
+                button.classList.add("correct-glow");
+            }
+        });
+
+        nextTimer = setTimeout(nextQuestion, 1500);
+    }
 }
 
+function nextQuestion() {
+    currentQuestion++;
+
+    if (currentQuestion >= shuffledQuestions.length) {
+        finishGame();
+    } else {
+        loadQuestion();
+    }
+}
+
+function finishGame() {
+    clearTimeout(nextTimer);
+
+    finalScore.textContent =
+        `⭐ Your Score: ${score}/${shuffledQuestions.length}`;
+
+    showScreen(endScreen);
+    playSound(clapSound);
+}
+
+function restartGame() {
+    startGame();
+}
+
+/* Prevent accidental page movement on touch devices */
+document.addEventListener(
+    "touchmove",
+    event => event.preventDefault(),
+    { passive: false }
+);
 </script>
 
 </body>
