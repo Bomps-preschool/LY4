@@ -2,182 +2,896 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Magic Shape Painter</title>
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden;font-family:"Comic Sans MS",sans-serif}
-.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center}
-#logo{display:flex;background:white}
-#logo img{width:260px}
-#intro,#game,#end{background:linear-gradient(#fff2d8,#dff6ff,#f7e8ff);padding:20px}
-.card{background:white;border:4px solid #e6a3c2;border-radius:30px;padding:30px;width:90%;max-width:900px}
-.start,.action{background:#7bbf8c;color:white;border:0;border-radius:25px;padding:12px 30px;font-size:24px}
-.header{position:absolute;top:10px;left:10px;right:10px;background:white;padding:12px;border-radius:25px;display:flex;justify-content:space-between;color:#51438b}
-.main{background:white;border:4px solid #e6a3c2;border-radius:30px;padding:40px;display:flex;gap:30px;align-items:center}
-#shapeCanvas{border:4px dashed #d84f91;border-radius:40px;background:white;touch-action:none}
-.colors button{width:65px;height:65px;border-radius:50%;margin:8px;border:4px solid white}
-.red{background:red}.yellow{background:#ffd166}.green{background:#70d6a5}.blue{background:#5dade2}.purple{background:#b084f5}
-.msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:24px;color:#d84f91;background:white;padding:10px 20px;border-radius:20px}
-@media(max-width:800px){.main{flex-direction:column}#shapeCanvas{width:260px;height:260px}}
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    height:100%;
+    overflow:hidden;
+    font-family:"Comic Sans MS",sans-serif;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
+    touch-action:manipulation;
+}
+
+.screen{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+/* Logo Screen */
+
+#logo{
+    display:flex;
+    background:white;
+}
+
+#logo img{
+    width:260px;
+    max-width:75%;
+}
+
+/* General Screens */
+
+#intro,
+#game,
+#end{
+    background:linear-gradient(#fff2d8,#dff6ff,#f7e8ff);
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border:4px solid #e6a3c2;
+    border-radius:30px;
+    padding:30px;
+    width:90%;
+    max-width:900px;
+}
+
+.card p{
+    font-size:22px;
+    line-height:1.5;
+}
+
+/* Buttons */
+
+.start,
+.action{
+    background:#7bbf8c;
+    color:white;
+    border:0;
+    border-radius:25px;
+    padding:12px 30px;
+    font-size:24px;
+    margin:8px;
+}
+
+.start:hover,
+.action:hover{
+    transform:scale(1.03);
+}
+
+.start:active,
+.action:active{
+    transform:scale(0.97);
+}
+
+.audio-btn{
+    background:#5dade2;
+    color:white;
+    border:0;
+    border-radius:25px;
+    padding:11px 22px;
+    font-size:20px;
+    margin:8px;
+}
+
+/* Game Header */
+
+.header{
+    position:absolute;
+    top:10px;
+    left:10px;
+    right:10px;
+    background:white;
+    padding:12px 18px;
+    border-radius:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#51438b;
+    font-size:20px;
+}
+
+.header-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.header-audio{
+    width:42px;
+    height:42px;
+    padding:0;
+    margin:0;
+    border:0;
+    border-radius:50%;
+    background:#5dade2;
+    color:white;
+    font-size:21px;
+}
+
+/* Main Game Area */
+
+.main{
+    background:white;
+    border:4px solid #e6a3c2;
+    border-radius:30px;
+    padding:40px;
+    display:flex;
+    gap:30px;
+    align-items:center;
+    justify-content:center;
+    width:90%;
+    max-width:950px;
+    margin-top:60px;
+}
+
+#question{
+    color:#51438b;
+    min-height:60px;
+}
+
+#shapeCanvas{
+    border:4px dashed #d84f91;
+    border-radius:40px;
+    background:white;
+    touch-action:none;
+    max-width:100%;
+}
+
+/* Colour Buttons */
+
+.colors{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    max-width:260px;
+}
+
+.colors button{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    margin:8px;
+    border:4px solid white;
+    box-shadow:0 3px 8px rgba(0,0,0,0.18);
+}
+
+.colors button.selected-colour{
+    border:5px solid #51438b;
+    transform:scale(1.12);
+}
+
+.red{
+    background:red;
+}
+
+.yellow{
+    background:#ffd166;
+}
+
+.green{
+    background:#70d6a5;
+}
+
+.blue{
+    background:#5dade2;
+}
+
+.purple{
+    background:#b084f5;
+}
+
+/* Message */
+
+.msg{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:24px;
+    color:#d84f91;
+    background:white;
+    padding:10px 20px;
+    border-radius:20px;
+    min-width:260px;
+}
+
+/* Responsive Layout */
+
+@media(max-width:800px){
+
+    #intro,
+    #game,
+    #end{
+        padding:10px;
+    }
+
+    .header{
+        font-size:16px;
+    }
+
+    .main{
+        flex-direction:column;
+        gap:10px;
+        padding:18px;
+        margin-top:55px;
+        max-height:calc(100vh - 120px);
+    }
+
+    #question{
+        font-size:21px;
+        min-height:auto;
+        margin:5px 0 10px;
+    }
+
+    #shapeCanvas{
+        width:250px;
+        height:250px;
+    }
+
+    .colors{
+        max-width:100%;
+    }
+
+    .colors button{
+        width:48px;
+        height:48px;
+        margin:5px;
+    }
+
+    .action{
+        font-size:18px;
+        padding:9px 20px;
+        margin:4px;
+    }
+
+    .msg{
+        bottom:8px;
+        font-size:18px;
+        padding:7px 15px;
+    }
+}
+
+@media(max-height:650px){
+
+    .main{
+        transform:scale(0.88);
+        margin-top:40px;
+    }
+
+    .msg{
+        bottom:5px;
+    }
+}
 </style>
 </head>
+
 <body>
 
-<div id="logo" class="screen"><img src="assets/innovine-logo.png"></div>
+<!-- Logo Screen -->
 
-<div id="intro" class="screen"><div class="card">
-<h1>🎨 Magic Shape Painter</h1>
-<p>Choose a colour and paint the whole, half or quarter.</p>
-<button class="start" onclick="startGame()">Start Painting</button>
-</div></div>
+<div id="logo" class="screen">
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Introduction Screen -->
+
+<div id="intro" class="screen">
+
+    <div class="card">
+
+        <h1>🎨 Magic Shape Painter</h1>
+
+        <p>
+            Choose a colour and paint the whole, half or quarter.
+        </p>
+
+        <button
+            class="audio-btn"
+            onclick="playInstruction()"
+            aria-label="Play instructions">
+            🔊 Play Instructions
+        </button>
+
+        <br>
+
+        <button
+            class="start"
+            onclick="startGame()">
+            Start Painting
+        </button>
+
+    </div>
+
+</div>
+
+<!-- Game Screen -->
 
 <div id="game" class="screen">
-<div class="header"><b>🎨 Magic Shape Painter</b><b>⭐ <span id="score">0</span>/10</b></div>
 
-<div class="main">
-<div>
-<h2 id="question"></h2>
-<canvas id="shapeCanvas" width="350" height="350"></canvas>
+    <div class="header">
+
+        <div class="header-title">
+            <b>🎨 Magic Shape Painter</b>
+
+            <button
+                class="header-audio"
+                onclick="playInstruction()"
+                aria-label="Replay instructions"
+                title="Replay Instructions">
+                🔊
+            </button>
+        </div>
+
+        <b>⭐ <span id="score">0</span>/10</b>
+
+    </div>
+
+    <div class="main">
+
+        <div>
+
+            <h2 id="question"></h2>
+
+            <canvas
+                id="shapeCanvas"
+                width="350"
+                height="350">
+            </canvas>
+
+        </div>
+
+        <div>
+
+            <p>Choose Colour</p>
+
+            <div class="colors">
+
+                <button
+                    class="red selected-colour"
+                    onclick="chooseColour('red',this)"
+                    aria-label="Red">
+                </button>
+
+                <button
+                    class="yellow"
+                    onclick="chooseColour('#ffd166',this)"
+                    aria-label="Yellow">
+                </button>
+
+                <button
+                    class="green"
+                    onclick="chooseColour('#70d6a5',this)"
+                    aria-label="Green">
+                </button>
+
+                <button
+                    class="blue"
+                    onclick="chooseColour('#5dade2',this)"
+                    aria-label="Blue">
+                </button>
+
+                <button
+                    class="purple"
+                    onclick="chooseColour('#b084f5',this)"
+                    aria-label="Purple">
+                </button>
+
+            </div>
+
+            <button
+                class="action"
+                onclick="clearPaint()">
+                Clear
+            </button>
+
+            <button
+                class="action"
+                onclick="submitAnswer()">
+                Submit
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="msg" class="msg"></div>
+
 </div>
 
-<div>
-<p>Choose Colour</p>
-<div class="colors">
-<button class="red" onclick="selected='red'"></button>
-<button class="yellow" onclick="selected='#ffd166'"></button>
-<button class="green" onclick="selected='#70d6a5'"></button>
-<button class="blue" onclick="selected='#5dade2'"></button>
-<button class="purple" onclick="selected='#b084f5'"></button>
-</div>
-<button class="action" onclick="clearPaint()">Clear</button>
-<button class="action" onclick="submitAnswer()">Submit</button>
-</div>
-</div>
-<div id="msg" class="msg"></div>
+<!-- End Screen -->
+
+<div id="end" class="screen">
+
+    <div class="card">
+
+        <h1>🎉 Amazing Painter!</h1>
+
+        <h2 id="final"></h2>
+
+        <button
+            class="start"
+            onclick="location.reload()">
+            Play Again
+        </button>
+
+    </div>
+
 </div>
 
-<div id="end" class="screen"><div class="card">
-<h1>🎉 Amazing Painter!</h1>
-<h2 id="final"></h2>
-<button class="start" onclick="location.reload()">Play Again</button>
-</div></div>
+<!-- Audio Files -->
 
-<audio id="correct" src="assets/correct.mp3"></audio>
-<audio id="wrong" src="assets/wrong.mp3"></audio>
-<audio id="clap" src="assets/claps.mp3"></audio>
+<audio
+    id="instructionAudio"
+    src="assets/instructions.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="correct"
+    src="assets/correct.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="wrong"
+    src="assets/wrong.mp3"
+    preload="auto">
+</audio>
+
+<audio
+    id="clap"
+    src="assets/claps.mp3"
+    preload="auto">
+</audio>
 
 <script>
-let questions=[
-["pizza.png","whole","pizza"],
-["circle.png","whole","circle"],
-["balloon.png","whole","balloon"],
-["cake.png","half","cake"],
-["watermelon.png","half","watermelon"],
-["square.png","half","square"],
-["chocolate.png","quarter","chocolate"],
-["hexagon.png","quarter","hexagon"],
-["kiwi.png","quarter","kiwi"],
-["pizza.png","quarter","pizza"]
+
+const questions = [
+    ["pizza.png","whole","pizza"],
+    ["circle.png","whole","circle"],
+    ["balloon.png","whole","balloon"],
+    ["cake.png","half","cake"],
+    ["watermelon.png","half","watermelon"],
+    ["square.png","half","square"],
+    ["chocolate.png","quarter","chocolate"],
+    ["hexagon.png","quarter","hexagon"],
+    ["kiwi.png","quarter","kiwi"],
+    ["pizza.png","quarter","pizza"]
 ];
 
-let index=0,score=0,selected="red";
-let painted=false;
-let img=new Image();
-let canvas=document.getElementById("shapeCanvas");
-let ctx=canvas.getContext("2d");
-let drawing=false;
+let index = 0;
+let score = 0;
+let selected = "red";
+let painted = false;
+let drawing = false;
 
-questions.sort(()=>Math.random()-0.5);
+const logoScreen = document.getElementById("logo");
+const introScreen = document.getElementById("intro");
+const gameScreen = document.getElementById("game");
+const endScreen = document.getElementById("end");
 
-setTimeout(()=>{logo.style.display="none";intro.style.display="flex"},5000);
+const questionText = document.getElementById("question");
+const scoreText = document.getElementById("score");
+const messageBox = document.getElementById("msg");
+const finalText = document.getElementById("final");
+
+const instructionAudio =
+    document.getElementById("instructionAudio");
+
+const correctAudio =
+    document.getElementById("correct");
+
+const wrongAudio =
+    document.getElementById("wrong");
+
+const clapAudio =
+    document.getElementById("clap");
+
+const canvas =
+    document.getElementById("shapeCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const img = new Image();
+
+/* Randomise questions */
+
+questions.sort(function(){
+    return Math.random() - 0.5;
+});
+
+/* Logo Screen */
+
+setTimeout(function(){
+
+    logoScreen.style.display = "none";
+    introScreen.style.display = "flex";
+
+},5000);
+
+/* Audio Functions */
+
+function stopAllAudio(){
+
+    [
+        instructionAudio,
+        correctAudio,
+        wrongAudio,
+        clapAudio
+    ].forEach(function(audio){
+
+        audio.pause();
+        audio.currentTime = 0;
+
+    });
+
+}
+
+function playInstruction(){
+
+    stopAllAudio();
+
+    instructionAudio.currentTime = 0;
+
+    const playPromise = instructionAudio.play();
+
+    if(playPromise !== undefined){
+
+        playPromise.catch(function(){
+
+            console.log(
+                "Instruction audio requires a user tap."
+            );
+
+        });
+
+    }
+
+}
+
+function playSound(audio){
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    const playPromise = audio.play();
+
+    if(playPromise !== undefined){
+
+        playPromise.catch(function(error){
+
+            console.log(
+                "Audio playback was blocked:",
+                error
+            );
+
+        });
+
+    }
+
+}
+
+/* Start Game */
 
 function startGame(){
-intro.style.display="none";
-game.style.display="flex";
-load();
+
+    introScreen.style.display = "none";
+    gameScreen.style.display = "flex";
+
+    load();
+
+    /* Plays through the learner's Start-button tap */
+
+    playInstruction();
+
 }
+
+/* Load Question */
 
 function load(){
-painted=false;
-msg.innerHTML="";
-question.innerHTML="Colour the "+questions[index][1]+" of the "+questions[index][2]+".";
-document.getElementById("score").innerHTML=score;
-drawImage();
+
+    painted = false;
+    drawing = false;
+
+    messageBox.innerHTML = "";
+
+    questionText.innerHTML =
+        "Colour the " +
+        questions[index][1] +
+        " of the " +
+        questions[index][2] +
+        ".";
+
+    scoreText.innerHTML = score;
+
+    drawImage();
+
 }
+
+/* Draw Image */
 
 function drawImage(){
-ctx.clearRect(0,0,350,350);
-img.onload=function(){
-ctx.drawImage(img,50,50,250,250);
-};
-img.src="assets/"+questions[index][0];
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    img.onload = function(){
+
+        ctx.drawImage(
+            img,
+            50,
+            50,
+            250,
+            250
+        );
+
+    };
+
+    img.onerror = function(){
+
+        messageBox.innerHTML =
+            "Image could not be loaded.";
+
+    };
+
+    img.src =
+        "assets/" +
+        questions[index][0];
+
 }
 
-function paint(e){
-if(!drawing)return;
-let r=canvas.getBoundingClientRect();
-let x=(e.clientX-r.left)*(canvas.width/r.width);
-let y=(e.clientY-r.top)*(canvas.height/r.height);
+/* Colour Selection */
 
-ctx.fillStyle=selected;
-ctx.beginPath();
-ctx.arc(x,y,18,0,Math.PI*2);
-ctx.fill();
-painted=true;
+function chooseColour(colour,button){
+
+    selected = colour;
+
+    document
+        .querySelectorAll(".colors button")
+        .forEach(function(item){
+
+            item.classList.remove(
+                "selected-colour"
+            );
+
+        });
+
+    button.classList.add(
+        "selected-colour"
+    );
+
 }
 
-canvas.onpointerdown=e=>{drawing=true;paint(e)}
-canvas.onpointermove=e=>paint(e)
-canvas.onpointerup=()=>drawing=false;
-canvas.onpointerleave=()=>drawing=false;
+/* Painting */
+
+function paint(event){
+
+    if(!drawing){
+        return;
+    }
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const x =
+        (event.clientX - rect.left) *
+        (canvas.width / rect.width);
+
+    const y =
+        (event.clientY - rect.top) *
+        (canvas.height / rect.height);
+
+    ctx.fillStyle = selected;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        18,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    painted = true;
+
+}
+
+canvas.addEventListener(
+    "pointerdown",
+    function(event){
+
+        drawing = true;
+
+        canvas.setPointerCapture(
+            event.pointerId
+        );
+
+        paint(event);
+
+    }
+);
+
+canvas.addEventListener(
+    "pointermove",
+    paint
+);
+
+canvas.addEventListener(
+    "pointerup",
+    function(){
+
+        drawing = false;
+
+    }
+);
+
+canvas.addEventListener(
+    "pointercancel",
+    function(){
+
+        drawing = false;
+
+    }
+);
+
+canvas.addEventListener(
+    "pointerleave",
+    function(){
+
+        drawing = false;
+
+    }
+);
+
+/* Clear Painting */
 
 function clearPaint(){
-drawImage();
-painted=false;
-msg.innerHTML="";
+
+    drawImage();
+
+    painted = false;
+    drawing = false;
+
+    messageBox.innerHTML = "";
+
 }
+
+/* Submit Answer */
 
 function submitAnswer(){
 
-if(!painted){
-msg.innerHTML="🎨 Please colour the shape first!";
-return;
+    if(!painted){
+
+        messageBox.innerHTML =
+            "🎨 Please colour the shape first!";
+
+        return;
+
+    }
+
+    const pixels =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        ).data;
+
+    let count = 0;
+
+    for(
+        let i = 0;
+        i < pixels.length;
+        i += 4
+    ){
+
+        const red = pixels[i];
+        const green = pixels[i + 1];
+        const blue = pixels[i + 2];
+        const alpha = pixels[i + 3];
+
+        const isVisible =
+            alpha > 0;
+
+        const isAlmostWhite =
+            red > 240 &&
+            green > 240 &&
+            blue > 240;
+
+        if(
+            isVisible &&
+            !isAlmostWhite
+        ){
+
+            count++;
+
+        }
+
+    }
+
+    if(count < 3000){
+
+        messageBox.innerHTML =
+            "😊 Try colouring the correct part!";
+
+        playSound(wrongAudio);
+
+        return;
+
+    }
+
+    score++;
+
+    scoreText.innerHTML = score;
+
+    playSound(correctAudio);
+
+    messageBox.innerHTML =
+        "⭐ Great Painting!";
+
+    setTimeout(function(){
+
+        index++;
+
+        if(index >= questions.length){
+
+            gameScreen.style.display = "none";
+            endScreen.style.display = "flex";
+
+            finalText.innerHTML =
+                "⭐ Score: " +
+                score +
+                "/10";
+
+            playSound(clapAudio);
+
+        }else{
+
+            load();
+
+        }
+
+    },1000);
+
 }
 
-/* simple completion check based on painted area */
-let pixels=ctx.getImageData(0,0,350,350).data;
-let count=0;
-
-for(let i=0;i<pixels.length;i+=4){
-if(pixels[i+3]>0 && !(pixels[i]>240&&pixels[i+1]>240&&pixels[i+2]>240)){
-count++;
-}
-}
-
-if(count<3000){
-msg.innerHTML="😊 Try colouring the correct part!";
-wrong.play();
-return;
-}
-
-score++;
-correct.play();
-msg.innerHTML="⭐ Great Painting!";
-
-setTimeout(()=>{
-index++;
-if(index>=questions.length){
-game.style.display="none";
-end.style.display="flex";
-final.innerHTML="⭐ Score: "+score+"/10";
-clap.play();
-}else{
-load();
-}
-},1000);
-
-}
 </script>
+
 </body>
 </html>
