@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
 <title>Magic Shape Painter</title>
 
@@ -11,7 +14,8 @@
     box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
     margin:0;
     height:100%;
     overflow:hidden;
@@ -50,7 +54,13 @@ button{
 #intro,
 #game,
 #end{
-    background:linear-gradient(#fff2d8,#dff6ff,#f7e8ff);
+    background:
+        linear-gradient(
+            #fff2d8,
+            #dff6ff,
+            #f7e8ff
+        );
+
     padding:20px;
 }
 
@@ -74,87 +84,90 @@ button{
 .action{
     background:#7bbf8c;
     color:white;
-    border:0;
+    border:none;
     border-radius:25px;
     padding:12px 30px;
     font-size:24px;
     margin:8px;
 }
 
-.start:hover,
-.action:hover{
-    transform:scale(1.03);
-}
-
 .start:active,
-.action:active{
-    transform:scale(0.97);
+.action:active,
+.speaker-button:active{
+    transform:scale(0.95);
 }
 
-.audio-btn{
-    background:#5dade2;
-    color:white;
-    border:0;
-    border-radius:25px;
-    padding:11px 22px;
-    font-size:20px;
-    margin:8px;
-}
-
-/* Game Header */
+/* Header */
 
 .header{
     position:absolute;
     top:10px;
     left:10px;
     right:10px;
+
     background:white;
     padding:12px 18px;
     border-radius:25px;
+
     display:flex;
     justify-content:space-between;
     align-items:center;
+
     color:#51438b;
     font-size:20px;
 }
 
-.header-title{
+.header-left{
     display:flex;
     align-items:center;
     gap:10px;
 }
 
-.header-audio{
-    width:42px;
-    height:42px;
+.speaker-button{
+    width:45px;
+    height:45px;
+
     padding:0;
     margin:0;
-    border:0;
+
+    border:none;
     border-radius:50%;
+
     background:#5dade2;
     color:white;
-    font-size:21px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.15);
 }
 
-/* Main Game Area */
+/* Main Game */
 
 .main{
     background:white;
     border:4px solid #e6a3c2;
     border-radius:30px;
+
     padding:40px;
+
     display:flex;
     gap:30px;
     align-items:center;
     justify-content:center;
+
     width:90%;
     max-width:950px;
+
     margin-top:60px;
 }
 
 #question{
     color:#51438b;
     min-height:60px;
+    margin-top:0;
 }
 
 #shapeCanvas{
@@ -177,10 +190,15 @@ button{
 .colors button{
     width:65px;
     height:65px;
+
     border-radius:50%;
     margin:8px;
+
     border:4px solid white;
-    box-shadow:0 3px 8px rgba(0,0,0,0.18);
+
+    box-shadow:
+        0 3px 8px
+        rgba(0,0,0,0.18);
 }
 
 .colors button.selected-colour{
@@ -215,15 +233,18 @@ button{
     bottom:20px;
     left:50%;
     transform:translateX(-50%);
+
+    min-width:260px;
+
     font-size:24px;
     color:#d84f91;
+
     background:white;
     padding:10px 20px;
     border-radius:20px;
-    min-width:260px;
 }
 
-/* Responsive Layout */
+/* Responsive */
 
 @media(max-width:800px){
 
@@ -235,25 +256,40 @@ button{
 
     .header{
         font-size:16px;
+        padding:9px 12px;
+    }
+
+    .header-left{
+        gap:6px;
+    }
+
+    .speaker-button{
+        width:40px;
+        height:40px;
+        font-size:21px;
     }
 
     .main{
         flex-direction:column;
-        gap:10px;
-        padding:18px;
+        gap:8px;
+
+        padding:16px;
+
         margin-top:55px;
-        max-height:calc(100vh - 120px);
+
+        max-height:
+            calc(100vh - 115px);
     }
 
     #question{
-        font-size:21px;
+        font-size:20px;
         min-height:auto;
-        margin:5px 0 10px;
+        margin:2px 0 8px;
     }
 
     #shapeCanvas{
-        width:250px;
-        height:250px;
+        width:245px;
+        height:245px;
     }
 
     .colors{
@@ -273,8 +309,8 @@ button{
     }
 
     .msg{
-        bottom:8px;
-        font-size:18px;
+        bottom:6px;
+        font-size:17px;
         padding:7px 15px;
     }
 }
@@ -283,11 +319,11 @@ button{
 
     .main{
         transform:scale(0.88);
-        margin-top:40px;
+        margin-top:38px;
     }
 
     .msg{
-        bottom:5px;
+        bottom:4px;
     }
 }
 </style>
@@ -297,35 +333,39 @@ button{
 
 <!-- Logo Screen -->
 
-<div id="logo" class="screen">
-    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+<div
+    id="logo"
+    class="screen">
+
+    <img
+        src="assets/innovine-logo.png"
+        alt="Innovine Logo">
+
 </div>
 
 <!-- Introduction Screen -->
 
-<div id="intro" class="screen">
+<div
+    id="intro"
+    class="screen">
 
     <div class="card">
 
-        <h1>🎨 Magic Shape Painter</h1>
+        <h1>
+            🎨 Magic Shape Painter
+        </h1>
 
         <p>
-            Choose a colour and paint the whole, half or quarter.
+            Choose a colour and paint the whole,
+            half or quarter.
         </p>
-
-        <button
-            class="audio-btn"
-            onclick="playInstruction()"
-            aria-label="Play instructions">
-            🔊 Play Instructions
-        </button>
-
-        <br>
 
         <button
             class="start"
             onclick="startGame()">
+
             Start Painting
+
         </button>
 
     </div>
@@ -334,23 +374,34 @@ button{
 
 <!-- Game Screen -->
 
-<div id="game" class="screen">
+<div
+    id="game"
+    class="screen">
 
     <div class="header">
 
-        <div class="header-title">
-            <b>🎨 Magic Shape Painter</b>
+        <div class="header-left">
+
+            <b>
+                🎨 Magic Shape Painter
+            </b>
 
             <button
-                class="header-audio"
-                onclick="playInstruction()"
-                aria-label="Replay instructions"
-                title="Replay Instructions">
+                class="speaker-button"
+                onclick="speakCurrentInstruction()"
+                aria-label="Repeat the instruction"
+                title="Repeat the instruction">
+
                 🔊
+
             </button>
+
         </div>
 
-        <b>⭐ <span id="score">0</span>/10</b>
+        <b>
+            ⭐
+            <span id="score">0</span>/10
+        </b>
 
     </div>
 
@@ -370,7 +421,9 @@ button{
 
         <div>
 
-            <p>Choose Colour</p>
+            <p>
+                Choose Colour
+            </p>
 
             <div class="colors">
 
@@ -409,50 +462,57 @@ button{
             <button
                 class="action"
                 onclick="clearPaint()">
+
                 Clear
+
             </button>
 
             <button
                 class="action"
                 onclick="submitAnswer()">
+
                 Submit
+
             </button>
 
         </div>
 
     </div>
 
-    <div id="msg" class="msg"></div>
+    <div
+        id="msg"
+        class="msg">
+    </div>
 
 </div>
 
 <!-- End Screen -->
 
-<div id="end" class="screen">
+<div
+    id="end"
+    class="screen">
 
     <div class="card">
 
-        <h1>🎉 Amazing Painter!</h1>
+        <h1>
+            🎉 Amazing Painter!
+        </h1>
 
         <h2 id="final"></h2>
 
         <button
             class="start"
-            onclick="location.reload()">
+            onclick="restartGame()">
+
             Play Again
+
         </button>
 
     </div>
 
 </div>
 
-<!-- Audio Files -->
-
-<audio
-    id="instructionAudio"
-    src="assets/instructions.mp3"
-    preload="auto">
-</audio>
+<!-- Sound Effects -->
 
 <audio
     id="correct"
@@ -474,37 +534,71 @@ button{
 
 <script>
 
-const questions = [
+/* Questions */
+
+const originalQuestions = [
+
     ["pizza.png","whole","pizza"],
+
     ["circle.png","whole","circle"],
+
     ["balloon.png","whole","balloon"],
+
     ["cake.png","half","cake"],
+
     ["watermelon.png","half","watermelon"],
+
     ["square.png","half","square"],
+
     ["chocolate.png","quarter","chocolate"],
+
     ["hexagon.png","quarter","hexagon"],
+
     ["kiwi.png","quarter","kiwi"],
+
     ["pizza.png","quarter","pizza"]
+
 ];
+
+let questions = [];
 
 let index = 0;
 let score = 0;
+
 let selected = "red";
+
 let painted = false;
 let drawing = false;
 
-const logoScreen = document.getElementById("logo");
-const introScreen = document.getElementById("intro");
-const gameScreen = document.getElementById("game");
-const endScreen = document.getElementById("end");
+let currentInstruction = "";
 
-const questionText = document.getElementById("question");
-const scoreText = document.getElementById("score");
-const messageBox = document.getElementById("msg");
-const finalText = document.getElementById("final");
+let speechEnabled = false;
 
-const instructionAudio =
-    document.getElementById("instructionAudio");
+/* Elements */
+
+const logoScreen =
+    document.getElementById("logo");
+
+const introScreen =
+    document.getElementById("intro");
+
+const gameScreen =
+    document.getElementById("game");
+
+const endScreen =
+    document.getElementById("end");
+
+const questionText =
+    document.getElementById("question");
+
+const scoreText =
+    document.getElementById("score");
+
+const messageBox =
+    document.getElementById("msg");
+
+const finalText =
+    document.getElementById("final");
 
 const correctAudio =
     document.getElementById("correct");
@@ -521,15 +615,10 @@ const canvas =
 const ctx =
     canvas.getContext("2d");
 
-const img = new Image();
+const img =
+    new Image();
 
-/* Randomise questions */
-
-questions.sort(function(){
-    return Math.random() - 0.5;
-});
-
-/* Logo Screen */
+/* Logo Timer */
 
 setTimeout(function(){
 
@@ -538,63 +627,37 @@ setTimeout(function(){
 
 },5000);
 
-/* Audio Functions */
+/* Shuffle Questions */
 
-function stopAllAudio(){
+function shuffleQuestions(){
 
-    [
-        instructionAudio,
-        correctAudio,
-        wrongAudio,
-        clapAudio
-    ].forEach(function(audio){
+    questions =
+        originalQuestions.map(
+            function(question){
 
-        audio.pause();
-        audio.currentTime = 0;
+                return [...question];
 
-    });
+            }
+        );
 
-}
+    for(
+        let i = questions.length - 1;
+        i > 0;
+        i--
+    ){
 
-function playInstruction(){
-
-    stopAllAudio();
-
-    instructionAudio.currentTime = 0;
-
-    const playPromise = instructionAudio.play();
-
-    if(playPromise !== undefined){
-
-        playPromise.catch(function(){
-
-            console.log(
-                "Instruction audio requires a user tap."
+        const randomIndex =
+            Math.floor(
+                Math.random() * (i + 1)
             );
 
-        });
-
-    }
-
-}
-
-function playSound(audio){
-
-    audio.pause();
-    audio.currentTime = 0;
-
-    const playPromise = audio.play();
-
-    if(playPromise !== undefined){
-
-        playPromise.catch(function(error){
-
-            console.log(
-                "Audio playback was blocked:",
-                error
-            );
-
-        });
+        [
+            questions[i],
+            questions[randomIndex]
+        ] = [
+            questions[randomIndex],
+            questions[i]
+        ];
 
     }
 
@@ -604,36 +667,157 @@ function playSound(audio){
 
 function startGame(){
 
+    speechEnabled = true;
+
+    shuffleQuestions();
+
+    index = 0;
+    score = 0;
+
     introScreen.style.display = "none";
+    endScreen.style.display = "none";
     gameScreen.style.display = "flex";
 
-    load();
-
-    /* Plays through the learner's Start-button tap */
-
-    playInstruction();
+    loadQuestion();
 
 }
 
-/* Load Question */
+/* Load Current Question */
 
-function load(){
+function loadQuestion(){
 
     painted = false;
     drawing = false;
 
-    messageBox.innerHTML = "";
+    messageBox.textContent = "";
 
-    questionText.innerHTML =
+    const part =
+        questions[index][1];
+
+    const objectName =
+        questions[index][2];
+
+    currentInstruction =
         "Colour the " +
-        questions[index][1] +
+        part +
         " of the " +
-        questions[index][2] +
+        objectName +
         ".";
 
-    scoreText.innerHTML = score;
+    questionText.textContent =
+        currentInstruction;
+
+    scoreText.textContent =
+        score;
 
     drawImage();
+
+    /*
+    Automatically read every new instruction.
+    A small delay allows the new question to
+    appear before the voice begins.
+    */
+
+    if(speechEnabled){
+
+        setTimeout(function(){
+
+            speakCurrentInstruction();
+
+        },400);
+
+    }
+
+}
+
+/* Speak Current Instruction */
+
+function speakCurrentInstruction(){
+
+    if(!currentInstruction){
+        return;
+    }
+
+    if(
+        !("speechSynthesis" in window)
+    ){
+
+        messageBox.textContent =
+            "Audio instructions are not supported on this device.";
+
+        return;
+    }
+
+    /*
+    Stop any instruction that is already playing.
+    */
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            currentInstruction
+        );
+
+    /*
+    en-IN gives an Indian English voice when
+    available. The browser will use another
+    English voice when en-IN is unavailable.
+    */
+
+    speech.lang = "en-IN";
+    speech.rate = 0.82;
+    speech.pitch = 1.05;
+    speech.volume = 1;
+
+    const voices =
+        window.speechSynthesis.getVoices();
+
+    const preferredVoice =
+        voices.find(
+            function(voice){
+
+                return voice.lang === "en-IN";
+
+            }
+        ) ||
+
+        voices.find(
+            function(voice){
+
+                return voice.lang.startsWith("en");
+
+            }
+        );
+
+    if(preferredVoice){
+
+        speech.voice =
+            preferredVoice;
+
+    }
+
+    window.speechSynthesis.speak(
+        speech
+    );
+
+}
+
+/*
+Some browsers load available voices after
+the page has already opened.
+*/
+
+if(
+    "speechSynthesis" in window
+){
+
+    window.speechSynthesis.onvoiceschanged =
+        function(){
+
+            window.speechSynthesis.getVoices();
+
+        };
 
 }
 
@@ -650,6 +834,13 @@ function drawImage(){
 
     img.onload = function(){
 
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
         ctx.drawImage(
             img,
             50,
@@ -662,8 +853,8 @@ function drawImage(){
 
     img.onerror = function(){
 
-        messageBox.innerHTML =
-            "Image could not be loaded.";
+        messageBox.textContent =
+            "The picture could not be loaded.";
 
     };
 
@@ -673,21 +864,29 @@ function drawImage(){
 
 }
 
-/* Colour Selection */
+/* Choose Colour */
 
-function chooseColour(colour,button){
+function chooseColour(
+    colour,
+    button
+){
 
-    selected = colour;
+    selected =
+        colour;
 
     document
-        .querySelectorAll(".colors button")
-        .forEach(function(item){
+        .querySelectorAll(
+            ".colors button"
+        )
+        .forEach(
+            function(item){
 
-            item.classList.remove(
-                "selected-colour"
-            );
+                item.classList.remove(
+                    "selected-colour"
+                );
 
-        });
+            }
+        );
 
     button.classList.add(
         "selected-colour"
@@ -695,7 +894,7 @@ function chooseColour(colour,button){
 
 }
 
-/* Painting */
+/* Paint */
 
 function paint(event){
 
@@ -703,18 +902,31 @@ function paint(event){
         return;
     }
 
-    const rect =
+    const rectangle =
         canvas.getBoundingClientRect();
 
     const x =
-        (event.clientX - rect.left) *
-        (canvas.width / rect.width);
+        (
+            event.clientX -
+            rectangle.left
+        ) *
+        (
+            canvas.width /
+            rectangle.width
+        );
 
     const y =
-        (event.clientY - rect.top) *
-        (canvas.height / rect.height);
+        (
+            event.clientY -
+            rectangle.top
+        ) *
+        (
+            canvas.height /
+            rectangle.height
+        );
 
-    ctx.fillStyle = selected;
+    ctx.fillStyle =
+        selected;
 
     ctx.beginPath();
 
@@ -732,15 +944,27 @@ function paint(event){
 
 }
 
+/* Pointer Controls */
+
 canvas.addEventListener(
     "pointerdown",
     function(event){
 
         drawing = true;
 
-        canvas.setPointerCapture(
-            event.pointerId
-        );
+        try{
+
+            canvas.setPointerCapture(
+                event.pointerId
+            );
+
+        }catch(error){
+
+            console.log(
+                "Pointer capture unavailable."
+            );
+
+        }
 
         paint(event);
 
@@ -779,7 +1003,7 @@ canvas.addEventListener(
     }
 );
 
-/* Clear Painting */
+/* Clear */
 
 function clearPaint(){
 
@@ -788,17 +1012,46 @@ function clearPaint(){
     painted = false;
     drawing = false;
 
-    messageBox.innerHTML = "";
+    messageBox.textContent = "";
 
 }
 
-/* Submit Answer */
+/* Play Sound Effect */
+
+function playSound(audio){
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    const soundPromise =
+        audio.play();
+
+    if(soundPromise !== undefined){
+
+        soundPromise.catch(
+            function(error){
+
+                console.log(
+                    "Sound could not play:",
+                    error
+                );
+
+            }
+        );
+
+    }
+
+}
+
+/* Submit */
 
 function submitAnswer(){
 
+    window.speechSynthesis.cancel();
+
     if(!painted){
 
-        messageBox.innerHTML =
+        messageBox.textContent =
             "🎨 Please colour the shape first!";
 
         return;
@@ -821,22 +1074,29 @@ function submitAnswer(){
         i += 4
     ){
 
-        const red = pixels[i];
-        const green = pixels[i + 1];
-        const blue = pixels[i + 2];
-        const alpha = pixels[i + 3];
+        const red =
+            pixels[i];
 
-        const isVisible =
+        const green =
+            pixels[i + 1];
+
+        const blue =
+            pixels[i + 2];
+
+        const alpha =
+            pixels[i + 3];
+
+        const visible =
             alpha > 0;
 
-        const isAlmostWhite =
+        const almostWhite =
             red > 240 &&
             green > 240 &&
             blue > 240;
 
         if(
-            isVisible &&
-            !isAlmostWhite
+            visible &&
+            !almostWhite
         ){
 
             count++;
@@ -847,10 +1107,12 @@ function submitAnswer(){
 
     if(count < 3000){
 
-        messageBox.innerHTML =
+        messageBox.textContent =
             "😊 Try colouring the correct part!";
 
-        playSound(wrongAudio);
+        playSound(
+            wrongAudio
+        );
 
         return;
 
@@ -858,38 +1120,92 @@ function submitAnswer(){
 
     score++;
 
-    scoreText.innerHTML = score;
+    scoreText.textContent =
+        score;
 
-    playSound(correctAudio);
+    playSound(
+        correctAudio
+    );
 
-    messageBox.innerHTML =
+    messageBox.textContent =
         "⭐ Great Painting!";
 
-    setTimeout(function(){
+    setTimeout(
+        function(){
 
-        index++;
+            index++;
 
-        if(index >= questions.length){
+            if(
+                index >=
+                questions.length
+            ){
 
-            gameScreen.style.display = "none";
-            endScreen.style.display = "flex";
+                finishGame();
 
-            finalText.innerHTML =
-                "⭐ Score: " +
-                score +
-                "/10";
+            }else{
 
-            playSound(clapAudio);
+                /*
+                loadQuestion automatically reads
+                the next instruction.
+                */
 
-        }else{
+                loadQuestion();
 
-            load();
+            }
+
+        },
+        1100
+    );
+
+}
+
+/* End Game */
+
+function finishGame(){
+
+    window.speechSynthesis.cancel();
+
+    gameScreen.style.display =
+        "none";
+
+    endScreen.style.display =
+        "flex";
+
+    finalText.textContent =
+        "⭐ Score: " +
+        score +
+        "/10";
+
+    playSound(
+        clapAudio
+    );
+
+}
+
+/* Play Again */
+
+function restartGame(){
+
+    window.speechSynthesis.cancel();
+
+    startGame();
+
+}
+
+/* Stop Voice When Page Is Hidden */
+
+document.addEventListener(
+    "visibilitychange",
+    function(){
+
+        if(document.hidden){
+
+            window.speechSynthesis.cancel();
 
         }
 
-    },1000);
-
-}
+    }
+);
 
 </script>
 
