@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>3D Shape – Cone · LY4 · Game 35</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:stretch;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+    /* ── INTRO ── */
+    #intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+    #intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+    @keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+    /* ── GAME SCREEN ── */
+    #game-screen{display:none;flex-direction:column;width:100%;max-width:860px;height:100%;padding:12px 14px 76px;overflow-y:auto}
+
+    .hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+    .hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:80px}
+    .hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+    .mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+    .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-shrink:0}
+    .progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+    .progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+    .progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+    /* ── Q-CARD ── */
+    .q-card{background:white;border-radius:24px;padding:18px 16px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;flex:1;min-height:0;overflow:hidden}
+    .instruction{font-size:clamp(1em,3.2vw,1.3em);font-weight:800;color:#555;text-align:center}
+    .instruction span{color:#FF5722}
+
+    /* ── SHAPE GRID ── */
+    .draw-tip{font-size:clamp(0.78em,2.4vw,0.9em);color:#888;font-weight:700;text-align:center}
+    .grid-wrap{position:relative;width:100%;max-width:420px}
+    #draw-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:10;border-radius:16px}
+    .shapes-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+
+    .shape-card{
+      background:white;border-radius:20px;padding:14px 10px 10px;
+      box-shadow:0 5px 18px rgba(0,0,0,0.1);
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      cursor:pointer;border:3px solid transparent;
+      transition:transform 0.12s,box-shadow 0.12s,border-color 0.2s;
+      touch-action:manipulation;min-height:44px;
+    }
+    .shape-card:active{transform:scale(0.95)}
+
+    .shape-card.correct{
+      border-color:#4CAF50 !important;
+      box-shadow:0 0 0 4px rgba(76,175,80,0.3),0 8px 24px rgba(0,0,0,0.15) !important;
+      animation:cardPop 0.4s ease !important;
+    }
+    .shape-card.wrong{
+      border-color:#f44336 !important;
+      animation:shakeCard 0.42s ease !important;
+    }
+    .shape-card.hint{
+      border-color:#FFD700 !important;
+      animation:pulseHint 0.9s ease-in-out infinite !important;
+    }
+    @keyframes cardPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+    @keyframes shakeCard{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+    @keyframes pulseHint{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.7)}50%{box-shadow:0 0 0 10px rgba(255,215,0,0)}}
+
+    /* ── FLOAT ANIMATIONS ── */
+    @keyframes float0{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+    @keyframes float1{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-12px) rotate(-1deg)}}
+    @keyframes float2{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-8px) rotate(-3deg)}}
+    @keyframes float3{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-11px) rotate(2deg)}}
+    .shape-card:nth-child(1) .shape-svg-wrap{animation:float0 2.8s ease-in-out infinite}
+    .shape-card:nth-child(2) .shape-svg-wrap{animation:float1 3.2s ease-in-out infinite;animation-delay:0.4s}
+    .shape-card:nth-child(3) .shape-svg-wrap{animation:float2 2.6s ease-in-out infinite;animation-delay:0.8s}
+    .shape-card:nth-child(4) .shape-svg-wrap{animation:float3 3.0s ease-in-out infinite;animation-delay:1.2s}
+
+    /* ── CONE gets a slow 3D-spin glow ── */
+    @keyframes coneSpin{
+      0%   {filter:drop-shadow(0 4px 8px rgba(255,87,34,0.4)) scaleX(1)}
+      25%  {filter:drop-shadow(-6px 4px 10px rgba(255,87,34,0.6)) scaleX(0.65)}
+      50%  {filter:drop-shadow(0 4px 8px rgba(255,87,34,0.3)) scaleX(1)}
+      75%  {filter:drop-shadow(6px 4px 10px rgba(255,87,34,0.6)) scaleX(0.65)}
+      100% {filter:drop-shadow(0 4px 8px rgba(255,87,34,0.4)) scaleX(1)}
+    }
+    .cone-svg{animation:coneSpin 3s ease-in-out infinite}
+
+    .shape-label{font-size:clamp(0.82em,2.5vw,0.95em);font-weight:800;color:#555;text-align:center}
+
+    .shape-svg-wrap{width:90px;height:100px;display:flex;align-items:center;justify-content:center}
+    .shape-svg-wrap svg{width:100%;height:100%}
+
+    /* Toast */
+    #toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:14px 30px;border-radius:50px;font-size:1.5em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+    #toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+
+    .confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+    /* Bottom */
+    .bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+    .btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);touch-action:manipulation;min-height:44px}
+
+    /* End screen */
+    #end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+    .end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+    @keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+    .end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+    .end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+    .end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+    .end-stars{font-size:2.2em;letter-spacing:4px}
+    .btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;touch-action:manipulation;min-height:44px}
+
+    @media(max-width:768px){.hdr-title{display:none}}
+    @media(max-width:480px){
+      #game-screen{padding:8px 10px 72px}
+      .hdr{padding:8px 12px;margin-bottom:6px}
+      .q-card{padding:12px 10px;gap:12px}
+      .shapes-grid{gap:10px;max-width:340px}
+      .shape-svg-wrap{width:74px;height:82px}
+      .shape-card{padding:10px 8px 8px}
+    }
+    @media(max-height:640px){
+      .q-card{gap:10px;padding:10px 8px}
+      .shapes-grid{gap:8px}
+      .shape-svg-wrap{width:64px;height:70px}
+      .shape-card{padding:8px 6px 6px;gap:6px}
+      .draw-tip{font-size:clamp(0.7em,2vw,0.82em)}
+      .instruction{font-size:clamp(0.88em,2.8vw,1.1em)}
+    }
+  </style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">⭐ <span id="score-val">0</span> / 10</div>
+    <div class="hdr-title">Shape – Cone · LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="step-num">1</span> / 10</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="q-card" id="q-card">
+    <div class="instruction" id="instruction-txt">&#9997; Circle the <span>CONE</span> shaped object!</div>
+    <div class="draw-tip">Draw a circle around the cone shaped object!</div>
+    <div class="grid-wrap" id="grid-wrap">
+      <div class="shapes-grid" id="shapes-grid"></div>
+      <canvas id="draw-canvas"></canvas>
+    </div>
+  </div>
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">🔄 &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">🏆</div>
+  <div class="end-title">You have done a great job!</div>
+  <div class="end-sub">You learnt all about the CONE shape!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 10</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">▶ &nbsp;Play Again</button>
+</div>
+
+<script>
+/* ── Real-life cone objects ── */
+const CONE_OBJECTS = [
+  { img:'Assets/ice_cream.png',      label:'Ice Cream' },
+  { img:'Assets/traffic cone.png',   label:'Traffic Cone' },
+  { img:'Assets/party hat.png',      label:'Party Hat' },
+  { img:'Assets/volcano.png',        label:'Volcano' },
+];
+
+/* ── Non-cone distractors ── */
+const DISTRACTORS = [
+  { img:'Assets/drum.png',       label:'Drum' },
+  { img:'Assets/lemon.png',      label:'Lemon' },
+  { img:'Assets/paint-tin.png',  label:'Paint Tin' },
+  { img:'Assets/football.png',   label:'Football' },
+  { img:'Assets/egg.png',        label:'Egg' },
+  { img:'Assets/balloon.png',    label:'Balloon' },
+];
+
+/* Preload */
+[...CONE_OBJECTS,...DISTRACTORS].forEach(o=>{const i=new Image();i.src=o.img;});
+
+function getRound(q){
+  const cone = CONE_OBJECTS[q % CONE_OBJECTS.length];
+  const shuffled=[...DISTRACTORS].sort(()=>Math.random()-0.5);
+  return { cone, distractors:shuffled.slice(0,3) };
+}
+
+/* ── Audio ── */
+const sndWrong = new Audio('Assets/wrong.mp3');
+const sndClaps = new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{})}
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0},3000)}
+
+/* ── TTS ── */
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  if(muted)return;
+  setTimeout(()=>{
+    if(muted)return;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.82;u.pitch=1.1;u.volume=1;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+/* ── Toast ── */
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+
+/* ── Confetti ── */
+const CC=['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC','#26C6DA'];
+function spawnConfetti(){
+  for(let i=0;i<70;i++)setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){const s=document.createElement('style');s.id='cf-style';s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';document.head.appendChild(s);}
+
+/* ── State ── */
+let curQ=0, score=0, attempts=0, answered=false, muted=false;
+let pathPts=[], isDrawing=false, coneCardEl=null;
+
+/* ── Build round ── */
+function buildRound(q){
+  const grid = document.getElementById('shapes-grid');
+  grid.innerHTML = '';
+  coneCardEl = null;
+
+  const round = getRound(q);
+  const items = [
+    { ...round.cone, isCone:true },
+    ...round.distractors.map(d=>({...d, isCone:false}))
+  ];
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}
+
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'shape-card';
+    card.dataset.cone = item.isCone ? 'true' : 'false';
+    if(item.isCone) coneCardEl = card;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'shape-svg-wrap';
+    const img = document.createElement('img');
+    img.alt = item.label;
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px;';
+    img.onerror = () => { img.style.opacity = '0.2'; };
+    img.onload  = () => { img.style.opacity = '1'; };
+    img.src = item.img;
+    if (img.complete && img.naturalWidth > 0) img.style.opacity = '1';
+    wrap.appendChild(img);
+
+    const label = document.createElement('div');
+    label.className = 'shape-label';
+    label.textContent = item.label;
+
+    card.appendChild(wrap);
+    card.appendChild(label);
+    grid.appendChild(card);
+  });
+
+  /* size canvas to grid */
+  requestAnimationFrame(()=>{
+    const gw = document.getElementById('grid-wrap');
+    const cv = document.getElementById('draw-canvas');
+    cv.width  = gw.offsetWidth;
+    cv.height = gw.offsetHeight;
+    clearCanvas();
+  });
+}
+
+/* ── Canvas helpers ── */
+function cv(){ return document.getElementById('draw-canvas'); }
+function ctx(){ return cv().getContext('2d'); }
+function clearCanvas(){ ctx().clearRect(0,0,cv().width,cv().height); }
+
+function flashPath(color, alpha, lw){
+  const c=cv(), x=ctx();
+  x.clearRect(0,0,c.width,c.height);
+  if(!pathPts.length) return;
+  x.save(); x.globalAlpha=alpha; x.strokeStyle=color; x.lineWidth=lw;
+  x.lineCap='round'; x.lineJoin='round'; x.shadowColor=color; x.shadowBlur=12;
+  x.beginPath(); x.moveTo(pathPts[0].x,pathPts[0].y);
+  pathPts.forEach(p=>x.lineTo(p.x,p.y));
+  x.stroke(); x.restore();
+}
+
+function drawGuideCircle(card, color){
+  const gwRect = document.getElementById('grid-wrap').getBoundingClientRect();
+  const cRect  = card.getBoundingClientRect();
+  const cx = cRect.left + cRect.width/2  - gwRect.left;
+  const cy = cRect.top  + cRect.height/2 - gwRect.top;
+  const r  = Math.min(cRect.width, cRect.height) * 0.52;
+  const x=ctx();
+  x.save(); x.strokeStyle=color; x.lineWidth=7; x.globalAlpha=0.9;
+  x.shadowColor=color; x.shadowBlur=14;
+  if(color!=='#4CAF50') x.setLineDash([10,6]);
+  x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.stroke(); x.restore();
+}
+
+/* ── Pointer events ── */
+function onDown(e){
+  if(answered) return;
+  e.preventDefault();
+  isDrawing=true; pathPts=[];
+  const r=cv().getBoundingClientRect();
+  pathPts.push({x:e.clientX-r.left, y:e.clientY-r.top});
+  cv().setPointerCapture(e.pointerId);
+}
+
+function onMove(e){
+  if(!isDrawing) return;
+  e.preventDefault();
+  const r=cv().getBoundingClientRect();
+  pathPts.push({x:e.clientX-r.left, y:e.clientY-r.top});
+  const x=ctx(), c=cv();
+  x.clearRect(0,0,c.width,c.height);
+  x.save(); x.strokeStyle='rgba(108,92,231,0.7)'; x.lineWidth=5;
+  x.lineCap='round'; x.lineJoin='round';
+  x.beginPath(); x.moveTo(pathPts[0].x,pathPts[0].y);
+  pathPts.forEach(p=>x.lineTo(p.x,p.y));
+  x.stroke(); x.restore();
+}
+
+function onUp(e){
+  if(!isDrawing) return;
+  isDrawing=false;
+  clearCanvas();
+  if(pathPts.length < 5) return;
+  evaluateDrawing();
+}
+
+/* ── Evaluate circle drawing ── */
+function evaluateDrawing(){
+  if(pathPts.length < 8) return;
+  /* min stroke length */
+  let len=0;
+  for(let i=1;i<pathPts.length;i++) len+=Math.hypot(pathPts[i].x-pathPts[i-1].x, pathPts[i].y-pathPts[i-1].y);
+  if(len < 60) return;
+  /* centroid */
+  const cx=pathPts.reduce((s,p)=>s+p.x,0)/pathPts.length;
+  const cy=pathPts.reduce((s,p)=>s+p.y,0)/pathPts.length;
+  /* angular coverage — must cover ≥240° */
+  const angles=pathPts.map(p=>Math.atan2(p.y-cy,p.x-cx));
+  const sorted=[...angles].sort((a,b)=>a-b);
+  let maxGap=0;
+  for(let i=1;i<sorted.length;i++) maxGap=Math.max(maxGap,sorted[i]-sorted[i-1]);
+  maxGap=Math.max(maxGap, sorted[0]+Math.PI*2-sorted[sorted.length-1]);
+  if(maxGap > (120*Math.PI/180)) return; /* not a circle */
+
+  /* which card was circled? */
+  const gwRect=document.getElementById('grid-wrap').getBoundingClientRect();
+  const cards=document.querySelectorAll('.shape-card');
+  let hitCard=null;
+  cards.forEach(card=>{
+    const r=card.getBoundingClientRect();
+    const lx=r.left-gwRect.left, ly=r.top-gwRect.top;
+    if(cx>=lx && cx<=lx+r.width && cy>=ly && cy<=ly+r.height) hitCard=card;
+  });
+  if(!hitCard) return;
+
+  if(hitCard.dataset.cone==='true') registerCorrect(hitCard);
+  else registerWrong(hitCard);
+}
+
+/* ── Correct / Wrong ── */
+function registerCorrect(card){
+  answered=true;
+  flashPath('#4CAF50', 1.0, 8);
+  card.classList.add('correct');
+  score++;
+  document.getElementById('score-val').textContent=score;
+  window.speechSynthesis?.cancel();
+  playClaps();
+  showToast('⭐ That\'s a cone!','#4CAF50');
+  spawnConfetti();
+  setTimeout(()=>{ curQ++; loadQuestion(); }, 3200);
+}
+
+function registerWrong(card){
+  if(answered) return;
+  attempts++;
+  play(sndWrong);
+  flashPath('#f44336', 0.9, 7);
+  card.classList.add('wrong');
+  setTimeout(()=>card.classList.remove('wrong'), 500);
+
+  if(attempts===1){
+    showToast('❌ Try again!','#f44336');
+    setTimeout(()=>{ clearCanvas(); if(coneCardEl) drawGuideCircle(coneCardEl,'#FFD700'); }, 800);
+  } else {
+    answered=true;
+    showToast('❌ Wrong!','#f44336');
+    setTimeout(()=>{
+      clearCanvas();
+      if(coneCardEl){ coneCardEl.classList.add('correct'); drawGuideCircle(coneCardEl,'#4CAF50'); }
+      showToast('💡 This is the cone!','#FF9800');
+      setTimeout(()=>{ curQ++; loadQuestion(); }, 3000);
+    }, 1000);
+  }
+}
+
+/* ── Game flow ── */
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0; score=0;
+  document.getElementById('score-val').textContent=0;
+  setupCanvas();
+  loadQuestion();
+}
+
+function setupCanvas(){
+  const c=cv();
+  c.addEventListener('pointerdown',onDown);
+  c.addEventListener('pointermove',onMove);
+  c.addEventListener('pointerup',onUp);
+  c.addEventListener('pointercancel',onUp);
+}
+
+const TOTAL_Q=10;
+function loadQuestion(){
+  if(curQ>=TOTAL_Q){showEnd();return;}
+  answered=false; attempts=0; pathPts=[];
+  document.getElementById('step-num').textContent=curQ+1;
+  document.getElementById('prog-bar').style.width=((curQ/TOTAL_Q)*100)+'%';
+  document.getElementById('score-val').textContent=score;
+  buildRound(curQ);
+  speak('Draw a circle around the cone shaped object!');
+}
+
+/* ── Mute ── */
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').textContent=muted?'🔇':'🔊';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else{speak('Draw a circle around the cone shaped object!');}
+}
+
+/* ── End ── */
+function showEnd(){
+  document.getElementById('prog-bar').style.width='100%';
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').textContent=score>=9?'⭐⭐⭐':score>=7?'⭐⭐':'⭐';
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti,800);
+}
+
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0; score=0; pathPts=[];
+  document.getElementById('score-val').textContent=0;
+  loadQuestion();
+}
+</script>
+</body>
+</html>
