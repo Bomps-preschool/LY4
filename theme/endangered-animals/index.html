@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1,
+  user-scalable=no, viewport-fit=cover"
+>
+
+<title>Endangered Animals Word Puzzle</title>
+
+<style>
+/* -------------------------------------------------
+   GENERAL
+------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #ffffff;
+  color: #294c5e;
+}
+
+button {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* -------------------------------------------------
+   SPLASH SCREEN
+------------------------------------------------- */
+
+#splashScreen {
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+#splashScreen img {
+  width: 250px;
+  max-width: 68vw;
+  max-height: 55vh;
+  object-fit: contain;
+}
+
+/* -------------------------------------------------
+   GAME SCREEN
+------------------------------------------------- */
+
+#gameScreen {
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    max(9px, env(safe-area-inset-top))
+    max(9px, env(safe-area-inset-right))
+    max(9px, env(safe-area-inset-bottom))
+    max(9px, env(safe-area-inset-left));
+
+  background:
+    radial-gradient(circle at 7% 15%, #ffffff 0 32px, transparent 33px),
+    radial-gradient(circle at 92% 18%, #ffffff 0 40px, transparent 41px),
+    radial-gradient(circle at 12% 90%, #fff0ac 0 45px, transparent 46px),
+    radial-gradient(circle at 92% 88%, #d8f4ff 0 50px, transparent 51px),
+    linear-gradient(135deg, #e4f7d2, #fff4ca 52%, #daf4ff);
+}
+
+.game-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.progress-box {
+  padding: 7px 16px;
+  border: 2px solid #62b99b;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #294c5e;
+  font-size: clamp(13px, 2.6vw, 17px);
+  font-weight: 900;
+  box-shadow: 0 4px 0 rgba(57, 136, 108, 0.17);
+}
+
+.game-card {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  padding: clamp(8px, 2vh, 18px) clamp(10px, 2.5vw, 24px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(255, 255, 255, 0.97);
+  border: 4px solid #5db593;
+  border-radius: 30px;
+
+  box-shadow:
+    0 8px 0 rgba(39, 125, 91, 0.17),
+    0 15px 30px rgba(51, 95, 85, 0.13);
+}
+
+/* Decorative corner leaves */
+
+.game-card::before,
+.game-card::after {
+  content: "";
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  border-radius: 50% 10% 50% 10%;
+  background: rgba(119, 208, 157, 0.16);
+  pointer-events: none;
+}
+
+.game-card::before {
+  top: -17px;
+  left: -17px;
+  transform: rotate(25deg);
+}
+
+.game-card::after {
+  right: -17px;
+  bottom: -17px;
+  transform: rotate(205deg);
+}
+
+.heading-area {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  color: #e2538a;
+  font-size: clamp(22px, 4.5vw, 36px);
+  line-height: 1.05;
+}
+
+.instruction {
+  margin: 4px 0 0;
+  color: #496778;
+  font-size: clamp(12px, 2.7vw, 18px);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------
+   ANIMAL IMAGE
+------------------------------------------------- */
+
+.clue-area {
+  width: 100%;
+  flex: 1;
+  min-height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.animal-box {
+  width: clamp(180px, 38vw, 315px);
+  height: clamp(125px, 25vh, 210px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  background: #ffffff;
+  border: 3px solid #8bc9dd;
+  border-radius: 20px;
+
+  box-shadow:
+    0 6px 0 #d1edf5,
+    0 10px 20px rgba(59, 109, 129, 0.11);
+}
+
+#animalImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.image-fallback {
+  display: none;
+  font-size: clamp(55px, 12vw, 90px);
+}
+
+/* -------------------------------------------------
+   ANSWER BLANKS
+------------------------------------------------- */
+
+.answer-section {
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.section-label {
+  margin: 2px 0 5px;
+  color: #637680;
+  font-size: clamp(12px, 2.5vw, 16px);
+  font-weight: 900;
+}
+
+.answer-slots {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(3px, 0.8vw, 7px);
+}
+
+.answer-slot {
+  width: clamp(25px, 6vw, 45px);
+  height: clamp(34px, 7vh, 51px);
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-bottom: 4px solid #7398aa;
+  border-radius: 8px 8px 4px 4px;
+
+  background: #f4fbff;
+  color: #244c62;
+
+  font-size: clamp(17px, 4vw, 27px);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.answer-slot.filled {
+  background: #e1f5ff;
+  border: 2px solid #77b9d6;
+  border-bottom: 4px solid #4d98bb;
+  box-shadow: 0 3px 0 rgba(69, 142, 174, 0.16);
+}
+
+.answer-slot.correct {
+  color: #147044;
+  background: #d7f8df;
+  border: 2px solid #48b875;
+  border-bottom: 4px solid #26945a;
+}
+
+.answer-slot.answer-glow {
+  animation: answerGlow 0.75s infinite alternate;
+}
+
+/* -------------------------------------------------
+   JUMBLED LETTERS
+------------------------------------------------- */
+
+.letters-section {
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.letter-board {
+  width: 100%;
+  min-height: 53px;
+
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+
+  gap: clamp(3px, 0.9vw, 8px);
+}
+
+.letter-tile {
+  width: clamp(28px, 6.4vw, 49px);
+  height: clamp(38px, 7.3vh, 55px);
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #ee9f35;
+  border-radius: 12px;
+
+  background: linear-gradient(180deg, #ffe185, #ffc25b);
+  color: #5c452d;
+
+  box-shadow:
+    0 5px 0 #df902e,
+    0 7px 10px rgba(127, 83, 34, 0.14);
+
+  font-size: clamp(18px, 4.2vw, 28px);
+  font-weight: 900;
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.letter-tile:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #df902e;
+}
+
+.letter-tile.used {
+  opacity: 0.2;
+  pointer-events: none;
+  transform: scale(0.88);
+}
+
+.letter-tile.hint-glow {
+  color: #0c6242;
+  border-color: #2dae70;
+  background: #bdf4d1;
+
+  animation: tileGlow 0.65s infinite alternate;
+}
+
+/* -------------------------------------------------
+   FEEDBACK
+------------------------------------------------- */
+
+.feedback {
+  width: 100%;
+  min-height: 39px;
+  flex-shrink: 0;
+
+  margin-top: 4px;
+  padding: 5px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+  text-align: center;
+
+  color: #61747d;
+  font-size: clamp(14px, 3vw, 21px);
+  font-weight: 900;
+}
+
+.feedback.good {
+  color: #147847;
+  background: #dcf8e4;
+}
+
+.feedback.wrong {
+  color: #ae4545;
+  background: #fff0ef;
+}
+
+.feedback.hint {
+  color: #85600e;
+  background: #fff3c0;
+}
+
+/* -------------------------------------------------
+   END SCREEN
+------------------------------------------------- */
+
+#endScreen {
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    max(14px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+
+  background:
+    radial-gradient(circle at 10% 18%, #ffffff 0 42px, transparent 43px),
+    radial-gradient(circle at 90% 80%, #ffffff 0 52px, transparent 53px),
+    linear-gradient(140deg, #dcf8ff, #fff2c5, #e3ffd7);
+}
+
+.end-card {
+  position: relative;
+  z-index: 5;
+
+  width: 92%;
+  max-width: 620px;
+  padding: 22px 18px;
+
+  background: #ffffff;
+  border: 5px solid #58b38b;
+  border-radius: 34px;
+  text-align: center;
+
+  box-shadow:
+    0 10px 0 rgba(39, 127, 91, 0.18),
+    0 20px 35px rgba(44, 100, 82, 0.14);
+}
+
+.end-logo {
+  width: 135px;
+  max-height: 75px;
+  object-fit: contain;
+}
+
+.end-animals {
+  margin: 5px 0;
+  font-size: clamp(50px, 12vw, 78px);
+  line-height: 1;
+  animation: happyBounce 1.2s infinite;
+}
+
+.end-card h1 {
+  margin: 5px 0;
+  color: #e2538a;
+  font-size: clamp(31px, 9vw, 52px);
+}
+
+.end-card p {
+  margin: 7px 0 17px;
+  color: #4d6a77;
+  font-size: clamp(16px, 4vw, 23px);
+  font-weight: 900;
+}
+
+.play-again-button {
+  min-width: 190px;
+  min-height: 56px;
+  padding: 10px 24px;
+
+  border: 3px solid #238956;
+  border-radius: 29px;
+
+  background: linear-gradient(#71dca2, #39b975);
+  color: #ffffff;
+
+  box-shadow: 0 6px 0 #24814f;
+
+  font-size: clamp(19px, 4.5vw, 24px);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.play-again-button:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 #24814f;
+}
+
+/* -------------------------------------------------
+   CONFETTI
+------------------------------------------------- */
+
+#confettiContainer {
+  position: fixed;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  top: -25px;
+  width: 12px;
+  height: 18px;
+  border-radius: 3px;
+  animation: confettiFall linear forwards;
+}
+
+/* -------------------------------------------------
+   ANIMATIONS
+------------------------------------------------- */
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-8px) rotate(-3deg);
+  }
+
+  40% {
+    transform: translateX(8px) rotate(3deg);
+  }
+
+  60% {
+    transform: translateX(-6px) rotate(-2deg);
+  }
+
+  80% {
+    transform: translateX(6px) rotate(2deg);
+  }
+}
+
+@keyframes tileGlow {
+  from {
+    transform: scale(1);
+    box-shadow:
+      0 5px 0 #258c58,
+      0 0 5px rgba(45, 184, 110, 0.5);
+  }
+
+  to {
+    transform: scale(1.12);
+    box-shadow:
+      0 5px 0 #258c58,
+      0 0 18px 7px rgba(55, 221, 132, 0.8);
+  }
+}
+
+@keyframes answerGlow {
+  from {
+    transform: scale(1);
+    box-shadow: 0 0 4px rgba(45, 185, 112, 0.4);
+  }
+
+  to {
+    transform: scale(1.07);
+    box-shadow: 0 0 16px 6px rgba(45, 185, 112, 0.75);
+  }
+}
+
+@keyframes happyBounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes confettiFall {
+  from {
+    transform: translateY(-25px) rotate(0deg);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(110vh) rotate(760deg);
+    opacity: 0.85;
+  }
+}
+
+/* -------------------------------------------------
+   SHORT SCREENS
+------------------------------------------------- */
+
+@media (max-height: 670px) {
+  .top-bar {
+    min-height: 39px;
+  }
+
+  .game-card {
+    border-radius: 23px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .animal-box {
+    height: clamp(105px, 22vh, 145px);
+  }
+
+  .answer-slot {
+    height: 37px;
+  }
+
+  .letter-tile {
+    height: 41px;
+  }
+
+  .feedback {
+    min-height: 32px;
+    margin-top: 2px;
+  }
+}
+
+/* -------------------------------------------------
+   LANDSCAPE PHONE LAYOUT
+------------------------------------------------- */
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .game-wrapper {
+    max-width: 960px;
+  }
+
+  .top-bar {
+    min-height: 35px;
+  }
+
+  .progress-box {
+    padding: 4px 11px;
+    font-size: 12px;
+  }
+
+  .game-card {
+    display: grid;
+    grid-template-columns: 36% 64%;
+    grid-template-rows: auto 1fr auto auto auto;
+    column-gap: 14px;
+    padding: 5px 14px 7px;
+  }
+
+  .heading-area {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+
+  .clue-area {
+    grid-column: 1;
+    grid-row: 2 / 6;
+    min-height: 0;
+  }
+
+  .animal-box {
+    width: min(29vw, 260px);
+    height: min(47vh, 185px);
+  }
+
+  .answer-section {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+
+  .letters-section {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .feedback {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .answer-slot {
+    width: clamp(25px, 4.2vw, 41px);
+    height: 37px;
+  }
+
+  .letter-tile {
+    width: clamp(28px, 4.5vw, 44px);
+    height: 40px;
+  }
+}
+
+/* Very small phones */
+
+@media (max-width: 390px) {
+  .game-card {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .answer-slots,
+  .letter-board {
+    gap: 2px;
+  }
+
+  .answer-slot {
+    width: min(8.3vw, 32px);
+  }
+
+  .letter-tile {
+    width: min(8.5vw, 34px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Splash screen: logo only for 2 seconds -->
+<section id="splashScreen" class="screen active">
+  <img
+    src="assets/innovine-logo.png"
+    alt="Innovine"
+    draggable="false"
+  >
+</section>
+
+<!-- Game screen -->
+<section id="gameScreen" class="screen">
+  <div class="game-wrapper">
+
+    <header class="top-bar">
+      <div id="progressBox" class="progress-box">
+        Question 1 of 6
+      </div>
+    </header>
+
+    <main class="game-card">
+
+      <div class="heading-area">
+        <h1 class="title">Unscramble the Animal!</h1>
+
+        <p class="instruction">
+          Tap the letters to complete the animal's name.
+        </p>
+      </div>
+
+      <div class="clue-area">
+        <div class="animal-box">
+          <img
+            id="animalImage"
+            src=""
+            alt="Endangered animal"
+            draggable="false"
+          >
+
+          <div id="imageFallback" class="image-fallback">
+            🐾
+          </div>
+        </div>
+      </div>
+
+      <div class="answer-section">
+        <p class="section-label">
+          Complete the spelling
+        </p>
+
+        <div
+          id="answerSlots"
+          class="answer-slots"
+          aria-label="Answer blanks"
+        ></div>
+      </div>
+
+      <div class="letters-section">
+        <p class="section-label">
+          Tap the jumbled letters
+        </p>
+
+        <div
+          id="letterBoard"
+          class="letter-board"
+          aria-label="Jumbled letters"
+        ></div>
+      </div>
+
+      <div
+        id="feedback"
+        class="feedback"
+        aria-live="polite"
+      >
+        Tap a letter to begin.
+      </div>
+
+    </main>
+  </div>
+</section>
+
+<!-- End screen -->
+<section id="endScreen" class="screen">
+
+  <div id="confettiContainer"></div>
+
+  <div class="end-card">
+    <img
+      class="end-logo"
+      src="assets/innovine-logo.png"
+      alt="Innovine"
+      draggable="false"
+    >
+
+    <div class="end-animals">
+      🐋 🐯 🦏
+    </div>
+
+    <h1>Good Job!</h1>
+
+    <p>
+      You completed all the animal names!
+    </p>
+
+    <button
+      id="playAgainButton"
+      class="play-again-button"
+      type="button"
+    >
+      Play Again
+    </button>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  var animals = [
+    {
+      name: "whale",
+      image: "assets/whale.png",
+      emoji: "🐋"
+    },
+    {
+      name: "tiger",
+      image: "assets/tiger.png",
+      emoji: "🐯"
+    },
+    {
+      name: "rhinoceros",
+      image: "assets/rhinoceros.png",
+      emoji: "🦏"
+    },
+    {
+      name: "dolphin",
+      image: "assets/dolphin.png",
+      emoji: "🐬"
+    },
+    {
+      name: "lion",
+      image: "assets/lion.png",
+      emoji: "🦁"
+    },
+    {
+      name: "elephant",
+      image: "assets/elephant.png",
+      emoji: "🐘"
+    }
+  ];
+
+  var splashScreen = document.getElementById("splashScreen");
+  var gameScreen = document.getElementById("gameScreen");
+  var endScreen = document.getElementById("endScreen");
+
+  var progressBox = document.getElementById("progressBox");
+  var animalImage = document.getElementById("animalImage");
+  var imageFallback = document.getElementById("imageFallback");
+
+  var answerSlots = document.getElementById("answerSlots");
+  var letterBoard = document.getElementById("letterBoard");
+  var feedback = document.getElementById("feedback");
+
+  var playAgainButton =
+    document.getElementById("playAgainButton");
+
+  var confettiContainer =
+    document.getElementById("confettiContainer");
+
+  var clapAudio = new Audio("assets/claps.mp3");
+  var wrongAudio = new Audio("assets/wrong.mp3");
+
+  clapAudio.preload = "auto";
+  wrongAudio.preload = "auto";
+
+  var gameAnimals = [];
+  var currentQuestion = 0;
+  var currentWord = "";
+  var currentPosition = 0;
+  var wrongAttempts = 0;
+  var questionLocked = false;
+  var selectedLetters = [];
+  var nextQuestionTimer = null;
+
+  function shuffle(array) {
+    var copiedArray = array.slice();
+
+    for (var i = copiedArray.length - 1; i > 0; i--) {
+      var randomIndex =
+        Math.floor(Math.random() * (i + 1));
+
+      var temporaryValue = copiedArray[i];
+      copiedArray[i] = copiedArray[randomIndex];
+      copiedArray[randomIndex] = temporaryValue;
+    }
+
+    return copiedArray;
+  }
+
+  function createJumbledLetters(word) {
+    var originalLetters = word.toUpperCase().split("");
+    var jumbledLetters;
+    var joinedWord;
+    var attempts = 0;
+
+    do {
+      jumbledLetters = shuffle(originalLetters);
+      joinedWord = jumbledLetters.join("");
+      attempts++;
+    } while (
+      joinedWord === word.toUpperCase() &&
+      attempts < 20
+    );
+
+    if (joinedWord === word.toUpperCase()) {
+      var firstLetter = jumbledLetters.shift();
+      jumbledLetters.push(firstLetter);
+    }
+
+    return jumbledLetters;
+  }
+
+  function showScreen(selectedScreen) {
+    splashScreen.classList.remove("active");
+    gameScreen.classList.remove("active");
+    endScreen.classList.remove("active");
+
+    selectedScreen.classList.add("active");
+  }
+
+  function safelyPlay(audioElement) {
+    try {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+
+      var playPromise = audioElement.play();
+
+      if (
+        playPromise &&
+        typeof playPromise.catch === "function"
+      ) {
+        playPromise.catch(function () {
+          /* Keep playing the game if audio is blocked. */
+        });
+      }
+    } catch (error) {
+      /* Keep playing the game if audio is unavailable. */
+    }
+  }
+
+  function capitalise(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  function startGame() {
+    clearTimeout(nextQuestionTimer);
+
+    gameAnimals = shuffle(animals);
+    currentQuestion = 0;
+
+    confettiContainer.innerHTML = "";
+
+    showScreen(gameScreen);
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    var animal = gameAnimals[currentQuestion];
+
+    currentWord = animal.name.toUpperCase();
+    currentPosition = 0;
+    wrongAttempts = 0;
+    questionLocked = false;
+    selectedLetters = [];
+
+    answerSlots.innerHTML = "";
+    letterBoard.innerHTML = "";
+
+    feedback.textContent = "Tap a letter to begin.";
+    feedback.className = "feedback";
+
+    progressBox.textContent =
+      "Question " +
+      (currentQuestion + 1) +
+      " of " +
+      gameAnimals.length;
+
+    animalImage.style.display = "block";
+    imageFallback.style.display = "none";
+    imageFallback.textContent = animal.emoji;
+
+    animalImage.alt = capitalise(animal.name);
+    animalImage.src = animal.image;
+
+    animalImage.onerror = function () {
+      animalImage.style.display = "none";
+      imageFallback.style.display = "block";
+    };
+
+    createAnswerSlots();
+    createLetterTiles();
+  }
+
+  function createAnswerSlots() {
+    for (var i = 0; i < currentWord.length; i++) {
+      var slot = document.createElement("button");
+
+      slot.type = "button";
+      slot.className = "answer-slot";
+      slot.setAttribute("data-position", i);
+      slot.setAttribute(
+        "aria-label",
+        "Blank letter " + (i + 1)
+      );
+
+      slot.addEventListener(
+        "click",
+        removeLetterFromSlot
+      );
+
+      answerSlots.appendChild(slot);
+    }
+  }
+
+  function createLetterTiles() {
+    var jumbledLetters =
+      createJumbledLetters(currentWord);
+
+    for (var i = 0; i < jumbledLetters.length; i++) {
+      var tile = document.createElement("button");
+
+      tile.type = "button";
+      tile.className = "letter-tile";
+      tile.textContent = jumbledLetters[i];
+
+      tile.setAttribute("data-letter", jumbledLetters[i]);
+      tile.setAttribute("data-tile-id", "tile-" + i);
+      tile.setAttribute(
+        "aria-label",
+        "Letter " + jumbledLetters[i]
+      );
+
+      tile.addEventListener("click", chooseLetter);
+
+      letterBoard.appendChild(tile);
+    }
+  }
+
+  function chooseLetter(event) {
+    if (questionLocked) {
+      return;
+    }
+
+    var selectedTile = event.currentTarget;
+
+    if (selectedTile.classList.contains("used")) {
+      return;
+    }
+
+    var selectedLetter =
+      selectedTile.getAttribute("data-letter");
+
+    var correctLetter =
+      currentWord.charAt(currentPosition);
+
+    clearLetterHints();
+
+    if (selectedLetter === correctLetter) {
+      placeCorrectLetter(selectedTile, selectedLetter);
+    } else {
+      handleWrongLetter(selectedTile);
+    }
+  }
+
+  function placeCorrectLetter(tile, letter) {
+    var slots =
+      answerSlots.getElementsByClassName("answer-slot");
+
+    var currentSlot = slots[currentPosition];
+
+    currentSlot.textContent = letter;
+    currentSlot.classList.add("filled");
+    currentSlot.setAttribute(
+      "data-tile-id",
+      tile.getAttribute("data-tile-id")
+    );
+
+    tile.classList.add("used");
+
+    selectedLetters[currentPosition] = {
+      letter: letter,
+      tileId: tile.getAttribute("data-tile-id")
+    };
+
+    currentPosition++;
+    wrongAttempts = 0;
+
+    feedback.textContent =
+      currentPosition === currentWord.length
+        ? "Wonderful!"
+        : "Good! Choose the next letter.";
+
+    feedback.className = "feedback good";
+
+    if (currentPosition === currentWord.length) {
+      completeWord();
+    }
+  }
+
+  function handleWrongLetter(tile) {
+    wrongAttempts++;
+
+    safelyPlay(wrongAudio);
+
+    tile.classList.remove("shake");
+
+    void tile.offsetWidth;
+
+    tile.classList.add("shake");
+
+    setTimeout(function () {
+      tile.classList.remove("shake");
+    }, 430);
+
+    if (wrongAttempts >= 2) {
+      feedback.textContent =
+        "Look for the glowing letter.";
+
+      feedback.className = "feedback hint";
+
+      glowCorrectLetter();
+    } else {
+      feedback.textContent =
+        "Oops! Try another letter.";
+
+      feedback.className = "feedback wrong";
+    }
+  }
+
+  function glowCorrectLetter() {
+    var correctLetter =
+      currentWord.charAt(currentPosition);
+
+    var tiles =
+      letterBoard.getElementsByClassName("letter-tile");
+
+    for (var i = 0; i < tiles.length; i++) {
+      var tileLetter =
+        tiles[i].getAttribute("data-letter");
+
+      if (
+        tileLetter === correctLetter &&
+        !tiles[i].classList.contains("used")
+      ) {
+        tiles[i].classList.add("hint-glow");
+        break;
+      }
+    }
+
+    var slots =
+      answerSlots.getElementsByClassName("answer-slot");
+
+    if (slots[currentPosition]) {
+      slots[currentPosition].classList.add(
+        "answer-glow"
+      );
+    }
+  }
+
+  function clearLetterHints() {
+    var glowingTiles =
+      letterBoard.querySelectorAll(".hint-glow");
+
+    for (var i = 0; i < glowingTiles.length; i++) {
+      glowingTiles[i].classList.remove("hint-glow");
+    }
+
+    var glowingSlots =
+      answerSlots.querySelectorAll(".answer-glow");
+
+    for (var j = 0; j < glowingSlots.length; j++) {
+      glowingSlots[j].classList.remove(
+        "answer-glow"
+      );
+    }
+  }
+
+  function removeLetterFromSlot(event) {
+    if (questionLocked) {
+      return;
+    }
+
+    var clickedSlot = event.currentTarget;
+    var slotPosition = parseInt(
+      clickedSlot.getAttribute("data-position"),
+      10
+    );
+
+    if (
+      clickedSlot.textContent === "" ||
+      slotPosition !== currentPosition - 1
+    ) {
+      return;
+    }
+
+    var tileId =
+      clickedSlot.getAttribute("data-tile-id");
+
+    var matchingTile = letterBoard.querySelector(
+      '[data-tile-id="' + tileId + '"]'
+    );
+
+    if (matchingTile) {
+      matchingTile.classList.remove("used");
+    }
+
+    clickedSlot.textContent = "";
+    clickedSlot.classList.remove(
+      "filled",
+      "correct",
+      "answer-glow"
+    );
+
+    clickedSlot.removeAttribute("data-tile-id");
+
+    selectedLetters.splice(slotPosition, 1);
+    currentPosition = slotPosition;
+    wrongAttempts = 0;
+
+    clearLetterHints();
+
+    feedback.textContent =
+      "Choose a different letter.";
+
+    feedback.className = "feedback";
+  }
+
+  function completeWord() {
+    questionLocked = true;
+
+    var slots =
+      answerSlots.getElementsByClassName("answer-slot");
+
+    for (var i = 0; i < slots.length; i++) {
+      slots[i].classList.remove(
+        "filled",
+        "answer-glow"
+      );
+
+      slots[i].classList.add("correct");
+    }
+
+    feedback.textContent = "✓ Good job!";
+    feedback.className = "feedback good";
+
+    safelyPlay(clapAudio);
+
+    nextQuestionTimer = setTimeout(function () {
+      currentQuestion++;
+
+      if (currentQuestion < gameAnimals.length) {
+        loadQuestion();
+      } else {
+        finishGame();
+      }
+    }, 1500);
+  }
+
+  function finishGame() {
+    showScreen(endScreen);
+    safelyPlay(clapAudio);
+    createConfetti();
+  }
+
+  function createConfetti() {
+    var colours = [
+      "#ff5470",
+      "#ffcf56",
+      "#4ecdc4",
+      "#6c63ff",
+      "#55c271",
+      "#ff83c1",
+      "#4ba3ff"
+    ];
+
+    confettiContainer.innerHTML = "";
+
+    for (var i = 0; i < 80; i++) {
+      var piece = document.createElement("span");
+
+      piece.className = "confetti";
+
+      piece.style.left =
+        Math.random() * 100 + "%";
+
+      piece.style.backgroundColor =
+        colours[
+          Math.floor(Math.random() * colours.length)
+        ];
+
+      piece.style.animationDelay =
+        Math.random() * 1.4 + "s";
+
+      piece.style.animationDuration =
+        2.7 + Math.random() * 2.4 + "s";
+
+      piece.style.transform =
+        "rotate(" +
+        Math.floor(Math.random() * 360) +
+        "deg)";
+
+      confettiContainer.appendChild(piece);
+    }
+  }
+
+  playAgainButton.addEventListener("click", function () {
+    startGame();
+  });
+
+  /* Display logo splash for 2 seconds. */
+  setTimeout(function () {
+    startGame();
+  }, 2000);
+})();
+</script>
+
+</body>
+</html>
