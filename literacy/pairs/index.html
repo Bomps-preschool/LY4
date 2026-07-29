@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Pair Up Fun</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --app-height: 100vh;
+  --target-size: 155px;
+  --option-size: 145px;
+  --grid-gap: 10px;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: var(--app-height);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #fff7db;
+  touch-action: manipulation;
+}
+
+.screen {
+  width: 100vw;
+  height: var(--app-height);
+  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.active {
+  display: flex;
+}
+
+/* Splash */
+#splash {
+  background: white;
+  align-items: center;
+  justify-content: center;
+}
+
+#splash img {
+  width: min(42vw, 190px);
+  height: auto;
+}
+
+/* Background */
+.game-bg {
+  background:
+    linear-gradient(rgba(255,255,255,0.14), rgba(255,255,255,0.14)),
+    url("assets/background-pairs.png") center/cover no-repeat;
+}
+
+/* Start screen */
+#startScreen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+}
+
+.start-card {
+  width: min(92vw, 560px);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+  padding: 26px 20px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  border: 4px solid #ffd86b;
+}
+
+.game-title {
+  font-size: clamp(34px, 8vw, 56px);
+  color: #ff7a00;
+  margin: 0 0 10px;
+  font-weight: 900;
+  text-shadow: 2px 3px 0 #ffe1a3;
+}
+
+.instruction {
+  font-size: clamp(20px, 4.8vw, 30px);
+  color: #333;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 8px 0 20px;
+}
+
+.start-btn,
+.play-btn {
+  border: none;
+  background: linear-gradient(180deg, #3bd66f, #16a84c);
+  color: white;
+  font-size: clamp(22px, 5vw, 32px);
+  font-weight: 900;
+  padding: 14px 36px;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 7px 0 #087a33, 0 10px 20px rgba(0,0,0,0.22);
+}
+
+.start-btn:active,
+.play-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 3px 0 #087a33;
+}
+
+/* Game screen */
+#gameScreen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 10px 10px;
+}
+
+.top-bar {
+  width: min(94vw, 900px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.badge {
+  background: #ffffffee;
+  color: #333;
+  padding: 7px 13px;
+  border-radius: 18px;
+  font-size: clamp(14px, 3.8vw, 20px);
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 3px solid #ffd86b;
+  white-space: nowrap;
+}
+
+.question-title {
+  width: min(96vw, 900px);
+  text-align: center;
+  margin: 6px 0 4px;
+  font-size: clamp(24px, 6vw, 38px);
+  line-height: 1;
+  color: #d99a00;
+  font-weight: 900;
+  text-shadow: 2px 3px 0 rgba(255,255,255,0.85);
+  flex: 0 0 auto;
+}
+
+.question-area {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.target-card {
+  width: var(--target-size);
+  height: var(--target-size);
+  background: #ffffffee;
+  border-radius: 24px;
+  border: 5px solid #ffbd35;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.target-card::after {
+  content: "Find my pair!";
+  position: absolute;
+  bottom: -18px;
+  background: #ff7a00;
+  color: white;
+  padding: 5px 14px;
+  border-radius: 18px;
+  font-weight: 900;
+  font-size: clamp(12px, 3.2vw, 16px);
+  white-space: nowrap;
+}
+
+.target-card img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.options-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, var(--option-size));
+  grid-template-rows: repeat(2, var(--option-size));
+  gap: var(--grid-gap);
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.option {
+  width: var(--option-size);
+  height: var(--option-size);
+  background: #ffffffee;
+  border: 4px solid #87d8ff;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #4aa9d7, 0 8px 16px rgba(0,0,0,0.18);
+  transition: transform 0.15s ease;
+  position: relative;
+}
+
+.option img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.option:active {
+  transform: scale(0.97);
+}
+
+.option.correct {
+  border-color: #22c55e;
+  box-shadow: 0 6px 0 #15803d, 0 0 20px #55ff91;
+  background: #edfff3;
+}
+
+.glow {
+  animation: glowPulse 0.8s infinite alternate;
+}
+
+@keyframes glowPulse {
+  from {
+    box-shadow: 0 6px 0 #15803d, 0 0 10px #47ff80;
+    transform: scale(1);
+  }
+  to {
+    box-shadow: 0 6px 0 #15803d, 0 0 28px #47ff80;
+    transform: scale(1.04);
+  }
+}
+
+.wiggle {
+  animation: wiggle 0.4s ease;
+  border-color: #ff4d4d;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.feedback {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 20;
+  background: white;
+  color: #16a34a;
+  border: 5px solid #22c55e;
+  border-radius: 28px;
+  padding: 16px 28px;
+  font-size: clamp(30px, 8vw, 56px);
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  text-align: center;
+  pointer-events: none;
+}
+
+.feedback.show {
+  animation: pop 0.8s ease forwards;
+}
+
+@keyframes pop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  25% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+  75% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+}
+
+/* End screen */
+#endScreen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+}
+
+.end-card {
+  width: min(92vw, 560px);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  padding: 28px 20px;
+  border: 5px solid #ffbd35;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+  z-index: 5;
+}
+
+.end-title {
+  font-size: clamp(42px, 10vw, 70px);
+  color: #16a34a;
+  font-weight: 900;
+  margin: 0 0 10px;
+  text-shadow: 2px 3px 0 #c5f7d3;
+}
+
+.end-msg {
+  font-size: clamp(21px, 5vw, 32px);
+  color: #333;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Tablet / Desktop */
+@media (min-width: 700px) {
+  :root {
+    --target-size: 210px;
+    --option-size: 160px;
+    --grid-gap: 16px;
+  }
+
+  #gameScreen {
+    padding: 12px;
+  }
+
+  .question-title {
+    margin: 8px 0 6px;
+  }
+
+  .options-grid {
+    grid-template-columns: repeat(4, var(--option-size));
+    grid-template-rows: repeat(1, var(--option-size));
+    margin-top: 32px;
+  }
+}
+
+/* Very small phone height */
+@media (max-width: 430px) and (max-height: 720px) {
+  #gameScreen {
+    padding: 6px 8px 8px;
+  }
+
+  .badge {
+    padding: 6px 10px;
+    border-radius: 15px;
+    border-width: 3px;
+  }
+
+  .question-title {
+    margin: 5px 0 3px;
+    font-size: clamp(22px, 6vw, 28px);
+  }
+
+  .target-card {
+    border-radius: 20px;
+    border-width: 4px;
+    padding: 9px;
+  }
+
+  .target-card::after {
+    bottom: -15px;
+    padding: 4px 12px;
+  }
+
+  .options-grid {
+    margin-top: 24px;
+  }
+
+  .option {
+    border-radius: 18px;
+    border-width: 4px;
+    padding: 7px;
+  }
+}
+
+/* Landscape phones */
+@media (orientation: landscape) and (max-height: 520px) {
+  #gameScreen {
+    padding: 6px;
+  }
+
+  .question-title {
+    font-size: clamp(18px, 4vw, 26px);
+    margin: 4px 0;
+  }
+
+  .question-area {
+    flex-direction: row;
+    justify-content: center;
+    gap: 22px;
+  }
+
+  .target-card {
+    width: min(24vw, 130px);
+    height: min(24vw, 130px);
+  }
+
+  .options-grid {
+    margin-top: 0;
+    grid-template-columns: repeat(4, min(18vw, 115px));
+    grid-template-rows: repeat(1, min(18vw, 115px));
+    gap: 8px;
+  }
+
+  .option {
+    width: min(18vw, 115px);
+    height: min(18vw, 115px);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<section id="splash" class="screen active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</section>
+
+<section id="startScreen" class="screen game-bg">
+  <div class="start-card">
+    <h1 class="game-title">Pair Up Fun!</h1>
+    <p class="instruction">Look at the picture and tap its matching pair.</p>
+    <button class="start-btn" onclick="startGame()">Start</button>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen game-bg">
+  <div class="top-bar">
+    <div class="badge" id="questionCount">Question 1 / 5</div>
+    <div class="badge" id="scoreCount">Score: 0</div>
+  </div>
+
+  <div class="question-title">Match the pair</div>
+
+  <div class="question-area">
+    <div class="target-card">
+      <img id="targetImage" src="" alt="">
+    </div>
+
+    <div class="options-grid" id="optionsGrid"></div>
+  </div>
+
+  <div id="feedback" class="feedback">✓<br>Good job!</div>
+</section>
+
+<section id="endScreen" class="screen game-bg">
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="end-card">
+    <h2 class="end-title">Good Job!</h2>
+    <p class="end-msg" id="finalScore">You matched all pairs!</p>
+    <button class="play-btn" onclick="restartGame()">Play Again</button>
+  </div>
+</section>
+
+<audio id="clapSound" src="assets/claps.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+
+<script>
+function setAppHeightAndSizes() {
+  const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const visualWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+
+  document.documentElement.style.setProperty("--app-height", visualHeight + "px");
+
+  if (visualWidth < 700) {
+    let targetSize = Math.min(155, Math.max(108, visualWidth * 0.36, visualHeight * 0.19));
+
+    const topBarSpace = 48;
+    const titleSpace = 35;
+    const findPairLabelSpace = 18;
+    const verticalGaps = 34;
+    const bottomPadding = 12;
+
+    let remainingForOptions = visualHeight - topBarSpace - titleSpace - targetSize - findPairLabelSpace - verticalGaps - bottomPadding;
+    let optionByHeight = (remainingForOptions - 10) / 2;
+    let optionByWidth = (visualWidth * 0.86 - 10) / 2;
+
+    let optionSize = Math.min(optionByHeight, optionByWidth, 155);
+
+    if (optionSize < 108) {
+      targetSize = Math.max(96, targetSize - 16);
+      remainingForOptions = visualHeight - topBarSpace - titleSpace - targetSize - findPairLabelSpace - verticalGaps - bottomPadding;
+      optionByHeight = (remainingForOptions - 10) / 2;
+      optionSize = Math.min(optionByHeight, optionByWidth, 145);
+    }
+
+    optionSize = Math.max(96, Math.floor(optionSize));
+    targetSize = Math.floor(targetSize);
+
+    document.documentElement.style.setProperty("--target-size", targetSize + "px");
+    document.documentElement.style.setProperty("--option-size", optionSize + "px");
+    document.documentElement.style.setProperty("--grid-gap", "10px");
+  } else {
+    document.documentElement.style.setProperty("--target-size", "210px");
+    document.documentElement.style.setProperty("--option-size", "160px");
+    document.documentElement.style.setProperty("--grid-gap", "16px");
+  }
+}
+
+setAppHeightAndSizes();
+
+window.addEventListener("resize", setAppHeightAndSizes);
+window.addEventListener("orientationchange", () => {
+  setTimeout(setAppHeightAndSizes, 300);
+});
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", setAppHeightAndSizes);
+  window.visualViewport.addEventListener("scroll", setAppHeightAndSizes);
+}
+
+const allPairs = [
+  { question: "book.png", answer: "pencil.png" },
+  { question: "lock.png", answer: "key.png" },
+  { question: "socks.png", answer: "shoes.png" },
+  { question: "comb.png", answer: "hair.png" },
+  { question: "bee.png", answer: "flowers.png" },
+  { question: "spoon.png", answer: "fork.png" },
+  { question: "nail.png", answer: "hammer.png" },
+  { question: "candle.png", answer: "matchstiks.png" },
+  { question: "nuts.png", answer: "bolts.png" }
+];
+
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let wrongAttempts = 0;
+let locked = false;
+
+const totalQuestions = 5;
+
+const splash = document.getElementById("splash");
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const endScreen = document.getElementById("endScreen");
+const targetImage = document.getElementById("targetImage");
+const optionsGrid = document.getElementById("optionsGrid");
+const questionCount = document.getElementById("questionCount");
+const scoreCount = document.getElementById("scoreCount");
+const feedback = document.getElementById("feedback");
+const clapSound = document.getElementById("clapSound");
+const wrongSound = document.getElementById("wrongSound");
+const finalScore = document.getElementById("finalScore");
+
+window.addEventListener("load", () => {
+  setAppHeightAndSizes();
+  setTimeout(() => {
+    showScreen(startScreen);
+  }, 2000);
+});
+
+function showScreen(screen) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  screen.classList.add("active");
+  setAppHeightAndSizes();
+}
+
+function startGame() {
+  questions = shuffleArray([...allPairs]).slice(0, totalQuestions);
+  currentIndex = 0;
+  score = 0;
+  wrongAttempts = 0;
+  locked = false;
+  showScreen(gameScreen);
+  loadQuestion();
+}
+
+function restartGame() {
+  stopConfetti();
+  startGame();
+}
+
+function loadQuestion() {
+  setAppHeightAndSizes();
+
+  locked = false;
+  wrongAttempts = 0;
+  feedback.classList.remove("show");
+  optionsGrid.innerHTML = "";
+
+  const current = questions[currentIndex];
+  targetImage.src = "assets/" + current.question;
+
+  questionCount.textContent = "Question " + (currentIndex + 1) + " / " + totalQuestions;
+  scoreCount.textContent = "Score: " + score;
+
+  let wrongChoices = allPairs
+    .map(p => p.answer)
+    .filter(answer => answer !== current.answer);
+
+  wrongChoices = shuffleArray(wrongChoices).slice(0, 3);
+
+  let optionFiles = shuffleArray([current.answer, ...wrongChoices]);
+
+  optionFiles.forEach(file => {
+    const option = document.createElement("button");
+    option.className = "option";
+    option.dataset.file = file;
+
+    const img = document.createElement("img");
+    img.src = "assets/" + file;
+    img.alt = "";
+
+    option.appendChild(img);
+    option.addEventListener("click", () => checkAnswer(option, file));
+    optionsGrid.appendChild(option);
+  });
+}
+
+function checkAnswer(option, selectedFile) {
+  if (locked) return;
+
+  const correctFile = questions[currentIndex].answer;
+
+  if (selectedFile === correctFile) {
+    locked = true;
+    score++;
+    scoreCount.textContent = "Score: " + score;
+    option.classList.add("correct");
+
+    playSound(clapSound);
+    showGoodJob();
+
+    setTimeout(() => {
+      currentIndex++;
+      if (currentIndex < totalQuestions) {
+        loadQuestion();
+      } else {
+        endGame();
+      }
+    }, 1200);
+
+  } else {
+    wrongAttempts++;
+    playSound(wrongSound);
+
+    option.classList.add("wiggle");
+    setTimeout(() => {
+      option.classList.remove("wiggle");
+    }, 450);
+
+    if (wrongAttempts >= 2) {
+      const correctOption = [...document.querySelectorAll(".option")]
+        .find(btn => btn.dataset.file === correctFile);
+
+      if (correctOption) {
+        correctOption.classList.add("glow");
+      }
+    }
+  }
+}
+
+function showGoodJob() {
+  feedback.classList.remove("show");
+  void feedback.offsetWidth;
+  feedback.classList.add("show");
+}
+
+function endGame() {
+  finalScore.textContent = "You matched " + score + " out of " + totalQuestions + " pairs!";
+  showScreen(endScreen);
+  playSound(clapSound);
+  startConfetti();
+}
+
+function playSound(audio) {
+  try {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  } catch(e) {}
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/* Confetti */
+const canvas = document.getElementById("confettiCanvas");
+const ctx = canvas.getContext("2d");
+let confettiPieces = [];
+let confettiAnimation;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+function startConfetti() {
+  resizeCanvas();
+  confettiPieces = [];
+
+  for (let i = 0; i < 100; i++) {
+    confettiPieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      size: Math.random() * 8 + 5,
+      speed: Math.random() * 3 + 2,
+      rotate: Math.random() * 360,
+      rotateSpeed: Math.random() * 8 - 4
+    });
+  }
+
+  animateConfetti();
+}
+
+function animateConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  confettiPieces.forEach(p => {
+    p.y += p.speed;
+    p.rotate += p.rotateSpeed;
+
+    if (p.y > canvas.height) {
+      p.y = -20;
+      p.x = Math.random() * canvas.width;
+    }
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotate * Math.PI / 180);
+    ctx.fillStyle = getConfettiColor(p.x + p.y);
+    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    ctx.restore();
+  });
+
+  confettiAnimation = requestAnimationFrame(animateConfetti);
+}
+
+function stopConfetti() {
+  cancelAnimationFrame(confettiAnimation);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function getConfettiColor(seed) {
+  const colors = ["#ff4d6d", "#ffd93d", "#6bcb77", "#4d96ff", "#ff922b", "#b197fc"];
+  return colors[Math.floor(seed) % colors.length];
+}
+</script>
+
+</body>
+</html>
