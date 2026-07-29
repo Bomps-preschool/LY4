@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0,
+  user-scalable=no, viewport-fit=cover"
+>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<title>Sequence Adventure</title>
+
+<style>
+/* =====================================================
+   BASIC RESET
+===================================================== */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #ffffff;
+  color: #27475a;
+}
+
+button {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* =====================================================
+   SCREENS
+===================================================== */
+
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* =====================================================
+   SPLASH SCREEN
+===================================================== */
+
+#splashScreen {
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+#splashScreen img {
+  width: 240px;
+  max-width: 68vw;
+  max-height: 55vh;
+  object-fit: contain;
+}
+
+/* =====================================================
+   GAME BACKGROUND
+===================================================== */
+
+#gameScreen {
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    max(8px, env(safe-area-inset-top))
+    max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom))
+    max(8px, env(safe-area-inset-left));
+
+  background:
+    radial-gradient(circle at 8% 14%, #ffffff 0 31px, transparent 32px),
+    radial-gradient(circle at 93% 15%, #ffffff 0 38px, transparent 39px),
+    radial-gradient(circle at 10% 88%, #ffe9a8 0 43px, transparent 44px),
+    radial-gradient(circle at 90% 87%, #d3f4ff 0 50px, transparent 51px),
+    linear-gradient(135deg, #e8f9d7, #fff2c5 52%, #dff6ff);
+}
+
+.game-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 1050px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.top-bar {
+  width: 100%;
+  min-height: 46px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 3px;
+}
+
+.game-name {
+  color: #d94e86;
+  font-size: 18px;
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: 900;
+}
+
+.progress-box {
+  padding: 7px 14px;
+
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid #5bb697;
+  border-radius: 22px;
+
+  box-shadow: 0 4px 0 rgba(42, 130, 99, 0.17);
+
+  color: #315368;
+  font-size: 15px;
+  font-size: clamp(12px, 2.8vw, 17px);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+/* =====================================================
+   GAME CARD
+===================================================== */
+
+.game-card {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  padding: 10px 16px 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(255, 255, 255, 0.97);
+  border: 4px solid #60b794;
+  border-radius: 28px;
+
+  box-shadow:
+    0 8px 0 rgba(42, 129, 96, 0.17),
+    0 15px 28px rgba(54, 104, 91, 0.13);
+}
+
+.game-card::before,
+.game-card::after {
+  content: "";
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.22;
+}
+
+.game-card::before {
+  top: -26px;
+  left: -24px;
+  background: #76d7a4;
+}
+
+.game-card::after {
+  right: -25px;
+  bottom: -27px;
+  background: #7dcbed;
+}
+
+/* =====================================================
+   HEADING
+===================================================== */
+
+.heading-area {
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.heading-area h1 {
+  margin: 0;
+  color: #e1538a;
+
+  font-size: 30px;
+  font-size: clamp(22px, 4.8vw, 37px);
+  line-height: 1.05;
+}
+
+.instruction {
+  margin: 4px 0 0;
+  color: #506d7c;
+
+  font-size: 16px;
+  font-size: clamp(12px, 2.8vw, 18px);
+  font-weight: 700;
+}
+
+.sequence-title {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 5px 15px;
+
+  border-radius: 18px;
+  background: #fff1bc;
+  color: #805c13;
+
+  font-size: 16px;
+  font-size: clamp(13px, 3vw, 19px);
+  font-weight: 900;
+}
+
+/* =====================================================
+   ANSWER SPACES
+===================================================== */
+
+.answer-area {
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.area-label {
+  margin: 2px 0 5px;
+  color: #617681;
+
+  font-size: 14px;
+  font-size: clamp(12px, 2.6vw, 16px);
+  font-weight: 900;
+}
+
+.answer-row {
+  width: 100%;
+  min-height: 100px;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+}
+
+.answer-place {
+  position: relative;
+  width: 31%;
+  max-width: 230px;
+  min-height: 96px;
+
+  padding: 7px;
+
+  border: 3px dashed #88b9cf;
+  border-radius: 18px;
+  background: #f4fbff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: #7994a1;
+}
+
+.answer-place.active-place {
+  border-color: #e5a53d;
+  background: #fff9df;
+  animation: placePulse 0.9s infinite alternate;
+}
+
+.answer-place.filled {
+  border-style: solid;
+  border-color: #51b77c;
+  background: #e5f9eb;
+  animation: none;
+}
+
+.place-number {
+  position: absolute;
+  top: -10px;
+  left: -8px;
+
+  width: 31px;
+  height: 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background: #5faed4;
+  color: #ffffff;
+
+  box-shadow: 0 3px 0 #397fa1;
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.answer-place.filled .place-number {
+  background: #38ad6b;
+  box-shadow: 0 3px 0 #21894f;
+}
+
+.placeholder-text {
+  color: #93a9b3;
+  font-size: 14px;
+  font-size: clamp(11px, 2.3vw, 15px);
+  font-weight: 800;
+}
+
+.placed-emoji {
+  font-size: 38px;
+  font-size: clamp(27px, 7vw, 45px);
+  line-height: 1;
+}
+
+.placed-label {
+  margin-top: 3px;
+  color: #245c49;
+
+  font-size: 14px;
+  font-size: clamp(10px, 2.4vw, 15px);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.green-tick {
+  position: absolute;
+  top: -8px;
+  right: -7px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background: #27ad65;
+  color: #ffffff;
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* =====================================================
+   JUMBLED PICTURE CARDS
+===================================================== */
+
+.options-area {
+  width: 100%;
+  flex: 1;
+  min-height: 125px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.option-row {
+  width: 100%;
+
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sequence-option {
+  position: relative;
+  width: 31%;
+  max-width: 230px;
+  min-height: 115px;
+
+  padding: 8px 6px;
+
+  border: 3px solid #72b8da;
+  border-radius: 19px;
+
+  background: linear-gradient(180deg, #ffffff, #eaf8ff);
+
+  box-shadow:
+    0 6px 0 #4693b8,
+    0 9px 15px rgba(57, 118, 145, 0.13);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: #305b70;
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.sequence-option:active {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 #4693b8,
+    0 4px 8px rgba(57, 118, 145, 0.12);
+}
+
+.option-emoji {
+  font-size: 53px;
+  font-size: clamp(37px, 10vw, 64px);
+  line-height: 1;
+}
+
+.option-label {
+  margin-top: 6px;
+
+  color: #315b70;
+  font-size: 16px;
+  font-size: clamp(11px, 2.7vw, 17px);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.08;
+}
+
+.sequence-option.used {
+  opacity: 0.2;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+
+.sequence-option.wrong-option {
+  border-color: #e26b6b;
+  background: #fff0ef;
+  box-shadow: 0 6px 0 #c85151;
+}
+
+.sequence-option.correct-glow {
+  border-color: #28a965;
+  background: #dff8e7;
+  color: #12643c;
+
+  animation: correctGlow 0.7s infinite alternate;
+}
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+.feedback {
+  width: 100%;
+  min-height: 42px;
+  flex-shrink: 0;
+
+  margin-top: 5px;
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #60747e;
+  text-align: center;
+
+  font-size: 18px;
+  font-size: clamp(14px, 3.3vw, 21px);
+  font-weight: 900;
+}
+
+.feedback.good {
+  color: #147848;
+  background: #dcf8e4;
+}
+
+.feedback.wrong {
+  color: #ae4545;
+  background: #fff0ef;
+}
+
+.feedback.hint {
+  color: #855f0e;
+  background: #fff2bd;
+}
+
+/* =====================================================
+   END SCREEN
+===================================================== */
+
+#endScreen {
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    max(14px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+
+  background:
+    radial-gradient(circle at 10% 17%, #ffffff 0 41px, transparent 42px),
+    radial-gradient(circle at 91% 82%, #ffffff 0 52px, transparent 53px),
+    linear-gradient(140deg, #dcf8ff, #fff1c2, #e3ffd7);
+}
+
+.end-card {
+  position: relative;
+  z-index: 4;
+
+  width: 92%;
+  max-width: 620px;
+
+  padding: 22px 17px;
+
+  background: #ffffff;
+  border: 5px solid #58b38b;
+  border-radius: 34px;
+
+  box-shadow:
+    0 10px 0 rgba(39, 127, 91, 0.18),
+    0 20px 35px rgba(44, 100, 82, 0.14);
+
+  text-align: center;
+}
+
+.end-logo {
+  width: 135px;
+  max-height: 76px;
+  object-fit: contain;
+}
+
+.end-icons {
+  margin: 3px 0;
+  font-size: 64px;
+  font-size: clamp(46px, 13vw, 78px);
+  line-height: 1;
+  animation: happyBounce 1.15s infinite;
+}
+
+.end-card h1 {
+  margin: 5px 0;
+  color: #e1538a;
+
+  font-size: 43px;
+  font-size: clamp(31px, 9vw, 53px);
+}
+
+.end-card p {
+  margin: 7px 0 18px;
+  color: #4e6c79;
+
+  font-size: 20px;
+  font-size: clamp(16px, 4vw, 23px);
+  font-weight: 900;
+}
+
+.play-again-button {
+  min-width: 190px;
+  min-height: 57px;
+
+  padding: 10px 25px;
+
+  border: 3px solid #218652;
+  border-radius: 29px;
+
+  background: linear-gradient(#72dda4, #39b974);
+  color: #ffffff;
+
+  box-shadow: 0 6px 0 #247f4e;
+
+  font-size: 22px;
+  font-size: clamp(19px, 4.6vw, 25px);
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.play-again-button:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 #247f4e;
+}
+
+/* =====================================================
+   CONFETTI
+===================================================== */
+
+#confettiContainer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  top: -25px;
+
+  width: 12px;
+  height: 18px;
+  border-radius: 3px;
+
+  animation: confettiFall linear forwards;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+.giggle {
+  animation: giggle 0.42s ease;
+}
+
+@keyframes giggle {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+
+  20% {
+    transform: translateX(-8px) rotate(-3deg);
+  }
+
+  40% {
+    transform: translateX(8px) rotate(3deg);
+  }
+
+  60% {
+    transform: translateX(-6px) rotate(-2deg);
+  }
+
+  80% {
+    transform: translateX(6px) rotate(2deg);
+  }
+}
+
+@keyframes correctGlow {
+  from {
+    transform: scale(1);
+    box-shadow:
+      0 6px 0 #258b56,
+      0 0 5px rgba(45, 184, 110, 0.4);
+  }
+
+  to {
+    transform: scale(1.06);
+    box-shadow:
+      0 6px 0 #258b56,
+      0 0 19px 8px rgba(55, 221, 132, 0.78);
+  }
+}
+
+@keyframes placePulse {
+  from {
+    box-shadow: 0 0 3px rgba(232, 167, 62, 0.2);
+  }
+
+  to {
+    box-shadow: 0 0 14px 5px rgba(232, 167, 62, 0.42);
+  }
+}
+
+@keyframes happyBounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes confettiFall {
+  from {
+    transform: translateY(-25px) rotate(0deg);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(110vh) rotate(760deg);
+    opacity: 0.88;
+  }
+}
+
+/* =====================================================
+   SHORT SCREENS
+===================================================== */
+
+@media (max-height: 690px) {
+  .top-bar {
+    min-height: 38px;
+  }
+
+  .game-card {
+    padding-top: 6px;
+    padding-bottom: 7px;
+  }
+
+  .sequence-title {
+    margin-top: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .answer-row {
+    min-height: 82px;
+  }
+
+  .answer-place {
+    min-height: 78px;
+  }
+
+  .sequence-option {
+    min-height: 94px;
+  }
+
+  .option-emoji {
+    font-size: 41px;
+  }
+
+  .placed-emoji {
+    font-size: 30px;
+  }
+
+  .feedback {
+    min-height: 34px;
+    margin-top: 2px;
+  }
+}
+
+/* =====================================================
+   LANDSCAPE PHONES
+===================================================== */
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .top-bar {
+    min-height: 34px;
+  }
+
+  .game-name {
+    font-size: 13px;
+  }
+
+  .progress-box {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .game-card {
+    display: grid;
+    grid-template-columns: 45% 55%;
+    grid-template-rows: auto 1fr auto;
+    gap: 5px 12px;
+
+    padding: 5px 12px 7px;
+  }
+
+  .heading-area {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+
+  .heading-area h1 {
+    font-size: 22px;
+  }
+
+  .instruction {
+    margin-top: 1px;
+    font-size: 12px;
+  }
+
+  .sequence-title {
+    margin-top: 2px;
+    padding: 2px 11px;
+    font-size: 12px;
+  }
+
+  .answer-area {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+  }
+
+  .options-area {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 0;
+  }
+
+  .feedback {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    min-height: 30px;
+    margin-top: 0;
+    padding: 3px 8px;
+  }
+
+  .answer-row {
+    min-height: 100px;
+    gap: 5px;
+  }
+
+  .answer-place {
+    min-height: 96px;
+    padding: 4px;
+  }
+
+  .option-row {
+    gap: 6px;
+  }
+
+  .sequence-option {
+    min-height: 105px;
+    padding: 5px;
+  }
+
+  .option-emoji {
+    font-size: 42px;
+  }
+
+  .option-label,
+  .placed-label {
+    font-size: 10px;
+  }
+}
+
+/* =====================================================
+   SMALL WIDTH PHONES
+===================================================== */
+
+@media (max-width: 390px) {
+  .game-card {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .answer-row,
+  .option-row {
+    gap: 5px;
+  }
+
+  .answer-place,
+  .sequence-option {
+    width: 32%;
+    border-radius: 14px;
+  }
+
+  .place-number {
+    width: 27px;
+    height: 27px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==================================================
+     SPLASH SCREEN
+================================================== -->
+
+<section id="splashScreen" class="screen active">
+  <img
+    src="assets/innovine-logo.png"
+    alt="Innovine"
+    draggable="false"
+  >
+</section>
+
+<!-- ==================================================
+     GAME SCREEN
+================================================== -->
+
+<section id="gameScreen" class="screen">
+
+  <div class="game-wrapper">
+
+    <header class="top-bar">
+      <div class="game-name">Sequence Adventure</div>
+
+      <div id="progressBox" class="progress-box">
+        Question 1 of 6
+      </div>
+    </header>
+
+    <main class="game-card">
+
+      <div class="heading-area">
+        <h1>Sequence Adventure</h1>
+
+        <p class="instruction">
+          Tap the pictures in the correct order.
+        </p>
+
+        <div id="sequenceTitle" class="sequence-title">
+          Getting Ready
+        </div>
+      </div>
+
+      <section class="answer-area">
+
+        <p class="area-label">
+          First, Next, Last
+        </p>
+
+        <div id="answerRow" class="answer-row">
+
+          <div class="answer-place active-place" data-place="0">
+            <div class="place-number">1</div>
+            <div class="placeholder-text">First</div>
+          </div>
+
+          <div class="answer-place" data-place="1">
+            <div class="place-number">2</div>
+            <div class="placeholder-text">Next</div>
+          </div>
+
+          <div class="answer-place" data-place="2">
+            <div class="place-number">3</div>
+            <div class="placeholder-text">Last</div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="options-area">
+
+        <p class="area-label">
+          Jumbled pictures
+        </p>
+
+        <div id="optionRow" class="option-row"></div>
+
+      </section>
+
+      <div
+        id="feedback"
+        class="feedback"
+        aria-live="polite"
+      >
+        Tap the picture that comes first.
+      </div>
+
+    </main>
+
+  </div>
+
+</section>
+
+<!-- ==================================================
+     END SCREEN
+================================================== -->
+
+<section id="endScreen" class="screen">
+
+  <div id="confettiContainer"></div>
+
+  <div class="end-card">
+
+    <img
+      class="end-logo"
+      src="assets/innovine-logo.png"
+      alt="Innovine"
+      draggable="false"
+    >
+
+    <div class="end-icons">
+      ⭐ 🎉 ⭐
+    </div>
+
+    <h1>Good Job!</h1>
+
+    <p>
+      You completed every sequence!
+    </p>
+
+    <button
+      id="playAgainButton"
+      class="play-again-button"
+      type="button"
+    >
+      Play Again
+    </button>
+
+  </div>
+
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==================================================
+     QUESTION DATA
+  ================================================== */
+
+  var sequences = [
+    {
+      title: "Getting Ready",
+      steps: [
+        {
+          emoji: "🛏️",
+          label: "Wake up"
+        },
+        {
+          emoji: "🚿",
+          label: "Take a bath"
+        },
+        {
+          emoji: "👕",
+          label: "Get dressed"
+        }
+      ]
+    },
+
+    {
+      title: "Brushing Teeth",
+      steps: [
+        {
+          emoji: "🪥",
+          label: "Put paste on brush"
+        },
+        {
+          emoji: "😁",
+          label: "Brush your teeth"
+        },
+        {
+          emoji: "💧",
+          label: "Rinse your mouth"
+        }
+      ]
+    },
+
+    {
+      title: "Washing Hands",
+      steps: [
+        {
+          emoji: "🚰",
+          label: "Wet your hands"
+        },
+        {
+          emoji: "🧼",
+          label: "Rub with soap"
+        },
+        {
+          emoji: "🤲",
+          label: "Dry your hands"
+        }
+      ]
+    },
+
+    {
+      title: "Eating a Banana",
+      steps: [
+        {
+          emoji: "🍌",
+          label: "Take a banana"
+        },
+        {
+          emoji: "🙌",
+          label: "Peel the banana"
+        },
+        {
+          emoji: "😋",
+          label: "Eat the banana"
+        }
+      ]
+    },
+
+    {
+      title: "Planting a Seed",
+      steps: [
+        {
+          emoji: "🕳️",
+          label: "Make a small hole"
+        },
+        {
+          emoji: "🌰",
+          label: "Put in the seed"
+        },
+        {
+          emoji: "💦",
+          label: "Water the seed"
+        }
+      ]
+    },
+
+    {
+      title: "Bedtime Routine",
+      steps: [
+        {
+          emoji: "🧸",
+          label: "Put toys away"
+        },
+        {
+          emoji: "🦷",
+          label: "Brush your teeth"
+        },
+        {
+          emoji: "😴",
+          label: "Go to sleep"
+        }
+      ]
+    }
+  ];
+
+  /* ==================================================
+     ELEMENTS
+  ================================================== */
+
+  var splashScreen =
+    document.getElementById("splashScreen");
+
+  var gameScreen =
+    document.getElementById("gameScreen");
+
+  var endScreen =
+    document.getElementById("endScreen");
+
+  var progressBox =
+    document.getElementById("progressBox");
+
+  var sequenceTitle =
+    document.getElementById("sequenceTitle");
+
+  var answerRow =
+    document.getElementById("answerRow");
+
+  var optionRow =
+    document.getElementById("optionRow");
+
+  var feedback =
+    document.getElementById("feedback");
+
+  var playAgainButton =
+    document.getElementById("playAgainButton");
+
+  var confettiContainer =
+    document.getElementById("confettiContainer");
+
+  /* ==================================================
+     AUDIO
+  ================================================== */
+
+  var clapAudio = new Audio("assets/claps.mp3");
+  var wrongAudio = new Audio("assets/wrong.mp3");
+
+  clapAudio.preload = "auto";
+  wrongAudio.preload = "auto";
+
+  /* ==================================================
+     GAME VARIABLES
+  ================================================== */
+
+  var gameQuestions = [];
+  var currentQuestion = 0;
+  var currentStep = 0;
+  var wrongAttempts = 0;
+  var questionLocked = false;
+  var nextQuestionTimer = null;
+
+  /* ==================================================
+     HELPERS
+  ================================================== */
+
+  function shuffle(array) {
+    var copiedArray = array.slice();
+    var i;
+    var randomIndex;
+    var temporaryValue;
+
+    for (i = copiedArray.length - 1; i > 0; i--) {
+      randomIndex =
+        Math.floor(Math.random() * (i + 1));
+
+      temporaryValue = copiedArray[i];
+      copiedArray[i] = copiedArray[randomIndex];
+      copiedArray[randomIndex] = temporaryValue;
+    }
+
+    return copiedArray;
+  }
+
+  function showScreen(screenToShow) {
+    splashScreen.classList.remove("active");
+    gameScreen.classList.remove("active");
+    endScreen.classList.remove("active");
+
+    screenToShow.classList.add("active");
+  }
+
+  function safelyPlay(audioElement) {
+    try {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+
+      var playPromise = audioElement.play();
+
+      if (
+        playPromise &&
+        typeof playPromise.catch === "function"
+      ) {
+        playPromise.catch(function () {
+          /* Audio may be blocked on some devices. */
+        });
+      }
+    } catch (error) {
+      /* The game continues even if audio cannot play. */
+    }
+  }
+
+  function removeGlow() {
+    var glowingOption =
+      optionRow.querySelector(".correct-glow");
+
+    if (glowingOption) {
+      glowingOption.classList.remove("correct-glow");
+    }
+  }
+
+  /* ==================================================
+     START AND LOAD GAME
+  ================================================== */
+
+  function startGame() {
+    clearTimeout(nextQuestionTimer);
+
+    gameQuestions = shuffle(sequences);
+    currentQuestion = 0;
+    currentStep = 0;
+    wrongAttempts = 0;
+    questionLocked = false;
+
+    confettiContainer.innerHTML = "";
+
+    showScreen(gameScreen);
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    var question = gameQuestions[currentQuestion];
+    var jumbledSteps;
+    var i;
+
+    currentStep = 0;
+    wrongAttempts = 0;
+    questionLocked = false;
+
+    progressBox.textContent =
+      "Question " +
+      (currentQuestion + 1) +
+      " of " +
+      gameQuestions.length;
+
+    sequenceTitle.textContent = question.title;
+
+    feedback.textContent =
+      "Tap the picture that comes first.";
+
+    feedback.className = "feedback";
+
+    resetAnswerPlaces();
+
+    optionRow.innerHTML = "";
+
+    jumbledSteps = shuffle(question.steps);
+
+    for (i = 0; i < jumbledSteps.length; i++) {
+      createOptionCard(jumbledSteps[i]);
+    }
+  }
+
+  function resetAnswerPlaces() {
+    var places =
+      answerRow.getElementsByClassName("answer-place");
+
+    var words = ["First", "Next", "Last"];
+    var i;
+
+    for (i = 0; i < places.length; i++) {
+      places[i].className = "answer-place";
+
+      places[i].innerHTML =
+        '<div class="place-number">' +
+        (i + 1) +
+        "</div>" +
+        '<div class="placeholder-text">' +
+        words[i] +
+        "</div>";
+    }
+
+    places[0].classList.add("active-place");
+  }
+
+  /* ==================================================
+     CREATE OPTION CARDS
+  ================================================== */
+
+  function createOptionCard(step) {
+    var button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "sequence-option";
+
+    button.setAttribute("data-label", step.label);
+    button.setAttribute("data-emoji", step.emoji);
+
+    button.innerHTML =
+      '<span class="option-emoji">' +
+      step.emoji +
+      "</span>" +
+      '<span class="option-label">' +
+      step.label +
+      "</span>";
+
+    button.addEventListener("click", checkOption);
+
+    optionRow.appendChild(button);
+  }
+
+  /* ==================================================
+     CHECK ANSWER
+  ================================================== */
+
+  function checkOption(event) {
+    if (questionLocked) {
+      return;
+    }
+
+    var selectedOption = event.currentTarget;
+
+    if (selectedOption.classList.contains("used")) {
+      return;
+    }
+
+    var selectedLabel =
+      selectedOption.getAttribute("data-label");
+
+    var selectedEmoji =
+      selectedOption.getAttribute("data-emoji");
+
+    var correctStep =
+      gameQuestions[currentQuestion].steps[currentStep];
+
+    removeGlow();
+
+    if (selectedLabel === correctStep.label) {
+      handleCorrectStep(
+        selectedOption,
+        selectedEmoji,
+        selectedLabel
+      );
+    } else {
+      handleWrongStep(selectedOption);
+    }
+  }
+
+  function handleCorrectStep(
+    selectedOption,
+    selectedEmoji,
+    selectedLabel
+  ) {
+    var places =
+      answerRow.getElementsByClassName("answer-place");
+
+    var currentPlace = places[currentStep];
+
+    selectedOption.classList.add("used");
+
+    currentPlace.classList.remove("active-place");
+    currentPlace.classList.add("filled");
+
+    currentPlace.innerHTML =
+      '<div class="place-number">' +
+      (currentStep + 1) +
+      "</div>" +
+      '<div class="green-tick">✓</div>' +
+      '<div class="placed-emoji">' +
+      selectedEmoji +
+      "</div>" +
+      '<div class="placed-label">' +
+      selectedLabel +
+      "</div>";
+
+    currentStep++;
+    wrongAttempts = 0;
+
+    if (currentStep < 3) {
+      places[currentStep].classList.add("active-place");
+
+      if (currentStep === 1) {
+        feedback.textContent =
+          "✓ Good! What happens next?";
+      } else {
+        feedback.textContent =
+          "✓ Great! What happens last?";
+      }
+
+      feedback.className = "feedback good";
+    } else {
+      completeSequence();
+    }
+  }
+
+  function handleWrongStep(selectedOption) {
+    wrongAttempts++;
+
+    safelyPlay(wrongAudio);
+
+    selectedOption.classList.remove("giggle");
+    selectedOption.classList.add("wrong-option");
+
+    void selectedOption.offsetWidth;
+
+    selectedOption.classList.add("giggle");
+
+    setTimeout(function () {
+      selectedOption.classList.remove(
+        "giggle",
+        "wrong-option"
+      );
+    }, 450);
+
+    if (wrongAttempts >= 2) {
+      feedback.textContent =
+        "Look for the glowing picture.";
+
+      feedback.className = "feedback hint";
+
+      glowCorrectOption();
+    } else {
+      feedback.textContent =
+        "Oops! Try another picture.";
+
+      feedback.className = "feedback wrong";
+    }
+  }
+
+  function glowCorrectOption() {
+    var correctStep =
+      gameQuestions[currentQuestion].steps[currentStep];
+
+    var optionButtons =
+      optionRow.getElementsByClassName("sequence-option");
+
+    var i;
+    var label;
+
+    for (i = 0; i < optionButtons.length; i++) {
+      label =
+        optionButtons[i].getAttribute("data-label");
+
+      if (
+        label === correctStep.label &&
+        !optionButtons[i].classList.contains("used")
+      ) {
+        optionButtons[i].classList.add("correct-glow");
+        break;
+      }
+    }
+  }
+
+  /* ==================================================
+     COMPLETE QUESTION
+  ================================================== */
+
+  function completeSequence() {
+    questionLocked = true;
+
+    feedback.textContent =
+      "✓ Good job! That is the correct sequence.";
+
+    feedback.className = "feedback good";
+
+    safelyPlay(clapAudio);
+
+    nextQuestionTimer = setTimeout(function () {
+      currentQuestion++;
+
+      if (currentQuestion < gameQuestions.length) {
+        loadQuestion();
+      } else {
+        finishGame();
+      }
+    }, 1700);
+  }
+
+  /* ==================================================
+     END GAME
+  ================================================== */
+
+  function finishGame() {
+    questionLocked = true;
+
+    showScreen(endScreen);
+    safelyPlay(clapAudio);
+    createConfetti();
+  }
+
+  function createConfetti() {
+    var colours = [
+      "#ff5470",
+      "#ffcf56",
+      "#4ecdc4",
+      "#6c63ff",
+      "#55c271",
+      "#ff83c1",
+      "#4ba3ff",
+      "#f08a5d"
+    ];
+
+    var i;
+    var piece;
+
+    confettiContainer.innerHTML = "";
+
+    for (i = 0; i < 85; i++) {
+      piece = document.createElement("span");
+      piece.className = "confetti";
+
+      piece.style.left =
+        Math.random() * 100 + "%";
+
+      piece.style.backgroundColor =
+        colours[
+          Math.floor(Math.random() * colours.length)
+        ];
+
+      piece.style.animationDelay =
+        Math.random() * 1.4 + "s";
+
+      piece.style.animationDuration =
+        2.7 + Math.random() * 2.5 + "s";
+
+      piece.style.transform =
+        "rotate(" +
+        Math.floor(Math.random() * 360) +
+        "deg)";
+
+      confettiContainer.appendChild(piece);
+    }
+  }
+
+  /* ==================================================
+     PLAY AGAIN
+  ================================================== */
+
+  playAgainButton.addEventListener("click", function () {
+    startGame();
+  });
+
+  /* Logo stays on screen for 2 seconds. */
+  setTimeout(function () {
+    startGame();
+  }, 2000);
+
+})();
+</script>
+
+</body>
+</html>
