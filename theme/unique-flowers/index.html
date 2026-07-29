@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Unique Flower Words</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;}
+body{background:#fff;}
+
+.screen{
+  width:100vw;height:100vh;position:relative;
+  display:flex;justify-content:center;align-items:center;overflow:hidden;
+}
+
+#logoScreen{background:white;z-index:10;}
+#logoScreen img{width:230px;max-width:75%;}
+
+#gameScreen{
+  display:none;
+  background:
+  radial-gradient(circle at top right,rgba(255,190,210,.55),transparent 35%),
+  radial-gradient(circle at bottom left,rgba(255,225,160,.55),transparent 35%),
+  linear-gradient(135deg,#fff8df,#ffeef4,#eef6ff);
+}
+
+.flower-decor{position:absolute;font-size:48px;opacity:.45;pointer-events:none;}
+.d1{top:15px;left:15px;}
+.d2{top:20px;right:20px;}
+.d3{bottom:18px;left:20px;}
+.d4{bottom:18px;right:20px;}
+
+.card{
+  width:92vw;height:92vh;max-width:520px;
+  background:rgba(255,255,255,.86);
+  border-radius:24px;border:3px solid #f4b8c9;
+  box-shadow:0 8px 20px rgba(0,0,0,.14);
+  padding:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  z-index:2;
+}
+
+.topBar{
+  width:100%;display:flex;justify-content:space-between;
+  font-weight:bold;color:#9b4770;font-size:15px;
+}
+
+.flowerImg{
+  width:170px;height:135px;object-fit:contain;background:white;
+  border-radius:18px;border:3px solid #ffd2df;padding:6px;
+}
+
+.spellingTitle{font-size:15px;color:#7b4b61;font-weight:bold;}
+
+#correctWord{
+  font-size:24px;font-weight:bold;color:#b44273;
+  letter-spacing:2px;text-align:center;
+}
+
+#blankArea{
+  width:100%;display:flex;flex-wrap:wrap;justify-content:center;
+  gap:6px;min-height:82px;
+}
+
+.blank{
+  width:34px;height:40px;border-bottom:4px solid #89506a;background:#fff;
+  border-radius:10px 10px 4px 4px;
+  display:flex;justify-content:center;align-items:center;
+  font-size:23px;font-weight:bold;color:#4a3140;
+}
+
+.space{width:18px;height:40px;}
+
+#letterArea{
+  width:100%;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:7px;
+}
+
+.letter{
+  width:38px;height:38px;border:none;border-radius:12px;
+  background:#ffcae0;color:#66324d;
+  font-size:21px;font-weight:bold;
+  box-shadow:0 4px 0 #d98bac;cursor:pointer;
+}
+
+.letter:active{transform:translateY(3px);box-shadow:0 1px 0 #d98bac;}
+.letter.used{opacity:.25;pointer-events:none;}
+
+#message{
+  height:25px;font-size:18px;font-weight:bold;color:#2f9b5a;
+}
+
+#finalScreen{
+  display:none;background:white;flex-direction:column;text-align:center;
+}
+
+#finalScreen h1{
+  font-size:34px;color:#e34f87;margin-bottom:15px;
+}
+
+#finalScreen button{
+  padding:14px 28px;border:none;border-radius:25px;
+  background:#65c96f;color:white;font-size:20px;font-weight:bold;
+}
+
+.confetti{
+  position:absolute;width:10px;height:16px;top:-20px;
+  animation:fall 3s linear infinite;
+}
+
+@keyframes fall{
+  to{transform:translateY(110vh) rotate(360deg);}
+}
+
+@media(max-width:480px){
+  .card{height:95vh;padding:8px;}
+  .flowerImg{width:135px;height:100px;}
+  #correctWord{font-size:20px;}
+  .blank{width:28px;height:33px;font-size:19px;}
+  .letter{width:31px;height:31px;font-size:17px;}
+  #blankArea{gap:4px;min-height:70px;}
+  #letterArea{gap:5px;}
+}
+
+@media(max-height:620px){
+  .card{height:96vh;padding:8px;}
+  .flowerImg{width:130px;height:95px;}
+  #correctWord{font-size:19px;}
+  .blank{width:27px;height:32px;font-size:18px;}
+  .letter{width:30px;height:30px;font-size:17px;}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="correctSound" src="./assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="./assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="./assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+
+<div id="logoScreen" class="screen">
+  <img src="./assets/innovine-logo.png" alt="Logo">
+</div>
+
+<div id="gameScreen" class="screen">
+  <div class="flower-decor d1">🌸</div>
+  <div class="flower-decor d2">🌺</div>
+  <div class="flower-decor d3">🌿</div>
+  <div class="flower-decor d4">🌷</div>
+
+  <div class="card">
+    <div class="topBar">
+      <span id="slideNo">Question 1 / 5</span>
+      <span>Tap the letters and the blanks.</span>
+    </div>
+
+    <img id="flowerImage" class="flowerImg" src="" alt="Flower">
+
+    <div class="spellingTitle">Correct spelling</div>
+    <div id="correctWord"></div>
+
+    <div id="blankArea"></div>
+
+    <div id="letterArea"></div>
+
+    <div id="message"></div>
+  </div>
+</div>
+
+<div id="finalScreen" class="screen">
+  <h1>Well Done! 🎉</h1>
+  <button onclick="restartGame()">Play Again</button>
+</div>
+
+<script>
+const questions = [
+  {answer:"CHERRY BLOSSOM",display:"CHERRY BLOSSOM",jumble:"YHERCRSBOLSOM",image:"./assets/cherry-blossom.png"},
+  {answer:"RAFFLESIA",display:"RAFFLESIA",jumble:"AFRSEFAIL",image:"./assets/rafflesia.png"},
+  {answer:"PASSION FLOWER",display:"PASSION FLOWER",jumble:"SIPASNOFROWLE",image:"./assets/passion.png"},
+  {answer:"SNOWDROP",display:"SNOWDROP",jumble:"WDOSNROP",image:"./assets/snowdrop.png"},
+  {answer:"PROTEA",display:"PROTEA",jumble:"TAEPOR",image:"./assets/protea.png"}
+];
+
+let current = 0;
+let selectedLetter = null;
+let selectedButton = null;
+let filledCount = 0;
+
+const logoScreen = document.getElementById("logoScreen");
+const gameScreen = document.getElementById("gameScreen");
+const finalScreen = document.getElementById("finalScreen");
+
+window.onload = function(){
+  setTimeout(() => {
+    logoScreen.style.display = "none";
+    gameScreen.style.display = "flex";
+    loadQuestion();
+  }, 2000);
+};
+
+function playSound(id){
+  const sound = document.getElementById(id);
+  sound.currentTime = 0;
+  sound.play().catch(()=>{});
+}
+
+function loadQuestion(){
+  selectedLetter = null;
+  selectedButton = null;
+  filledCount = 0;
+
+  const q = questions[current];
+
+  document.getElementById("slideNo").innerText =
+  "Question " + (current + 1) + " / " + questions.length;
+
+  document.getElementById("flowerImage").src = q.image;
+  document.getElementById("correctWord").innerText = q.display;
+  document.getElementById("message").innerText = "";
+
+  createBlanks(q.answer);
+  createLetters(q.jumble);
+}
+
+function createBlanks(answer){
+  const blankArea = document.getElementById("blankArea");
+  blankArea.innerHTML = "";
+
+  for(let i=0;i<answer.length;i++){
+    if(answer[i] === " "){
+      const space = document.createElement("div");
+      space.className = "space";
+      blankArea.appendChild(space);
+    }else{
+      const blank = document.createElement("div");
+      blank.className = "blank";
+      blank.dataset.correct = answer[i];
+      blank.onclick = function(){ placeLetter(blank); };
+      blankArea.appendChild(blank);
+    }
+  }
+}
+
+function createLetters(jumble){
+  const letterArea = document.getElementById("letterArea");
+  letterArea.innerHTML = "";
+
+  jumble.split("").forEach(letter => {
+    const btn = document.createElement("button");
+    btn.className = "letter";
+    btn.innerText = letter;
+
+    btn.onclick = function(){
+      selectedLetter = letter;
+      selectedButton = btn;
+
+      document.querySelectorAll(".letter").forEach(b => {
+        b.style.outline = "none";
+      });
+
+      btn.style.outline = "3px solid #8e4d72";
+    };
+
+    letterArea.appendChild(btn);
+  });
+}
+
+function placeLetter(blank){
+  if(!selectedLetter || blank.innerText !== "") return;
+
+  if(selectedLetter === blank.dataset.correct){
+    blank.innerText = selectedLetter;
+    selectedButton.classList.add("used");
+    selectedButton.style.outline = "none";
+
+    selectedLetter = null;
+    selectedButton = null;
+    filledCount++;
+
+    playSound("correctSound");
+
+    if(filledCount === questions[current].answer.replaceAll(" ","").length){
+      document.getElementById("message").innerText = "Correct! 🌸";
+
+      setTimeout(() => {
+        current++;
+
+        if(current < questions.length){
+          loadQuestion();
+        }else{
+          showFinalScreen();
+        }
+      }, 1000);
+    }
+  }else{
+    playSound("wrongSound");
+    document.getElementById("message").innerText = "Try again";
+
+    setTimeout(() => {
+      document.getElementById("message").innerText = "";
+    }, 800);
+  }
+}
+
+function showFinalScreen(){
+  gameScreen.style.display = "none";
+  finalScreen.style.display = "flex";
+  playSound("clapSound");
+  createConfetti();
+}
+
+function createConfetti(){
+  finalScreen.querySelectorAll(".confetti").forEach(c => c.remove());
+
+  for(let i=0;i<45;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = ["#ff6b9a","#ffd166","#65d46e","#6ecbff","#b98cff"][i % 5];
+    c.style.animationDelay = Math.random() * 2 + "s";
+    finalScreen.appendChild(c);
+  }
+}
+
+function restartGame(){
+  current = 0;
+  finalScreen.style.display = "none";
+  logoScreen.style.display = "flex";
+
+  setTimeout(() => {
+    logoScreen.style.display = "none";
+    gameScreen.style.display = "flex";
+    loadQuestion();
+  }, 2000);
+}
+</script>
+
+</body>
+</html>
