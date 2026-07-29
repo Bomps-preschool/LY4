@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mad Sentences - LY4</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+<style>
+body, html {
+  margin: 0; padding: 0; font-family: 'Arial', sans-serif;
+  height: 100%; width: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center;
+  background: url('assets/background.png') no-repeat center center;
+  background-size: cover;
+}
+#logoScreen, #gameScreen, #endScreen {
+  width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column; position: absolute; top: 0; left:0;
+}
+#logoScreen { background: #fff; z-index:2;}
+#logoScreen img { width: 200px; }
+#gameScreen { background: #4CAF50; z-index:1; display:none; flex-direction: column; align-items: center; }
+#topicTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: 32px;
+  color: #fffdd0; /* cream color */
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px #00000050;
+}
+#creamBox { background: #fffdd0; border-radius: 12px; width: 90%; max-width: 400px; padding: 10px; box-shadow: 0 0 10px #00000033; }
+#instruction { text-align:center; font-size:16px; margin-bottom:5px; color:#333; }
+#imageContainer { width: 100%; text-align:center; margin-bottom:10px; }
+#imageContainer img { max-width: 100%; border-radius:8px; }
+#lineContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 35px;
+  border-bottom: 1px solid #ccc;
+  padding-left: 5px;
+  align-items: center;
+  font-size: 18px;
+}
+.wordBank { display:flex; flex-wrap: wrap; justify-content: center; margin-top:10px; }
+.word { background:#4CAF50; color:white; padding:5px 10px; margin:3px; border-radius:5px; cursor:pointer; user-select:none; font-size:16px; }
+.word.used { background:#9E9E9E; cursor:default; }
+#feedback { margin-top:5px; font-size:18px; height:24px; }
+#score { margin-top:5px; }
+#nextBtn { margin-top:10px; padding:5px 15px; background:#2196F3; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; display:none;}
+#endScreen {
+  background:#4CAF50; color:white; font-size:24px; display:none; flex-direction:column; justify-content:center; align-items:center;
+  overflow: hidden;
+  position: relative;
+}
+#endScreen h1 {
+  font-size: 48px;
+  color: #FFC0CB; /* baby pink */
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px #00000050;
+}
+#endScreen button {
+  font-size: 24px;
+  padding: 15px 30px;
+  background: #FFC0CB; /* baby pink */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00000033;
+  margin-top: 10px;
+}
+.confetti {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #fffdd0; /* cream color */
+  top: -10px;
+  animation: fall 3s linear infinite;
+}
+@keyframes fall {
+  to { transform: translateY(100vh) rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Logo -->
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <div id="topicTitle">Make Sentences</div>
+  <div id="creamBox">
+    <div id="instruction">Tap on a word below and place it in the line to form a sentence</div>
+    <div id="imageContainer"><img id="mainImage" src="" alt=""></div>
+    <div id="lineContainer"></div>
+    <div class="wordBank" id="wordBank"></div>
+    <div id="feedback"></div>
+    <div id="score"></div>
+    <button id="nextBtn">Next</button>
+  </div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <h1>🎉 Well Done! 🎉</h1>
+  <button onclick="restartGame()">Play Again</button>
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const questions = [
+  {img:'assets/car.png', sentence:['The','car','is','fast'], words:['car','fast','is','The']},
+  {img:'assets/school.png', sentence:['I','go','to','school'], words:['to','school','I','go']},
+  {img:'assets/tree.png', sentence:['The','tree','has','leaves'], words:['has','leaves','The','tree']},
+  {img:'assets/butterfly.png', sentence:['The','butterfly','is','colorful'], words:['colorful','is','The','butterfly']},
+  {img:'assets/dance.png', sentence:['She','likes','to','dance'], words:['dance','likes','She','to']}
+];
+
+let currentQ = 0;
+let userAnswer = [];
+let score = 0;
+
+// generate confetti
+function createConfetti() {
+  const endScreen = document.getElementById('endScreen');
+  for(let i=0; i<50; i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.animationDuration = 2 + Math.random()*2 + 's';
+    endScreen.appendChild(c);
+  }
+}
+
+function showQuestion(){
+  const q = questions[currentQ];
+  document.getElementById('mainImage').src = q.img;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('lineContainer').innerHTML = '';
+  userAnswer = [];
+
+  const bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  shuffle([...q.words]).forEach(word => {
+    const btn = document.createElement('div');
+    btn.textContent = word;
+    btn.className = 'word';
+    btn.onclick = ()=> selectWord(word, btn);
+    bank.appendChild(btn);
+  });
+}
+
+function selectWord(word, btn){
+  const line = document.getElementById('lineContainer');
+  const span = document.createElement('span');
+  span.textContent = word;
+  line.appendChild(span);
+  userAnswer.push(word);
+  btn.classList.add('used');
+
+  if(userAnswer.length === questions[currentQ].sentence.length){
+    checkAnswer();
+  }
+}
+
+function checkAnswer(){
+  const q = questions[currentQ];
+  let correct = userAnswer.join(' ') === q.sentence.join(' ');
+  const feedback = document.getElementById('feedback');
+
+  if(correct){
+    feedback.textContent = '✅ Good Job!';
+    document.getElementById('correctSound').play();
+    score++;
+    document.getElementById('score').textContent = `Score: ${score} / ${questions.length}`;
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  } else {
+    feedback.textContent = '❌ Try Again';
+    document.getElementById('wrongSound').play();
+    setTimeout(resetLine, 1000);
+  }
+}
+
+function resetLine(){
+  const line = document.getElementById('lineContainer');
+  line.innerHTML = '';
+  userAnswer = [];
+  const wordButtons = document.querySelectorAll('.word');
+  wordButtons.forEach(btn => btn.classList.remove('used'));
+}
+
+document.getElementById('nextBtn').onclick = ()=>{
+  currentQ++;
+  if(currentQ < questions.length){
+    showQuestion();
+  } else {
+    document.getElementById('gameScreen').style.display = 'none';
+    const endScreen = document.getElementById('endScreen');
+    endScreen.style.display = 'flex';
+    document.getElementById('clapSound').play();
+    createConfetti();
+  }
+};
+
+function restartGame(){
+  currentQ = 0; score = 0;
+  document.getElementById('endScreen').innerHTML = '<h1>🎉 Well Done! 🎉</h1><button onclick="restartGame()">Play Again</button>';
+  document.getElementById('endScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'flex';
+  showQuestion();
+}
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Logo screen timeout
+setTimeout(()=>{
+  document.getElementById('logoScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='flex';
+  showQuestion();
+}, 2000);
+</script>
+</body>
+</html>
