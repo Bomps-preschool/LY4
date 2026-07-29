@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Double Consonants &middot; LY4 &middot; Game 31</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:stretch;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+#game-screen{display:none;flex-direction:column;width:100%;max-width:860px;height:100%;padding:12px 14px 76px;overflow-y:auto}
+
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-shrink:0}
+.progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+.instruction{text-align:center;font-size:clamp(0.9em,2.8vw,1.1em);color:#555;font-weight:800;margin-bottom:8px;flex-shrink:0}
+
+.q-card{background:white;border-radius:24px;padding:18px 16px 22px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;width:100%;flex:1;min-height:0;overflow:hidden}
+
+/* Image area */
+.img-area{display:flex;align-items:center;justify-content:center;width:100%;flex:1;min-height:0}
+.q-img{max-height:100%;max-width:70%;object-fit:contain;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,0.1)}
+
+/* Sentence */
+.sentence-row{display:flex;align-items:center;justify-content:center;width:100%}
+.sentence-text{font-size:clamp(1.2em,4vw,1.7em);font-weight:800;color:#333;text-align:center;line-height:1.5}
+.word-blank{display:inline-block;min-width:44px;padding:2px 8px;border-bottom:4px solid #6c5ce7;color:#6c5ce7;font-weight:800;text-align:center;transition:color 0.3s,border-color 0.3s;border-radius:4px 4px 0 0;letter-spacing:2px}
+.word-blank.reveal{color:#4CAF50;border-color:#4CAF50;animation:popBlank 0.4s ease}
+.word-blank.wrong-reveal{color:#FF9800;border-color:#FF9800}
+@keyframes popBlank{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* Choice buttons */
+.choices-row{display:flex;gap:14px;justify-content:center;width:100%}
+.choice-btn{
+  width:90px;height:72px;border-radius:20px;
+  border:4px solid transparent;
+  font-size:clamp(1.4em,5vw,1.9em);font-weight:800;font-family:inherit;
+  color:white;cursor:pointer;letter-spacing:2px;
+  box-shadow:0 5px 16px rgba(0,0,0,0.18);
+  transition:transform 0.1s,border-color 0.2s;
+  display:flex;align-items:center;justify-content:center;
+  text-shadow:0 2px 6px rgba(0,0,0,0.2);
+  touch-action:manipulation;min-height:44px;
+}
+.choice-btn:active{transform:scale(0.93)}
+.choice-btn.c0{background:#6c5ce7}
+.choice-btn.c1{background:#00b894}
+.choice-btn.c2{background:#e17055}
+.choice-btn.correct{border-color:#4CAF50!important;background:#43A047!important;box-shadow:0 0 0 6px rgba(76,175,80,0.5)!important;animation:popCorrect 0.35s ease!important;transform:none!important}
+.choice-btn.wrong{border-color:#f44336;animation:shakeWrong 0.4s ease}
+.choice-btn.hint{border-color:#FFD700;animation:pulseHint 1s ease-in-out infinite}
+
+/* Bottom */
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);touch-action:manipulation;min-height:44px}
+
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:13px 28px;border-radius:50px;font-size:1.35em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;touch-action:manipulation;min-height:44px}
+
+@keyframes popCorrect{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes shakeWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pulseHint{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.6)}50%{box-shadow:0 0 0 12px rgba(255,215,0,0)}}
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+
+@media(max-width:768px){.hdr-title{display:none}.img-area{max-height:55vw}.q-img{max-height:52vw}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 72px}
+  .hdr{padding:8px 12px;margin-bottom:6px}
+  .q-card{padding:14px 12px 18px;gap:14px}
+  .sentence-text{font-size:clamp(1.1em,3.8vw,1.5em)}
+  .choice-btn{width:78px;height:64px;font-size:clamp(1.2em,4.5vw,1.6em)}
+  .choices-row{gap:10px}
+  .instruction{font-size:clamp(0.8em,2.5vw,0.92em);margin-bottom:4px}
+  .btn-restart{padding:10px 22px;font-size:0.92em}
+  .img-area{max-height:44vw}
+  .q-img{max-height:42vw}
+}
+@media(max-height:640px){
+  .q-card{gap:10px;padding:10px 10px 14px}
+  .img-area{max-height:32vw}
+  .q-img{max-height:30vw}
+  .sentence-text{font-size:clamp(1em,3.5vw,1.4em)}
+  .choices-row{gap:8px}
+  .instruction{margin-bottom:4px}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">&#11088; <span id="score-val">0</span> / 18</div>
+    <div class="hdr-title">Double Consonants &middot; LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">&#128266;</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="step-num">1</span> / 18</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction">&#9997;&#65039; Tap the double letters to complete the word!</div>
+  <div class="q-card" id="q-card">
+    <div class="img-area" id="img-area"></div>
+    <div class="sentence-row">
+      <div class="sentence-text" id="sentence-display"></div>
+    </div>
+    <div class="choices-row" id="choices-row"></div>
+  </div>
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">&#128260; &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">&#127942;</div>
+  <div class="end-title">Double Brilliant!</div>
+  <div class="end-sub">You know your double consonants!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 18</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">&#9654; &nbsp;Play Again</button>
+</div>
+
+<script>
+/* sentence: "___" marks where the double letters go (prefix is baked into sentence text) */
+const QUESTIONS = [
+  /* ff / ll */
+  { word:'cliff', blank:'ff', img:'Assets/cliff.png',        sentence:'I see a cli___.',          audio:'I see a cliff.',          choices:['ff','ll','ss'] },
+  { word:'sniff', blank:'ff', img:'Assets/sniff.png',        sentence:'He will sni___ the flower.',audio:'He will sniff the flower.',choices:['ff','zz','ll'] },
+  { word:'cuff',  blank:'ff', img:'Assets/cuff.png',         sentence:'This is a cu___.',          audio:'This is a cuff.',          choices:['ff','ll','ss'] },
+  { word:'hill',  blank:'ll', img:'Assets/hill.png',         sentence:'I climb the hi___.',        audio:'I climb the hill.',        choices:['ll','ff','ss'] },
+  { word:'shell', blank:'ll', img:'Assets/shell.png',        sentence:'I find a she___.',          audio:'I find a shell.',          choices:['ll','ff','zz'] },
+  { word:'bell',  blank:'ll', img:'Assets/bell.png',         sentence:'Ring the be___.',           audio:'Ring the bell.',           choices:['ll','ff','ss'] },
+  { word:'stuff', blank:'ff', img:'Assets/stuff.png',        sentence:'Put the stu___ in the bag.',audio:'Put the stuff in the bag.',choices:['ff','ll','zz'] },
+  { word:'ball',  blank:'ll', img:'Assets/cricket-ball.png', sentence:'Throw the ba___.',          audio:'Throw the ball.',          choices:['ll','ff','ss'] },
+  { word:'bull',  blank:'ll', img:'Assets/bull.png',         sentence:'The bu___ is strong.',      audio:'The bull is strong.',      choices:['ll','ff','zz'] },
+  /* ss / zz */
+  { word:'glass', blank:'ss', img:'Assets/glass.png',        sentence:'Drink from the gla___.',   audio:'Drink from the glass.',    choices:['ss','zz','ll'] },
+  { word:'dress', blank:'ss', img:'Assets/dress.png',        sentence:'She wears a dre___.',      audio:'She wears a dress.',       choices:['ss','ff','ll'] },
+  { word:'grass', blank:'ss', img:'Assets/grass.png',        sentence:'The gra___ is green.',     audio:'The grass is green.',      choices:['ss','zz','ff'] },
+  { word:'pizza', blank:'zz', img:'Assets/new assets/pizza.jpg', sentence:'I love pi___a.',       audio:'I love pizza.',            choices:['zz','ss','ll'] },
+  { word:'hiss',  blank:'ss', img:'Assets/hiss.png',         sentence:'The snake will hi___.',    audio:'The snake will hiss.',     choices:['ss','zz','ff'] },
+  { word:'jazz',  blank:'zz', img:'Assets/jazz.png',         sentence:'I play ja___.',            audio:'I play jazz.',             choices:['zz','ss','ll'] },
+  { word:'toss',  blank:'ss', img:'Assets/toss.png',         sentence:'Let us to___ the coin.',   audio:'Let us toss the coin.',    choices:['ss','zz','ff'] },
+  { word:'class', blank:'ss', img:'Assets/class.png',        sentence:'I go to cla___.',          audio:'I go to class.',           choices:['ss','ff','zz'] },
+  { word:'buzz',  blank:'zz', img:'Assets/bee.png',          sentence:'Bees bu___ and fly.',      audio:'Bees buzz and fly.',       choices:['zz','ss','ff'] },
+];
+
+/* preload */
+QUESTIONS.forEach(q=>{ if(q.img){ const i=new Image(); i.src=q.img; i.decode?.().catch(()=>{}); } });
+
+let curQ=0, score=0, attempts=0, answered=false, muted=false;
+let speakTimer=null;
+
+/* ── Audio ── */
+const sndWrong=new Audio('Assets/wrong.mp3');
+const sndClaps=new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{})}
+
+function speak(text,onEnd){
+  if(!('speechSynthesis' in window)||muted){if(onEnd)onEnd();return;}
+  window.speechSynthesis.cancel();
+  clearTimeout(speakTimer);
+  speakTimer=setTimeout(()=>{
+    if(muted){if(onEnd)onEnd();return;}
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.78;u.pitch=1.1;u.volume=1;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    u.onend=()=>{if(onEnd)onEnd();};
+    u.onerror=()=>{if(onEnd)onEnd();};
+    window.speechSynthesis.speak(u);
+  },200);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+/* ── Load question ── */
+function loadQuestion(){
+  if(curQ>=QUESTIONS.length){showEnd();return;}
+  const q=QUESTIONS[curQ];
+  attempts=0;answered=false;
+
+  document.getElementById('step-num').textContent=curQ+1;
+  document.getElementById('prog-bar').style.width=((curQ/QUESTIONS.length)*100)+'%';
+
+  /* image */
+  const imgArea=document.getElementById('img-area');
+  if(q.img){
+    imgArea.innerHTML='';
+    const qImg=document.createElement('img');
+    qImg.className='q-img'; qImg.alt=q.word; qImg.decoding='async'; qImg.loading='eager';
+    qImg.onerror=()=>{qImg.style.opacity='0.2';};
+    qImg.onload=()=>{qImg.style.opacity='1';};
+    qImg.src=q.img;
+    if(qImg.complete&&qImg.naturalWidth>0) qImg.style.opacity='1';
+    imgArea.appendChild(qImg);
+  } else {
+    imgArea.innerHTML='';
+  }
+
+  /* sentence */
+  renderSentence(false,false);
+
+  /* choices */
+  const shuffled=shuffle([...q.choices]);
+  const cols=shuffleColors();
+  document.getElementById('choices-row').innerHTML=shuffled.map((c,i)=>
+    `<button class="choice-btn c${cols[i]}" data-val="${c}" onclick="selectAnswer('${c}')">${c}</button>`
+  ).join('');
+
+  setTimeout(()=>speak(q.audio),500);
+}
+
+function renderSentence(revealed,correct){
+  const q=QUESTIONS[curQ];
+  const parts=q.sentence.split('___');
+  let blankHtml;
+  if(!revealed){
+    blankHtml=`<span class="word-blank" id="word-blank">_ _</span>`;
+  } else {
+    const cls=correct?'reveal':'wrong-reveal';
+    blankHtml=`<span class="word-blank ${cls}" id="word-blank">${q.blank}</span>`;
+  }
+  document.getElementById('sentence-display').innerHTML=
+    escHtml(parts[0])+blankHtml+escHtml(parts[1]||'');
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function shuffleColors(){const c=[0,1,2];for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]];}return c;}
+
+/* ── Answer ── */
+function selectAnswer(val){
+  if(answered)return;
+  const q=QUESTIONS[curQ];
+  const chosenBtn=document.querySelector(`.choice-btn[data-val="${val}"]`);
+  const correctBtn=document.querySelector(`.choice-btn[data-val="${q.blank}"]`);
+
+  if(val===q.blank){
+    answered=true;
+    document.querySelectorAll('.choice-btn').forEach(b=>{b.style.pointerEvents='none';b.classList.remove('hint','wrong');void b.offsetWidth;});
+    chosenBtn.classList.add('correct');
+    renderSentence(true,true);
+    score++;
+    document.getElementById('score-val').textContent=score;
+    window.speechSynthesis?.cancel();
+    showToast('&#11088; Correct!','#4CAF50');
+    spawnConfetti();
+    sndClaps.currentTime=0;sndClaps.play().catch(()=>{});
+    setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;curQ++;loadQuestion();},2800);
+  } else {
+    attempts++;
+    chosenBtn.classList.add('wrong');
+    play(sndWrong);
+    if(attempts===1){
+      showToast('&#10060; Try again!','#f44336');
+      setTimeout(()=>{chosenBtn.classList.remove('wrong');if(!answered)correctBtn.classList.add('hint');},900);
+    } else {
+      answered=true;
+      showToast('&#10060; Wrong!','#f44336');
+      setTimeout(()=>{
+        document.querySelectorAll('.choice-btn').forEach(b=>{b.classList.remove('correct','wrong','hint');void b.offsetWidth;});
+        correctBtn.classList.add('correct');
+        renderSentence(true,false);
+        showToast('&#128161; It\'s "'+q.word+'"!','#FF9800');
+        setTimeout(()=>{curQ++;loadQuestion();},2800);
+      },1000);
+    }
+  }
+}
+
+/* ── Helpers ── */
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;
+  document.getElementById('score-val').textContent=0;
+  loadQuestion();
+}
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;
+  document.getElementById('score-val').textContent=0;
+  loadQuestion();
+}
+
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.innerHTML=msg;el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+const CC=['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC','#26C6DA'];
+function spawnConfetti(){
+  for(let i=0;i<60;i++) setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){const s=document.createElement('style');s.id='cf-style';s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';document.head.appendChild(s);}
+
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').innerHTML=muted?'&#128263;':'&#128266;';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else if(!answered)speak(QUESTIONS[curQ]?.audio);
+}
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').innerHTML=score>=7?'&#11088;&#11088;&#11088;':score>=5?'&#11088;&#11088;':'&#11088;';
+  window.speechSynthesis?.cancel();
+  sndClaps.currentTime=0;sndClaps.play().catch(()=>{});
+  setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000);
+  spawnConfetti();setTimeout(spawnConfetti,800);
+}
+</script>
+</body>
+</html>
