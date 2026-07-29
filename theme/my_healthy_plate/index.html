@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>My Healthy Plate</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial, sans-serif;
+}
+
+/* SPLASH SCREEN ADDED */
+#logoScreen{
+  position:fixed;
+  inset:0;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#logoScreen img{
+  width:220px;
+  max-width:70%;
+}
+
+/* GAME BACKGROUND */
+body{
+  background:
+    linear-gradient(rgba(255,255,255,0.78),rgba(255,255,255,0.78)),
+    url("assets/picnic-bg.png");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+
+.game{
+  width:100vw;
+  height:100svh;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto auto;
+  gap:0.6vh;
+  padding:1vh 2vw;
+  overflow:hidden;
+}
+
+.header{
+  position:relative;
+  height:8vh;
+  min-height:48px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.title{
+  font-size:clamp(24px,6vw,54px);
+  font-weight:900;
+  color:#ff7048;
+  text-shadow:2px 2px 0 white;
+  white-space:nowrap;
+}
+
+.score{
+  position:absolute;
+  right:1vw;
+  top:0;
+  background:white;
+  border-radius:22px;
+  padding:8px 12px;
+  font-weight:900;
+  color:#ff7a00;
+  font-size:clamp(14px,3vw,22px);
+  box-shadow:0 3px 10px rgba(0,0,0,0.18);
+}
+
+.instruction{
+  justify-self:center;
+  max-width:86vw;
+  background:rgba(255,255,255,0.94);
+  border-radius:22px;
+  padding:7px 14px;
+  text-align:center;
+  font-size:clamp(12px,2.8vw,18px);
+  font-weight:800;
+  color:#694b41;
+  box-shadow:0 3px 10px rgba(0,0,0,0.12);
+}
+
+.plate-wrap{
+  min-height:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.plate{
+  width:min(72vw,48vh);
+  height:min(72vw,48vh);
+  border-radius:50%;
+  background:#f5d39a;
+  border:12px solid #f2c982;
+  box-shadow:inset 0 0 0 8px #ffe6bb, 0 5px 12px rgba(0,0,0,0.12);
+  position:relative;
+  overflow:hidden;
+}
+
+.section{
+  position:absolute;
+  width:50%;
+  height:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:5px solid white;
+  font-size:clamp(13px,3vw,22px);
+  font-weight:900;
+  color:#444;
+}
+
+.section span,.dairy span{
+  background:rgba(255,255,255,0.9);
+  padding:6px 12px;
+  border-radius:18px;
+}
+
+.fruits{left:0;top:0;background:#f5e38a;}
+.vegetables{right:0;top:0;background:#b9edc1;}
+.grains{left:0;bottom:0;background:#f5ca7d;}
+.protein{right:0;bottom:0;background:#e99399;}
+
+.dairy{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:27%;
+  height:27%;
+  border-radius:50%;
+  background:#b9dcf7;
+  border:7px solid white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+  font-size:clamp(12px,3vw,20px);
+  font-weight:900;
+  color:#111;
+}
+
+.food-options{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:6px;
+  padding:0 1vw;
+}
+
+.food{
+  height:clamp(44px,8vh,72px);
+  background:white;
+  border:3px solid #ffb13b;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(24px,5vw,40px);
+  box-shadow:0 3px 8px rgba(0,0,0,0.14);
+  cursor:pointer;
+}
+
+.food.selected{
+  outline:4px solid #ff7048;
+  transform:scale(1.04);
+}
+
+.food.done{
+  opacity:0.25;
+  pointer-events:none;
+}
+
+.message{
+  height:4vh;
+  min-height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(13px,3vw,20px);
+  font-weight:900;
+  color:#217d45;
+  text-align:center;
+}
+
+.end{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,0.94);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.card{
+  background:white;
+  padding:28px;
+  border-radius:24px;
+  text-align:center;
+  box-shadow:0 5px 18px rgba(0,0,0,0.2);
+}
+
+.card h2{
+  color:#ff7048;
+  font-size:32px;
+  margin-bottom:12px;
+}
+
+.card button{
+  margin-top:18px;
+  border:0;
+  background:#ffb13b;
+  color:white;
+  padding:12px 24px;
+  border-radius:16px;
+  font-size:18px;
+  font-weight:900;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ✅ LOGO SCREEN ADDED -->
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+
+<div class="game">
+
+  <div class="header">
+    <div class="title">🍽️ My Healthy Plate 🍎</div>
+    <div class="score">⭐ <span id="score">0</span>/15</div>
+  </div>
+
+  <div class="instruction">
+    Tap a food item and then tap the correct section on the healthy plate.
+  </div>
+
+  <div class="plate-wrap">
+    <div class="plate">
+      <div class="section fruits" data-group="fruits"><span>Fruits</span></div>
+      <div class="section vegetables" data-group="vegetables"><span>Vegetables</span></div>
+      <div class="section grains" data-group="grains"><span>Grains</span></div>
+      <div class="section protein" data-group="protein"><span>Protein</span></div>
+      <div class="dairy" data-group="dairy"><span>Dairy</span></div>
+    </div>
+  </div>
+
+  <div class="food-options" id="foodOptions"></div>
+
+  <div class="message" id="message">Let's make a healthy plate!</div>
+
+</div>
+
+<div class="end" id="endScreen">
+  <div class="card">
+    <h2>🎉 Good Job!</h2>
+    <p>You completed your healthy plate.</p>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
+</div>
+
+<script>
+
+/* ✅ LOGIC TO SHOW LOGO FIRST */
+window.onload = function(){
+  setTimeout(()=>{
+    document.getElementById("logoScreen").style.display = "none";
+  }, 5000);
+};
+
+const foods = [
+  {icon:"🍎", group:"fruits", name:"Apple"},
+  {icon:"🍌", group:"fruits", name:"Banana"},
+  {icon:"🍊", group:"fruits", name:"Orange"},
+  {icon:"🥕", group:"vegetables", name:"Carrot"},
+  {icon:"🥦", group:"vegetables", name:"Broccoli"},
+  {icon:"🥬", group:"vegetables", name:"Leafy vegetable"},
+  {icon:"🌾", group:"grains", name:"Wheat"},
+  {icon:"🍚", group:"grains", name:"Rice"},
+  {icon:"🍞", group:"grains", name:"Bread"},
+  {icon:"🥚", group:"protein", name:"Egg"},
+  {icon:"🍗", group:"protein", name:"Chicken"},
+  {icon:"🫘", group:"protein", name:"Beans"},
+  {icon:"🥛", group:"dairy", name:"Milk"},
+  {icon:"🧀", group:"dairy", name:"Cheese"},
+  {icon:"🥤", group:"dairy", name:"Curd"}
+];
+
+let selected = null;
+let score = 0;
+
+const foodOptions = document.getElementById("foodOptions");
+const scoreText = document.getElementById("score");
+const message = document.getElementById("message");
+
+const correctSound = document.getElementById("correctSound");
+const clapSound = document.getElementById("clapSound");
+const wrongSound = document.getElementById("wrongSound");
+
+function playSound(sound){
+  sound.currentTime = 0;
+  sound.play().catch(()=>{});
+}
+
+foods.forEach((food,index)=>{
+  const item = document.createElement("div");
+  item.className = "food";
+  item.textContent = food.icon;
+  item.dataset.group = food.group;
+  item.dataset.index = index;
+
+  item.onclick = ()=>{
+    if(item.classList.contains("done")) return;
+    document.querySelectorAll(".food").forEach(f=>f.classList.remove("selected"));
+    item.classList.add("selected");
+    selected = item;
+  };
+
+  foodOptions.appendChild(item);
+});
+
+document.querySelectorAll(".section, .dairy").forEach(section=>{
+  section.onclick = ()=>{
+    if(!selected){
+      message.textContent = "Select a food first!";
+      return;
+    }
+
+    const foodGroup = selected.dataset.group;
+    const sectionGroup = section.dataset.group;
+
+    if(foodGroup === sectionGroup){
+      playSound(correctSound);
+      score++;
+      scoreText.textContent = score;
+
+      selected.classList.add("done");
+      selected.classList.remove("selected");
+      selected = null;
+
+      if(score === foods.length){
+        setTimeout(()=>{
+          playSound(clapSound);
+          document.getElementById("endScreen").style.display = "flex";
+        },500);
+      }
+
+    }else{
+      playSound(wrongSound);
+      message.textContent = "Try again!";
+    }
+  };
+});
+</script>
+
+</body>
+</html>
