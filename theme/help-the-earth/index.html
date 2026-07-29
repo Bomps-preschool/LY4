@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Help the Earth</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#ffffff;
+  user-select:none;
+}
+
+.screen{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.screen.active{
+  display:flex;
+}
+
+/* LOGO SCREEN */
+#logoScreen{
+  background:#ffffff;
+  z-index:50;
+}
+
+#logoScreen img{
+  width:170px;
+  max-width:55vw;
+}
+
+/* EARTH MESSAGE SCREEN */
+#earthScreen{
+  background:linear-gradient(#c8f4ff,#ecffe9);
+  flex-direction:column;
+  text-align:center;
+  padding:20px;
+}
+
+.earth{
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 32%, #22c55e 0 16%, transparent 17%),
+    radial-gradient(circle at 64% 38%, #16a34a 0 15%, transparent 16%),
+    radial-gradient(circle at 43% 68%, #65a30d 0 17%, transparent 18%),
+    radial-gradient(circle at 72% 72%, #15803d 0 11%, transparent 12%),
+    #38bdf8;
+  border:7px solid white;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22);
+  position:relative;
+  animation:earthFloat 1.9s infinite ease-in-out;
+}
+
+.earth:before{
+  content:"";
+  position:absolute;
+  width:17px;
+  height:17px;
+  background:#111827;
+  border-radius:50%;
+  left:58px;
+  top:64px;
+  box-shadow:55px 0 #111827;
+}
+
+.earth:after{
+  content:"";
+  position:absolute;
+  width:62px;
+  height:30px;
+  border-bottom:5px solid #111827;
+  border-radius:0 0 60px 60px;
+  left:62px;
+  top:95px;
+}
+
+@keyframes earthFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+
+.earthMessage{
+  margin-top:24px;
+  background:#ffffff;
+  color:#166534;
+  padding:18px 24px;
+  border-radius:24px;
+  font-size:clamp(24px,5vw,40px);
+  font-weight:900;
+  line-height:1.2;
+  box-shadow:0 8px 22px rgba(0,0,0,0.16);
+}
+
+/* GAME SCREEN */
+#gameScreen{
+  background:url("assets/help-the-earth_background.png") center/cover no-repeat;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:8px;
+}
+
+.topPanel{
+  width:100%;
+  min-height:88px;
+  height:17vh;
+  max-height:125px;
+  background:rgba(255,255,255,0.92);
+  border-radius:18px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.18);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 12px;
+  z-index:10;
+}
+
+.gameTitle{
+  font-size:clamp(23px,4.5vw,36px);
+  color:#15803d;
+  font-weight:900;
+  margin-bottom:4px;
+}
+
+.instruction{
+  font-size:clamp(16px,3.3vw,25px);
+  color:#1f2937;
+  font-weight:800;
+  line-height:1.2;
+}
+
+.counter{
+  margin-top:3px;
+  font-size:clamp(12px,2.7vw,16px);
+  color:#475569;
+  font-weight:700;
+}
+
+.scene{
+  position:relative;
+  width:100%;
+  height:calc(83vh - 16px);
+  margin-top:8px;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+/* LITTER IMAGES */
+.litter{
+  position:absolute;
+  width:clamp(68px,13vw,125px);
+  height:clamp(58px,11vw,105px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform 0.25s ease, opacity 0.35s ease, filter 0.25s ease;
+  z-index:3;
+}
+
+.litter img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  filter:drop-shadow(0 8px 6px rgba(0,0,0,0.25));
+}
+
+.litter.selected{
+  transform:scale(1.14);
+}
+
+.litter.selected img{
+  filter:drop-shadow(0 0 12px #22c55e) drop-shadow(0 8px 6px rgba(0,0,0,0.25));
+}
+
+.litter.glow img{
+  animation:correctGlow 0.75s infinite alternate;
+}
+
+@keyframes correctGlow{
+  from{
+    filter:drop-shadow(0 0 6px #facc15) drop-shadow(0 8px 6px rgba(0,0,0,0.25));
+  }
+  to{
+    filter:drop-shadow(0 0 18px #22c55e) drop-shadow(0 8px 6px rgba(0,0,0,0.25));
+  }
+}
+
+.wiggle{
+  animation:wiggle 0.35s;
+}
+
+@keyframes wiggle{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-10px)}
+  50%{transform:translateX(10px)}
+  75%{transform:translateX(-8px)}
+  100%{transform:translateX(0)}
+}
+
+/* POSITIONS LIKE YOUR REFERENCE SCREEN */
+.pos-bottle{left:7%; top:41%;}
+.pos-chocolate{left:29%; top:30%;}
+.pos-fruits{left:49%; top:30%;}
+.pos-can{left:67%; top:31%;}
+.pos-cloth{left:28%; top:62%;}
+.pos-icecream{left:52%; top:64%;}
+
+/* DUSTBIN */
+#dustbin{
+  position:absolute;
+  right:4%;
+  bottom:8%;
+  width:clamp(115px,21vw,185px);
+  height:clamp(145px,28vw,230px);
+  cursor:pointer;
+  z-index:5;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  transition:transform 0.25s ease;
+}
+
+#dustbin img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 8px rgba(0,0,0,0.28));
+  pointer-events:none;
+}
+
+#dustbin.ready{
+  animation:binPulse 0.65s infinite alternate;
+}
+
+@keyframes binPulse{
+  from{transform:scale(1)}
+  to{transform:scale(1.07)}
+}
+
+/* FEEDBACK */
+#feedback{
+  position:absolute;
+  left:50%;
+  top:43%;
+  transform:translate(-50%,-50%);
+  background:rgba(255,255,255,0.97);
+  color:#15803d;
+  padding:16px 26px;
+  border-radius:24px;
+  font-size:clamp(26px,6vw,48px);
+  font-weight:900;
+  box-shadow:0 9px 24px rgba(0,0,0,0.24);
+  display:none;
+  z-index:20;
+  text-align:center;
+}
+
+#feedback.show{
+  display:block;
+}
+
+.tick{
+  font-size:clamp(42px,8vw,70px);
+  line-height:1;
+}
+
+/* END SCREEN */
+#endScreen{
+  background:linear-gradient(#dcfce7,#dff6ff);
+  flex-direction:column;
+  text-align:center;
+  padding:18px;
+}
+
+.endCard{
+  width:min(92vw,540px);
+  background:#ffffff;
+  border-radius:30px;
+  padding:28px 20px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.22);
+  z-index:5;
+}
+
+.endTitle{
+  font-size:clamp(34px,8vw,58px);
+  color:#15803d;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.endText{
+  font-size:clamp(18px,4vw,26px);
+  color:#1f2937;
+  font-weight:800;
+  line-height:1.3;
+  margin-bottom:20px;
+}
+
+button{
+  border:0;
+  outline:0;
+  background:#16a34a;
+  color:white;
+  font-size:clamp(18px,4vw,24px);
+  font-weight:900;
+  padding:14px 30px;
+  border-radius:999px;
+  cursor:pointer;
+  box-shadow:0 8px 16px rgba(0,0,0,0.22);
+}
+
+button:active{
+  transform:scale(0.96);
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  width:12px;
+  height:12px;
+  top:-20px;
+  z-index:100;
+  animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(720deg);
+    opacity:0;
+  }
+}
+
+/* MOBILE PORTRAIT BALANCING */
+@media(max-width:600px){
+  .topPanel{
+    height:19vh;
+    min-height:96px;
+  }
+
+  .scene{
+    height:calc(81vh - 16px);
+  }
+
+  .litter{
+    width:clamp(58px,19vw,88px);
+    height:clamp(52px,17vw,78px);
+  }
+
+  .pos-bottle{left:5%; top:22%;}
+  .pos-chocolate{left:33%; top:21%;}
+  .pos-fruits{left:5%; top:45%;}
+  .pos-can{left:34%; top:44%;}
+  .pos-cloth{left:6%; top:67%;}
+  .pos-icecream{left:34%; top:67%;}
+
+  #dustbin{
+    right:3%;
+    bottom:22%;
+    width:clamp(95px,31vw,135px);
+    height:clamp(130px,42vw,170px);
+  }
+}
+
+/* SMALL HEIGHT PHONES */
+@media(max-height:560px){
+  .topPanel{
+    height:20vh;
+    min-height:78px;
+  }
+
+  .scene{
+    height:calc(80vh - 16px);
+  }
+
+  .gameTitle{
+    font-size:21px;
+  }
+
+  .instruction{
+    font-size:15px;
+  }
+
+  .counter{
+    font-size:12px;
+  }
+
+  .litter{
+    width:60px;
+    height:52px;
+  }
+
+  #dustbin{
+    width:100px;
+    height:135px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="clapSound" src="assets/claps.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+
+<!-- SCREEN 1: LOGO -->
+<div id="logoScreen" class="screen active">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- SCREEN 2: EARTH MESSAGE -->
+<div id="earthScreen" class="screen">
+  <div class="earth"></div>
+  <div class="earthMessage">
+    Help me!<br>
+    Keep Me Neat And Clean
+  </div>
+</div>
+
+<!-- SCREEN 3: GAME -->
+<div id="gameScreen" class="screen">
+  <div class="topPanel">
+    <div class="gameTitle">Help the Earth</div>
+    <div id="instruction" class="instruction">Tap any garbage. Then tap the dustbin.</div>
+    <div id="counter" class="counter">Cleaned 0 of 6</div>
+  </div>
+
+  <div id="scene" class="scene">
+    <div id="feedback">
+      <div class="tick">✓</div>
+      Good Job!
+    </div>
+
+    <div id="dustbin">
+      <img src="assets/bin.png" alt="Dustbin">
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: END -->
+<div id="endScreen" class="screen">
+  <div class="endCard">
+    <div class="endTitle">Good Job!</div>
+    <div class="endText">
+      You helped the Earth become neat and clean.
+    </div>
+    <button onclick="restartGame()">Play Again</button>
+  </div>
+</div>
+
+<script>
+var logoScreen = document.getElementById("logoScreen");
+var earthScreen = document.getElementById("earthScreen");
+var gameScreen = document.getElementById("gameScreen");
+var endScreen = document.getElementById("endScreen");
+
+var scene = document.getElementById("scene");
+var instructionBox = document.getElementById("instruction");
+var counterBox = document.getElementById("counter");
+var feedback = document.getElementById("feedback");
+var dustbin = document.getElementById("dustbin");
+
+var clapSound = document.getElementById("clapSound");
+var wrongSound = document.getElementById("wrongSound");
+
+var garbageItems = [
+  {
+    id:"bottle",
+    name:"bottle",
+    img:"assets/bottle.png",
+    pos:"pos-bottle"
+  },
+  {
+    id:"chocolate",
+    name:"chocolate",
+    img:"assets/chocolate.png",
+    pos:"pos-chocolate"
+  },
+  {
+    id:"fruits",
+    name:"fruit waste",
+    img:"assets/fruits.png",
+    pos:"pos-fruits"
+  },
+  {
+    id:"can",
+    name:"can",
+    img:"assets/can.png",
+    pos:"pos-can"
+  },
+  {
+    id:"cloth",
+    name:"cloth",
+    img:"assets/cloth.png",
+    pos:"pos-cloth"
+  },
+  {
+    id:"icecream",
+    name:"ice cream waste",
+    img:"assets/ice-cream.png",
+    pos:"pos-icecream"
+  }
+];
+
+var selectedItem = null;
+var cleanedCount = 0;
+var totalItems = garbageItems.length;
+var dustbinWrongAttempts = 0;
+var accepting = true;
+
+function showScreen(screenName){
+  logoScreen.classList.remove("active");
+  earthScreen.classList.remove("active");
+  gameScreen.classList.remove("active");
+  endScreen.classList.remove("active");
+
+  if(screenName === "logo") logoScreen.classList.add("active");
+  if(screenName === "earth") earthScreen.classList.add("active");
+  if(screenName === "game") gameScreen.classList.add("active");
+  if(screenName === "end") endScreen.classList.add("active");
+}
+
+function playAudio(audio){
+  try{
+    audio.currentTime = 0;
+    audio.play();
+  }catch(e){}
+}
+
+function startOpening(){
+  showScreen("logo");
+
+  setTimeout(function(){
+    showScreen("earth");
+
+    setTimeout(function(){
+      startGame();
+    },2500);
+
+  },2000);
+}
+
+function startGame(){
+  showScreen("game");
+
+  selectedItem = null;
+  cleanedCount = 0;
+  dustbinWrongAttempts = 0;
+  accepting = true;
+
+  removeOldLitter();
+  createAllLitter();
+  updateTopText();
+}
+
+function removeOldLitter(){
+  var old = document.querySelectorAll(".litter");
+  for(var i = 0; i < old.length; i++){
+    old[i].parentNode.removeChild(old[i]);
+  }
+}
+
+function createAllLitter(){
+  for(var i = 0; i < garbageItems.length; i++){
+    var item = garbageItems[i];
+
+    var div = document.createElement("div");
+    div.className = "litter " + item.pos;
+    div.setAttribute("data-id", item.id);
+
+    var image = document.createElement("img");
+    image.src = item.img;
+    image.alt = item.name;
+
+    div.appendChild(image);
+
+    div.onclick = function(){
+      tapLitter(this);
+    };
+
+    scene.appendChild(div);
+  }
+}
+
+function updateTopText(){
+  if(selectedItem){
+    instructionBox.textContent = "Great! Now tap the dustbin.";
+  }else{
+    instructionBox.textContent = "Tap any garbage. Then tap the dustbin.";
+  }
+
+  counterBox.textContent = "Cleaned " + cleanedCount + " of " + totalItems;
+}
+
+function tapLitter(element){
+  if(!accepting) return;
+
+  var allLitter = document.querySelectorAll(".litter");
+  for(var i = 0; i < allLitter.length; i++){
+    allLitter[i].classList.remove("selected");
+    allLitter[i].classList.remove("glow");
+  }
+
+  selectedItem = element;
+  selectedItem.classList.add("selected");
+  dustbin.classList.add("ready");
+  dustbinWrongAttempts = 0;
+
+  updateTopText();
+}
+
+dustbin.onclick = function(){
+  if(!accepting) return;
+
+  if(selectedItem){
+    putInDustbin();
+  }else{
+    dustbinWrongAttempts++;
+    playAudio(wrongSound);
+
+    dustbin.classList.add("wiggle");
+    setTimeout(function(){
+      dustbin.classList.remove("wiggle");
+    },400);
+
+    instructionBox.textContent = "First tap any garbage. Then tap the dustbin.";
+
+    if(dustbinWrongAttempts >= 2){
+      glowAllGarbage();
+      instructionBox.textContent = "Tap any glowing garbage first.";
+    }
+  }
+};
+
+function glowAllGarbage(){
+  var allLitter = document.querySelectorAll(".litter");
+  for(var i = 0; i < allLitter.length; i++){
+    if(allLitter[i].style.display !== "none"){
+      allLitter[i].classList.add("glow");
+    }
+  }
+}
+
+function putInDustbin(){
+  accepting = false;
+  dustbin.classList.remove("ready");
+
+  var itemToClean = selectedItem;
+
+  var binRect = dustbin.getBoundingClientRect();
+  var sceneRect = scene.getBoundingClientRect();
+
+  itemToClean.style.left = (binRect.left - sceneRect.left + binRect.width / 2 - itemToClean.offsetWidth / 2) + "px";
+  itemToClean.style.top = (binRect.top - sceneRect.top + binRect.height / 2 - itemToClean.offsetHeight / 2) + "px";
+  itemToClean.style.transform = "scale(0.2)";
+  itemToClean.style.opacity = "0";
+
+  feedback.classList.add("show");
+  playAudio(clapSound);
+
+  setTimeout(function(){
+    itemToClean.style.display = "none";
+
+    cleanedCount++;
+    selectedItem = null;
+    accepting = true;
+
+    feedback.classList.remove("show");
+    updateTopText();
+
+    if(cleanedCount >= totalItems){
+      setTimeout(function(){
+        endGame();
+      },500);
+    }
+  },1100);
+}
+
+function endGame(){
+  showScreen("end");
+  playAudio(clapSound);
+  makeConfetti();
+}
+
+function makeConfetti(){
+  var colors = ["#22c55e","#38bdf8","#facc15","#fb7185","#a78bfa","#f97316"];
+
+  for(var i = 0; i < 100; i++){
+    var piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 1.3 + "s";
+    piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+
+    document.body.appendChild(piece);
+
+    setTimeout((function(p){
+      return function(){
+        if(p && p.parentNode){
+          p.parentNode.removeChild(p);
+        }
+      };
+    })(piece),4300);
+  }
+}
+
+function restartGame(){
+  var confetti = document.querySelectorAll(".confetti");
+  for(var i = 0; i < confetti.length; i++){
+    confetti[i].parentNode.removeChild(confetti[i]);
+  }
+
+  showScreen("earth");
+
+  setTimeout(function(){
+    startGame();
+  },1800);
+}
+
+startOpening();
+</script>
+
+</body>
+</html>
