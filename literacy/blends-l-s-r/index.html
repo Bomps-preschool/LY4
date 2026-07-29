@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blends L, S & R Game</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', Arial, sans-serif; }
+body, html { width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #fff; }
+#game-container { width: 100%; height: 100%; max-width: 600px; position: relative; }
+
+.screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.3s; }
+.hidden { opacity: 0; pointer-events: none; }
+
+#splash img { width: 200px; height: auto; }
+
+/* Question Screen with bright colorful background */
+#question-screen {
+    background: url('assets/a_bright_colorful_kids_educational_game_ui_scene.png') no-repeat center center;
+    background-size: cover;
+    padding: 20px;
+    flex-direction: column;
+    position: relative;
+}
+#instruction {
+    font-size: 2rem; 
+    color: #fff; 
+    text-align: center; 
+    font-weight: bold; 
+    padding: 10px 20px; 
+    border-radius: 15px; 
+    background: rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+#question-img { max-width: 70%; height: auto; margin: 15px 0; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
+.options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+.option { flex: 1 1 45%; padding: 15px; border-radius: 15px; text-align: center; font-size: 1.2rem; cursor: pointer; font-weight: bold;
+         transition: transform 0.2s, box-shadow 0.2s; color: #fff; }
+.option.correct { background: #4CAF50; }
+.option.wrong { background: #F44336; }
+.option.glow { box-shadow: 0 0 25px 8px yellow; }
+.option:nth-child(1){background:#FF9800;}
+.option:nth-child(2){background:#4CAF50;}
+.option:nth-child(3){background:#2196F3;}
+.option:nth-child(4){background:#E91E63;}
+#feedback { font-size: 1.5rem; margin: 10px; color: yellow; display: none; text-shadow: 1px 1px 2px #000; }
+
+#end-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+#end-screen button { margin-top: 20px; padding: 15px 25px; font-size: 1.2rem; border: none; border-radius: 10px; background-color: #FF5722; color: #fff; cursor: pointer; }
+
+canvas { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <!-- Splash Screen -->
+    <div class="screen" id="splash">
+        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+    </div>
+
+    <!-- Question Screen -->
+    <div class="screen hidden" id="question-screen">
+        <div id="instruction">Find the Blend</div>
+        <img id="question-img" src="" alt="Question">
+        <div class="options" id="options"></div>
+        <div id="feedback">Good Job!</div>
+    </div>
+
+    <!-- End Screen -->
+    <div class="screen hidden" id="end-screen">
+        <h1>🎉 Well Done! 🎉</h1>
+        <button id="play-again">Play Again</button>
+    </div>
+
+    <canvas id="confetti"></canvas>
+</div>
+
+<script>
+const splash = document.getElementById('splash');
+const questionScreen = document.getElementById('question-screen');
+const endScreen = document.getElementById('end-screen');
+const questionImg = document.getElementById('question-img');
+const optionsDiv = document.getElementById('options');
+const feedback = document.getElementById('feedback');
+const playAgainBtn = document.getElementById('play-again');
+
+const correctSound = new Audio('assets/correct.mp3');
+const wrongSound = new Audio('assets/wrong.mp3');
+const clapSound = new Audio('assets/freesound_community-claps-44774.mp3');
+
+const questions = [
+    {img:'assets/l-blend-block.png', answer:'bl', options:['bl','sl','br','cr']},
+    {img:'assets/l-blend-clap.png', answer:'cl', options:['cl','sl','br','cr']},
+    {img:'assets/l-blend-flags.png', answer:'fl', options:['fl','sl','br','cr']},
+    {img:'assets/l-blend-play.png', answer:'pl', options:['pl','sl','br','cr']},
+    {img:'assets/l-blend-slide.png', answer:'sl', options:['sl','bl','br','cr']},
+    {img:'assets/r-blend-brick.png', answer:'br', options:['br','cr','dr','fr']},
+    {img:'assets/r-blend-crab.png', answer:'cr', options:['cr','br','dr','fr']},
+    {img:'assets/r-blend-drop.png', answer:'dr', options:['dr','cr','br','fr']},
+    {img:'assets/r-blend-frog.png', answer:'fr', options:['fr','cr','dr','br']},
+    {img:'assets/r-blend-truck.png', answer:'tr', options:['tr','cr','dr','br']},
+    {img:'assets/s-blend-skate.png', answer:'sk', options:['sk','sm','sn','st']},
+    {img:'assets/s-blend-smile.png', answer:'sm', options:['sm','sk','sn','st']},
+    {img:'assets/s-blend-snow.png', answer:'sn', options:['sn','sk','sm','st']},
+    {img:'assets/s-blend-stop.png', answer:'st', options:['st','sk','sm','sn']},
+    {img:'assets/s-blend-swing.png', answer:'sw', options:['sw','sk','sm','st']},
+];
+
+let currentQ = 0;
+let attempts = 0;
+
+setTimeout(() => {
+    splash.classList.add('hidden');
+    showQuestion();
+}, 2000);
+
+function showQuestion() {
+    questionScreen.classList.remove('hidden');
+    feedback.style.display = 'none';
+    attempts = 0;
+    const q = questions[currentQ];
+    questionImg.src = q.img;
+    optionsDiv.innerHTML = '';
+    q.options.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        btn.textContent = opt;
+        btn.addEventListener('click', () => handleAnswer(btn,opt));
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function handleAnswer(btn, opt) {
+    const correct = questions[currentQ].answer;
+    if(opt === correct){
+        correctSound.play();
+        btn.classList.add('correct');
+        feedback.style.display = 'block';
+        setTimeout(() => { feedback.style.display = 'none'; nextQuestion(); }, 800);
+    } else {
+        wrongSound.play();
+        btn.classList.add('wrong');
+        attempts++;
+        btn.style.transform = 'translateX(5px)';
+        setTimeout(()=> btn.style.transform='translateX(0)',150);
+        setTimeout(()=> btn.style.transform='translateX(-5px)',150);
+        setTimeout(()=> btn.style.transform='translateX(0)',150);
+        if(attempts >=2){
+            Array.from(optionsDiv.children).forEach(o=>{
+                if(o.textContent === correct) o.classList.add('glow');
+            });
+        }
+    }
+}
+
+function nextQuestion() {
+    currentQ++;
+    if(currentQ >= questions.length){ showEndScreen(); } else { showQuestion(); }
+}
+
+function showEndScreen() {
+    questionScreen.classList.add('hidden');
+    endScreen.classList.remove('hidden');
+    launchConfetti();
+    clapSound.play();
+}
+
+playAgainBtn.addEventListener('click', ()=>{
+    currentQ=0;
+    endScreen.classList.add('hidden');
+    showQuestion();
+});
+
+const confettiCanvas = document.getElementById('confetti');
+const ctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+
+function launchConfetti() {
+    confettiCanvas.width = confettiCanvas.offsetWidth;
+    confettiCanvas.height = confettiCanvas.offsetHeight;
+    confettiParticles = [];
+    for(let i=0;i<150;i++){
+        confettiParticles.push({
+            x: Math.random()*confettiCanvas.width,
+            y: Math.random()*confettiCanvas.height - confettiCanvas.height,
+            r: Math.random()*6+2,
+            d: Math.random()*20+10,
+            color: `hsl(${Math.random()*360},100%,50%)`,
+            tilt: Math.floor(Math.random()*10)-10,
+            tiltAngleIncrement: Math.random()*0.07+0.05,
+            tiltAngle:0
+        });
+    }
+    requestAnimationFrame(drawConfetti);
+    setTimeout(()=>{confettiParticles=[];ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);},4000);
+}
+
+function drawConfetti() {
+    ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    confettiParticles.forEach(p=>{
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+        ctx.stroke();
+        p.tiltAngle += p.tiltAngleIncrement;
+        p.y += (Math.cos(p.d)+3+p.r/2)/2;
+        p.tilt = Math.sin(p.tiltAngle)*15;
+        if(p.y > confettiCanvas.height) p.y = -10;
+    });
+    if(confettiParticles.length>0) requestAnimationFrame(drawConfetti);
+}
+</script>
+
+</body>
+</html>
