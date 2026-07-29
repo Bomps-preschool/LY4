@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LY4 3D Cube Game</title>
+<style>
+html, body {
+  margin:0; padding:0; width:100%; height:100%; font-family: Arial, sans-serif; overflow:hidden;
+}
+body { background: #fff; }
+
+/* Screens */
+#logoScreen, #gameScreen, #endScreen {
+  width:100%; height:100%; position:absolute; top:0; left:0;
+  display:flex; justify-content:center; align-items:center; flex-direction:column;
+}
+#logoScreen { background:#fff; z-index:10; }
+#logoScreen img { width:150px; }
+
+/* Game Screen */
+#gameScreen {
+  display:none; flex-direction:column;
+  justify-content:flex-start; align-items:center;
+  background: url('assets/background.png') no-repeat center center;
+  background-size: cover;
+  padding-top: 50px;
+  box-sizing: border-box;
+  height: 100vh;
+}
+
+/* Instruction frame */
+#instructionFrame {
+  position: relative; display: flex; justify-content: center; align-items: center;
+  width: 90%; max-width: 450px; height: 100px; margin-bottom: 30px;
+  background: url('assets/instruction-frame.png') no-repeat center center;
+  background-size: contain;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(255,182,193,0.5);
+  padding: 0 10px;
+}
+#instructionFrame span {
+  position: absolute; text-align:center; font-size:24px; color:#9c1d6a; padding:0 25px;
+}
+
+/* Options frame */
+#options {
+  display:flex; justify-content:center; gap:25px;
+  flex: 1; align-items: center; /* center vertically in remaining space */
+}
+.optionWrapper {
+  position: relative; width:120px; height:120px; 
+  background: url('assets/option-frame.png') no-repeat center center;
+  background-size: contain;
+  display:flex; justify-content:center; align-items:center;
+  border-radius:20px;
+  box-shadow:0 4px 10px rgba(173,216,230,0.5);
+}
+.optionWrapper img.option-img {
+  width:90px; height:90px; cursor:pointer; border-radius:15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border:2px solid #ffb6c1;
+}
+.optionWrapper img.option-img.glow { box-shadow:0 0 20px 5px #0f0; }
+
+/* Tick */
+#tick { display:none; font-size:50px; color:green; margin-top:20px; }
+
+/* End Screen */
+#endScreen { display:none; background:#fff; z-index:20; text-align:center; justify-content:center; align-items:center; }
+#playAgainBtn { margin-top:20px; padding:12px 25px; font-size:20px; cursor:pointer; border-radius:10px; background-color:#9c1d6a; color:white; border:none; }
+
+/* Confetti canvas */
+canvas { position:absolute; top:0; left:0; pointer-events:none; }
+
+/* Responsive */
+@media(max-width:480px) {
+  #instructionFrame { height:80px; }
+  #instructionFrame span { font-size:20px; padding:0 15px; }
+  .optionWrapper { width:90px; height:90px; }
+  .optionWrapper img.option-img { width:70px; height:70px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Logo Screen -->
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <div id="instructionFrame"><span id="instructionText">Tap the cube!</span></div>
+  <div id="options"></div>
+  <div id="tick">✔️ Good Job!</div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <h1>Good Job!</h1>
+  <canvas id="confettiCanvas"></canvas>
+  <button id="playAgainBtn">Play Again</button>
+</div>
+
+<!-- Sounds -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="applauseSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+// Questions
+const questions = [
+  { correct: 'cube1.png', options: ['cube1.png','circle.png','cone.png'], instruction:'Tap the cube!' },
+  { correct: 'cube2.png', options: ['cube2.png','cylinder.png','daimond.png'], instruction:'Find the cube!' },
+  { correct: 'cube3.png', options: ['cone.png','cube3.png','circle.png'], instruction:'Which one is a cube?' },
+  { correct: 'cube1.png', options: ['cube1.png','daimond.png','cylinder.png'], instruction:'Click the cube!' },
+  { correct: 'cube2.png', options: ['cube2.png','cone.png','circle.png'], instruction:'Tap the cube!' },
+  { correct: 'cube3.png', options: ['cube3.png','cylinder.png','daimond.png'], instruction:'Find the cube!' },
+  { correct: 'cube1.png', options: ['cube1.png','circle.png','cone.png'], instruction:'Which one is a cube?' },
+  { correct: 'cube2.png', options: ['cube2.png','daimond.png','cylinder.png'], instruction:'Click the cube!' }
+];
+
+let currentQuestion = 0;
+let wrongAttempts = 0;
+
+const logoScreen = document.getElementById('logoScreen');
+const gameScreen = document.getElementById('gameScreen');
+const instructionText = document.getElementById('instructionText');
+const optionsDiv = document.getElementById('options');
+const tickDiv = document.getElementById('tick');
+const endScreen = document.getElementById('endScreen');
+const playAgainBtn = document.getElementById('playAgainBtn');
+
+const correctSound = document.getElementById('correctSound');
+const wrongSound = document.getElementById('wrongSound');
+const applauseSound = document.getElementById('applauseSound');
+
+// Show game after 2s logo
+setTimeout(()=>{ logoScreen.style.display='none'; showQuestion(); gameScreen.style.display='flex'; },2000);
+
+function showQuestion(){
+  tickDiv.style.display='none';
+  wrongAttempts=0;
+  const q = questions[currentQuestion];
+  instructionText.textContent=q.instruction;
+  optionsDiv.innerHTML='';
+  const shuffled = q.options.sort(()=>Math.random()-0.5);
+  shuffled.forEach(opt=>{
+    const wrapper = document.createElement('div');
+    wrapper.className='optionWrapper';
+    const img=document.createElement('img');
+    img.src='assets/'+opt;
+    img.className='option-img';
+    img.addEventListener('click',()=>checkAnswer(opt,img));
+    wrapper.appendChild(img);
+    optionsDiv.appendChild(wrapper);
+  });
+}
+
+function checkAnswer(selected,imgEl){
+  const q=questions[currentQuestion];
+  if(selected===q.correct){
+    correctSound.play();
+    tickDiv.style.display='block';
+    setTimeout(()=>{
+      currentQuestion++;
+      if(currentQuestion<questions.length){ showQuestion(); }
+      else{ endGame(); }
+    },1000);
+  } else {
+    wrongSound.play();
+    wrongAttempts++;
+    imgEl.style.transform='translateX(-10px)';
+    setTimeout(()=>{imgEl.style.transform='translateX(10px)';},100);
+    setTimeout(()=>{imgEl.style.transform='translateX(0px)';},200);
+    if(wrongAttempts>=2){
+      Array.from(optionsDiv.querySelectorAll('img.option-img')).forEach(c=>{
+        if(c.src.includes(q.correct)) c.classList.add('glow');
+      });
+    }
+  }
+}
+
+function endGame(){
+  gameScreen.style.display='none';
+  endScreen.style.display='flex';
+  applauseSound.play();
+  startConfetti();
+}
+
+playAgainBtn.addEventListener('click',()=>{
+  currentQuestion=0;
+  endScreen.style.display='none';
+  showQuestion();
+  gameScreen.style.display='flex';
+  stopConfetti();
+});
+
+// Confetti
+const confettiCanvas=document.getElementById('confettiCanvas');
+const ctx=confettiCanvas.getContext('2d');
+confettiCanvas.width=window.innerWidth;
+confettiCanvas.height=window.innerHeight;
+let confettiPieces=[]; let confettiInterval;
+
+function startConfetti(){
+  confettiPieces=[];
+  for(let i=0;i<150;i++){
+    confettiPieces.push({x:Math.random()*confettiCanvas.width,y:Math.random()*confettiCanvas.height,r:Math.random()*6+2,d:Math.random()*150+10,color:'rgb('+(Math.floor(Math.random()*255))+','+(Math.floor(Math.random()*255))+','+(Math.floor(Math.random()*255))+')',tilt:Math.random()*10-10,tiltAngleIncremental:Math.random()*0.07+0.05,tiltAngle:0});
+  }
+  confettiInterval=setInterval(drawConfetti,20);
+}
+
+function drawConfetti(){
+  ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiPieces.forEach(p=>{
+    ctx.beginPath(); ctx.lineWidth=p.r; ctx.strokeStyle=p.color;
+    ctx.moveTo(p.x+p.tilt+p.r/2,p.y);
+    ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/2); ctx.stroke();
+    p.tiltAngle+=p.tiltAngleIncremental;
+    p.y+=(Math.cos(p.d)+3+p.r/2)/2;
+    p.tilt=Math.sin(p.tiltAngle)*15;
+    if(p.y>confettiCanvas.height){ p.y=-10; p.x=Math.random()*confettiCanvas.width; }
+  });
+}
+
+function stopConfetti(){ clearInterval(confettiInterval); ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+</script>
+</body>
+</html>
