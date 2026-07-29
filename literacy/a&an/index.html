@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A and AN Game</title>
+<style>
+body, html {
+  margin:0; padding:0; font-family: Arial, sans-serif;
+  width:100%; height:100%; overflow:hidden;
+}
+
+/* Screens */
+#logoScreen, #gameScreen, #endScreen {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+}
+#logoScreen { background:white; z-index:2; }
+#logoScreen img { width:200px; max-width:50%; }
+
+/* Game Screen */
+#gameScreen {
+  display:none;
+  background: url('assets/a-an-backgroung.png') no-repeat center center;
+  background-size: cover;
+  padding:20px; box-sizing:border-box;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+}
+
+/* Instruction box */
+#instructions {
+  width:95%; max-width:600px; text-align:center;
+  font-size:20px; background:rgba(255,255,255,0.9);
+  padding:15px; border:4px solid #c5b1ff; border-radius:12px;
+  margin-bottom:30px;
+}
+
+/* Image and sentence */
+.sentence-box {
+  background: rgba(255,255,255,0.9); border-radius:12px;
+  padding:20px; margin:10px 0; width:90%; max-width:400px;
+  text-align:center; font-size:22px;
+  display:flex; flex-direction:column; align-items:center; gap:20px;
+}
+.sentence-box img { width:200px; height:200px; object-fit:contain; }
+
+/* Options */
+.options { margin-top:20px; display:flex; justify-content:center; gap:50px; flex-wrap:wrap; }
+.option-btn {
+  padding:20px 30px; font-size:24px; border-radius:50%;
+  border:none; cursor:pointer; background-color:#FFD700;
+  min-width:80px; min-height:80px;
+}
+.option-btn:hover { opacity:0.85; }
+
+/* End Screen */
+#endScreen {
+  display:none; background:#FFF0F5; z-index:3; justify-content:center; align-items:center; text-align:center;
+}
+#endScreen h1 { font-size:40px; color:#FF69B4; margin-bottom:30px; }
+#playAgainBtn { padding:20px 35px; font-size:24px; border-radius:14px; border:none; cursor:pointer; background-color:#FFB6C1; }
+canvas { position:absolute; top:0; left:0; pointer-events:none; }
+
+</style>
+</head>
+<body>
+
+<!-- Logo -->
+<div id="logoScreen">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <div id="instructions">Tap the correct word to complete the sentence: “a” or “an”</div>
+  <div class="sentence-box">
+    <img id="sentenceImage" src="" alt="">
+    <span id="sentenceSpan"></span>
+  </div>
+  <div class="options">
+    <button class="option-btn" id="optionA">a</button>
+    <button class="option-btn" id="optionAn">an</button>
+  </div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <h1>Good Job!</h1>
+  <button id="playAgainBtn">Play Again</button>
+  <canvas id="confettiCanvas"></canvas>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+// Sentences and images
+const sentences = [
+  {text:"I eat ___ orange.", answer:"an", image:"assets/orange.png"},
+  {text:"I see ___ car.", answer:"a", image:"assets/car.png"},
+  {text:"___ ant is reading.", answer:"an", image:"assets/ant.png"},
+  {text:"The boy is riding ___ bikecycle.", answer:"a", image:"assets/boy.png"},
+  {text:"It is ___ igloo.", answer:"an", image:"assets/igloo.png"},
+  {text:"He wants ___ cookie.", answer:"a", image:"assets/cookie.png"},
+  {text:"It is ___ apple.", answer:"an", image:"assets/apple.png"}
+];
+
+let currentIndex = 0;
+
+// Elements
+const sentenceSpan = document.getElementById("sentenceSpan");
+const sentenceImage = document.getElementById("sentenceImage");
+const optionA = document.getElementById("optionA");
+const optionAn = document.getElementById("optionAn");
+const gameScreen = document.getElementById("gameScreen");
+const logoScreen = document.getElementById("logoScreen");
+const endScreen = document.getElementById("endScreen");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+const playAgainBtn = document.getElementById("playAgainBtn");
+
+// Show logo 2s
+setTimeout(()=>{ logoScreen.style.display="none"; startGame(); }, 2000);
+
+// Game functions
+function startGame(){
+  currentIndex=0;
+  endScreen.style.display="none";
+  gameScreen.style.display="flex";
+  showSentence();
+}
+
+function showSentence(){
+  const s = sentences[currentIndex];
+  sentenceSpan.textContent = s.text;
+  sentenceImage.src = s.image;
+}
+
+function checkAnswer(selected){
+  const correct = sentences[currentIndex].answer;
+  if(selected===correct){
+    correctSound.play();
+    sentenceSpan.textContent = sentences[currentIndex].text.replace("___", correct);
+    clapSound.play();
+    setTimeout(()=>{
+      currentIndex++;
+      if(currentIndex<sentences.length) showSentence();
+      else showEndScreen();
+    },1000);
+  } else { wrongSound.play(); }
+}
+
+// Events
+optionA.addEventListener("click", ()=>checkAnswer("a"));
+optionAn.addEventListener("click", ()=>checkAnswer("an"));
+playAgainBtn.addEventListener("click", startGame);
+
+// End screen + confetti
+function showEndScreen(){
+  gameScreen.style.display="none";
+  endScreen.style.display="flex";
+  confetti();
+}
+
+function confetti(){
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const confettis=[];
+  for(let i=0;i<250;i++){   // more confetti particles
+    confettis.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height-canvas.height,
+      r:Math.random()*14+8,  // larger size
+      d:Math.random()*150+50,
+      color:Math.random()<0.5?"#FFB6C1":"#FFFFE0",
+      tilt:Math.random()*20-10
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confettis.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth=c.r/2;
+      ctx.strokeStyle=c.color;
+      ctx.moveTo(c.x+c.tilt+c.r/4,c.y);
+      ctx.lineTo(c.x+c.tilt,c.y+c.tilt+c.r/4);
+      ctx.stroke();
+      c.y+=4; if(c.y>canvas.height) c.y=-10;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
