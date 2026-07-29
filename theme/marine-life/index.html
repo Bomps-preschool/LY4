@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Marine Life Ocean Zones</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:"Comic Sans MS",Arial,sans-serif;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#c9f7ff;
+}
+
+#app{
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+}
+
+#logoSlide{
+  width:100%;
+  height:100%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#logoSlide img{
+  width:min(55vw,300px);
+}
+
+#gameSlide{
+  display:none;
+  width:100%;
+  height:100%;
+  background:#c9f7ff;
+  padding:.4vh .8vw;
+}
+
+.header{
+  height:10.5vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:.7vh;
+  text-align:center;
+  font-size:clamp(16px,2.4vw,30px);
+  font-weight:bold;
+  color:#004f83;
+  text-shadow:1px 2px white;
+}
+
+.instructionTabs{display:flex;width:min(96%,760px);gap:6px;padding:5px;background:rgba(255,255,255,.85);border:2px solid #55cfff;border-radius:18px;box-shadow:0 3px 8px rgba(0,80,120,.15)}
+.instructionTab{flex:1;padding:5px 7px;border-radius:13px;font-size:clamp(10px,1.45vw,16px);color:#216482;background:#eafaff;white-space:nowrap}
+.instructionTab.active{background:#ffd447;color:#00456d;box-shadow:0 2px #d99d00}
+.instructionTab.doneStep{background:#8ee6ae;color:#07522d}
+
+.main{
+  height:83.5vh;
+  display:flex;
+  gap:1vw;
+}
+
+.animalsPanel{
+  width:50%;
+  height:100%;
+  background:white;
+  border:3px solid #55cfff;
+  border-radius:16px;
+  padding:.6vh .6vw;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:.7vh .5vw;
+  overflow:hidden;
+}
+
+.animal{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.bubble{
+  width:96%;
+  height:86%;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#ffffff,#ecffff,#c9f7ff);
+  border:2px solid #75d9ff;
+  box-shadow:0 3px 8px rgba(0,80,120,.18), inset -4px -4px 8px rgba(0,120,160,.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.animal img{
+  max-width:74%;
+  max-height:74%;
+  object-fit:contain;
+  pointer-events:none;
+}
+
+.animal.selected .bubble{
+  border:4px solid #ffd447;
+  box-shadow:0 0 15px #ffd447;
+}
+
+.animal.done{
+  opacity:.25;
+  pointer-events:none;
+}
+
+.zonesPanel{
+  width:50%;
+  height:100%;
+  border:3px solid #07518a;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 5px 12px rgba(0,50,90,.25);
+}
+
+.zone{
+  height:33.333%;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:clamp(15px,2.4vw,28px);
+  font-weight:bold;
+  text-shadow:2px 3px 4px #001;
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.zone span{
+  background:rgba(0,0,0,.25);
+  padding:7px 14px;
+  border-radius:12px;
+  z-index:5;
+}
+
+.sunlight{background:linear-gradient(#37c7ee,#1f94d6)}
+.twilight{background:linear-gradient(#1269ad,#073f83)}
+.midnight{background:linear-gradient(#032c65,#011438)}
+
+.zone.flash{
+  outline:5px solid #fff176;
+  outline-offset:-8px;
+}
+
+.placedAnimal{
+  position:absolute;
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  z-index:4;
+  animation:swimAcross 6s linear infinite, floatUpDown 2s ease-in-out infinite;
+}
+
+@keyframes swimAcross{
+  0%{transform:translateX(0) scaleX(1)}
+  45%{transform:translateX(95px) scaleX(1)}
+  50%{transform:translateX(95px) scaleX(-1)}
+  95%{transform:translateX(0) scaleX(-1)}
+  100%{transform:translateX(0) scaleX(1)}
+}
+
+@keyframes floatUpDown{
+  0%,100%{margin-top:0}
+  50%{margin-top:-8px}
+}
+
+.footer{
+  height:5.5vh;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+button{
+  background:#ffd447;
+  color:#00456d;
+  border:none;
+  border-radius:14px;
+  padding:6px 14px;
+  font-weight:bold;
+  box-shadow:0 3px #d99d00;
+  cursor:pointer;
+}
+
+#message{
+  font-size:clamp(13px,1.8vw,20px);
+  color:#004f83;
+  font-weight:bold;
+  text-align:center;
+}
+
+#goodJob{
+  position:fixed;
+  top:42%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  background:#ffd447;
+  color:#00456d;
+  border:4px solid white;
+  border-radius:25px;
+  padding:16px 34px;
+  font-size:clamp(26px,5vw,58px);
+  font-weight:bold;
+  z-index:100;
+  text-shadow:1px 2px white;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+  transition:.25s;
+}
+
+#goodJob.show{
+  transform:translate(-50%,-50%) scale(1);
+}
+
+#endSlide{
+  display:none;
+  width:100%;
+  height:100%;
+  background:linear-gradient(#9ff1ff,#008bd7,#00386e);
+  color:white;
+  text-align:center;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#endSlide h1{
+  font-size:clamp(40px,8vw,80px);
+  text-shadow:3px 5px #00436d;
+}
+
+#endSlide p{
+  font-size:clamp(18px,4vw,34px);
+  margin:14px;
+  font-weight:bold;
+}
+
+.confetti{
+  position:fixed;
+  top:-20px;
+  width:10px;
+  height:16px;
+  animation:fall 3s linear forwards;
+  z-index:99;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(720deg);
+    opacity:0;
+  }
+}
+
+@media(max-width:800px){
+  .animalsPanel{
+    grid-template-columns:repeat(2,1fr);
+    grid-template-rows:repeat(5,1fr);
+  }
+
+  .bubble{
+    width:84%;
+    height:86%;
+  }
+
+  .placedAnimal{
+    width:34px;
+    height:34px;
+  }
+
+  @keyframes swimAcross{
+    0%{transform:translateX(0) scaleX(1)}
+    45%{transform:translateX(55px) scaleX(1)}
+    50%{transform:translateX(55px) scaleX(-1)}
+    95%{transform:translateX(0) scaleX(-1)}
+    100%{transform:translateX(0) scaleX(1)}
+  }
+
+  button{
+    padding:5px 10px;
+    font-size:11px;
+  }
+
+  #message{
+    font-size:11px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div id="logoSlide">
+    <img src="assets/innovine-logo.png" alt="Logo">
+  </div>
+
+  <div id="gameSlide">
+    <div class="header">
+      <div>Marine Life Ocean Zones</div>
+      <div class="instructionTabs" aria-label="Game instructions">
+        <div class="instructionTab active" id="step1">1. Tap an Animal</div>
+        <div class="instructionTab" id="step2">2. Tap Its Zone</div>
+        <div class="instructionTab" id="step3">3. Complete All</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="animalsPanel" id="animalsPanel"></div>
+
+      <div class="zonesPanel">
+        <div class="zone sunlight" data-zone="sunlight"><span>Sunlight Zone</span></div>
+        <div class="zone twilight" data-zone="twilight"><span>Twilight Zone</span></div>
+        <div class="zone midnight" data-zone="midnight"><span>Midnight Zone</span></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button onclick="resetGame()">Clear</button>
+      <div id="message">Tap one animal first.</div>
+      <button onclick="checkGame()">Check</button>
+    </div>
+  </div>
+
+  <div id="endSlide">
+    <h1>Great Job!</h1>
+    <p>You placed all marine animals correctly!</p>
+    <button onclick="resetGame()">Play Again</button>
+  </div>
+
+</div>
+
+<div id="goodJob">Good Job!</div>
+
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+
+<script>
+const animals=[
+  {name:"anglerfish",img:"anglerfish.png",zone:"midnight"},
+  {name:"clownfish",img:"clownfish.png",zone:"sunlight"},
+  {name:"dolphin",img:"dolphin.png",zone:"sunlight"},
+  {name:"eel",img:"eel.png",zone:"midnight"},
+  {name:"jellyfish",img:"jellyfish.png",zone:"twilight"},
+  {name:"octopus",img:"octopus.png",zone:"twilight"},
+  {name:"sea turtle",img:"sea-turtle.png",zone:"sunlight"},
+  {name:"shrimp",img:"shrimp.png",zone:"twilight"},
+  {name:"squid",img:"squid.png",zone:"twilight"},
+  {name:"starfish",img:"starfish.png",zone:"sunlight"}
+];
+
+let selectedAnimal=null;
+let placedCount=0;
+let audioUnlocked=false;
+
+setTimeout(()=>{
+  document.getElementById("logoSlide").style.display="none";
+  document.getElementById("gameSlide").style.display="block";
+  loadAnimals();
+},2000);
+
+function unlockAudio(){
+  if(audioUnlocked)return;
+  audioUnlocked=true;
+  [wrongSound,clapSound].forEach(a=>{
+    a.volume=1;
+    a.play().then(()=>{
+      a.pause();
+      a.currentTime=0;
+    }).catch(()=>{});
+  });
+}
+
+document.addEventListener("pointerdown",unlockAudio,{once:true});
+
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-.5);
+}
+
+function loadAnimals(){
+  const panel=document.getElementById("animalsPanel");
+  panel.innerHTML="";
+  selectedAnimal=null;
+  placedCount=0;
+  document.querySelectorAll(".placedAnimal,.confetti").forEach(e=>e.remove());
+  document.getElementById("message").textContent="Tap one animal first.";
+  setInstructionStep(1);
+
+  shuffle([...animals]).forEach(a=>{
+    const div=document.createElement("div");
+    div.className="animal";
+    div.dataset.name=a.name;
+    div.dataset.zone=a.zone;
+    div.dataset.img=a.img;
+    div.innerHTML=`<div class="bubble"><img src="assets/${a.img}" alt="${a.name}"></div>`;
+    div.onclick=()=>selectAnimal(div);
+    panel.appendChild(div);
+  });
+}
+
+function setInstructionStep(step){
+  [1,2,3].forEach(n=>{const el=document.getElementById("step"+n);el.classList.toggle("active",n===step);el.classList.toggle("doneStep",n<step);});
+}
+
+function selectAnimal(animalDiv){
+  document.querySelectorAll(".animal").forEach(a=>a.classList.remove("selected"));
+  selectedAnimal=animalDiv;
+  selectedAnimal.classList.add("selected");
+  document.getElementById("message").textContent="Now tap the correct ocean zone.";
+  setInstructionStep(2);
+}
+
+document.querySelectorAll(".zone").forEach(zone=>{
+  zone.onclick=()=>tapZone(zone);
+});
+
+function tapZone(zone){
+  if(!selectedAnimal){
+    document.getElementById("message").textContent="Tap one animal first.";
+    playWrong();
+    return;
+  }
+
+  zone.classList.add("flash");
+  setTimeout(()=>zone.classList.remove("flash"),250);
+
+  const correctZone=selectedAnimal.dataset.zone;
+  const chosenZone=zone.dataset.zone;
+
+  if(correctZone===chosenZone){
+    placeAnimal(selectedAnimal,zone);
+    selectedAnimal.classList.remove("selected");
+    selectedAnimal.classList.add("done");
+    selectedAnimal=null;
+    placedCount++;
+    playClap();
+    showGoodJob();
+
+    if(placedCount===animals.length){
+      document.getElementById("message").textContent="Excellent!";
+      setInstructionStep(3);
+      setTimeout(finishGame,900);
+    }else{
+      document.getElementById("message").textContent="Good Job! Tap another animal.";
+      setInstructionStep(1);
+    }
+  }else{
+    playWrong();
+    document.getElementById("message").textContent="Try again! Tap the correct zone.";
+    if(navigator.vibrate)navigator.vibrate(150);
+  }
+}
+
+function placeAnimal(animalDiv,zone){
+  const img=document.createElement("img");
+  img.src=`assets/${animalDiv.dataset.img}`;
+  img.className="placedAnimal";
+
+  const count=zone.querySelectorAll(".placedAnimal").length;
+  const spots=[
+    ["7%","12%"],["20%","56%"],["35%","16%"],
+    ["50%","55%"],["65%","16%"],["80%","55%"]
+  ];
+
+  img.style.left=spots[count%spots.length][0];
+  img.style.top=spots[count%spots.length][1];
+  img.style.animationDelay=(count * 0.35)+"s";
+
+  zone.appendChild(img);
+}
+
+function showGoodJob(){
+  const pop=document.getElementById("goodJob");
+  pop.classList.add("show");
+  setTimeout(()=>pop.classList.remove("show"),650);
+}
+
+function checkGame(){
+  if(placedCount===animals.length){
+    finishGame();
+  }else{
+    playWrong();
+    document.getElementById("message").textContent="Keep going! Some animals are still left.";
+  }
+}
+
+function finishGame(){
+  playClap();
+  document.getElementById("gameSlide").style.display="none";
+  document.getElementById("endSlide").style.display="flex";
+  makeConfetti();
+}
+
+function playWrong(){
+  wrongSound.currentTime=0;
+  wrongSound.play().catch(()=>{});
+}
+
+function playClap(){
+  clapSound.currentTime=0;
+  clapSound.play().catch(()=>{});
+}
+
+function makeConfetti(){
+  const colors=["#ff4d6d","#ffd166","#06d6a0","#4cc9f0","#fff","#ff9f1c"];
+  for(let i=0;i<90;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay=Math.random()*1+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4200);
+  }
+}
+
+function resetGame(){
+  document.getElementById("endSlide").style.display="none";
+  document.getElementById("gameSlide").style.display="block";
+  loadAnimals();
+}
+</script>
+
+</body>
+</html>
