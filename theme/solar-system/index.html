@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Solar System Letter Jumble - Blue Theme</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;}
+html,body{width:100%;height:100%;font-family:Arial,sans-serif;overflow:hidden;}
+body{background:url('./assets/background.png') no-repeat center center; background-size:cover;}
+
+.screen{width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;position:relative;}
+
+#logoScreen{background:white;z-index:10;display:flex;justify-content:center;align-items:center;}
+#logoScreen img{width:220px;max-width:70%;}
+
+#gameScreen{display:none;width:100%;height:100%;}
+
+.card{
+  width:92vw; max-width:550px; height:92vh; background:rgba(255,255,255,0.85);
+  border-radius:25px; border:3px solid #4a90e2; box-shadow:0 8px 20px rgba(0,0,0,0.14);
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+  padding:16px;
+}
+
+.topBar{width:100%; display:flex; justify-content:space-between; font-weight:bold; color:#1f3c88; font-size:16px;}
+
+.planetImg{
+  width:220px; height:220px; object-fit:contain; background:white; border-radius:20px; border:3px solid #5aa0f5; padding:8px;
+}
+
+.spellingTitle{font-size:16px; font-weight:bold; color:#1f3c88; margin-top:8px;}
+
+#correctWord{display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin:5px 0; font-weight:bold; color:#1f3c88; font-size:18px;}
+
+#blankArea{display:flex; justify-content:center; flex-wrap:wrap; gap:8px;}
+
+.blank{
+  width:50px; height:50px; border-radius:50%; background:#e0f0ff; border:3px solid #1f3c88;
+  display:flex; justify-content:center; align-items:center; font-size:22px; font-weight:bold; color:#1f3c88; cursor:pointer;
+}
+
+#letterArea{width:100%; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:12px;}
+.letter{
+  width:45px; height:45px; border:none; border-radius:15px; background:#5aa0f5;
+  color:white; font-size:20px; font-weight:bold; box-shadow:0 4px 0 #3c6bbf; cursor:pointer;
+}
+.letter:active{transform:translateY(3px); box-shadow:0 1px 0 #3c6bbf;}
+.letter.used{opacity:.25; pointer-events:none;}
+
+#message{height:28px; font-size:18px; font-weight:bold; color:#0d5abf; margin-top:8px;}
+
+#finalScreen{display:none; background:white; flex-direction:column; text-align:center; justify-content:center; align-items:center; padding:20px;}
+#finalScreen h1{font-size:34px; color:#1f3c88; margin-bottom:20px;}
+#finalScreen button{padding:14px 28px; border:none; border-radius:25px; background:#1f3c88; color:white; font-size:20px; font-weight:bold; cursor:pointer;}
+.confetti{position:absolute;width:10px;height:16px;top:-20px; animation:fall 3s linear infinite;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+
+@media(max-width:480px){
+  .card{height:95vh;padding:8px;}
+  .planetImg{width:160px;height:160px;}
+  .blank{width:40px;height:40px;font-size:18px;}
+  .letter{width:35px;height:35px;font-size:16px;}
+  #letterArea{gap:6px;}
+}
+</style>
+</head>
+
+<body>
+<audio id="correctSound" src="./assets/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="./assets/wrong.mp3" preload="auto"></audio>
+<audio id="clapSound" src="./assets/freesound_community-claps-44774.mp3" preload="auto"></audio>
+
+<div id="logoScreen" class="screen">
+  <img src="./assets/innovine-logo.png" alt="Logo">
+</div>
+
+<div id="gameScreen" class="screen">
+  <div class="card">
+    <div class="topBar">
+      <span id="slideNo">Question 1 / 8</span>
+      <span>Tap the letters and the blanks to complete the words.</span>
+    </div>
+
+    <img id="planetImage" class="planetImg" src="" alt="Planet">
+
+    <div class="spellingTitle">Correct spelling</div>
+    <div id="correctWord"></div>
+    <div id="blankArea"></div>
+    <div id="letterArea"></div>
+    <div id="message"></div>
+  </div>
+</div>
+
+<div id="finalScreen" class="screen">
+  <h1>Well Done! 🎉</h1>
+  <button onclick="restartGame()">Play Again</button>
+</div>
+
+<script>
+const questions = [
+  {answer:"mercury", jumble:"errmcyu", image:"./assets/mercury.png"},
+  {answer:"venus", jumble:"nvesu", image:"./assets/venus.png"},
+  {answer:"earth", jumble:"erhat", image:"./assets/earth.png"},
+  {answer:"mars", jumble:"mrsa", image:"./assets/mars.png"},
+  {answer:"jupiter", jumble:"tpirjeu", image:"./assets/jupiter.png"},
+  {answer:"saturn", jumble:"tsurna", image:"./assets/saturn.png"},
+  {answer:"uranus", jumble:"nuausr", image:"./assets/uranus.png"},
+  {answer:"neptune", jumble:"enunept", image:"./assets/neptune.png"}
+];
+
+let current=0, selectedLetter=null, selectedButton=null, filledCount=0;
+const logoScreen=document.getElementById("logoScreen");
+const gameScreen=document.getElementById("gameScreen");
+const finalScreen=document.getElementById("finalScreen");
+
+window.onload=function(){
+  setTimeout(()=>{
+    logoScreen.style.display="none";
+    gameScreen.style.display="flex";
+    loadQuestion();
+  },2000);
+};
+
+function playSound(id){const s=document.getElementById(id); s.currentTime=0; s.play().catch(()=>{});}
+
+function loadQuestion(){
+  selectedLetter=null; selectedButton=null; filledCount=0;
+  const q=questions[current];
+  document.getElementById("slideNo").innerText="Question "+(current+1)+" / "+questions.length;
+  document.getElementById("planetImage").src=q.image;
+  document.getElementById("correctWord").innerText=q.answer;
+  document.getElementById("blankArea").innerHTML="";
+  document.getElementById("letterArea").innerHTML="";
+  document.getElementById("message").innerText="";
+  createBlanks(q.answer);
+  createLetters(q.jumble);
+}
+
+function createBlanks(answer){
+  const blankArea=document.getElementById("blankArea");
+  blankArea.innerHTML="";
+  for(let i=0;i<answer.length;i++){
+    const blank=document.createElement("div");
+    blank.className="blank"; blank.dataset.correct=answer[i];
+    blank.onclick=function(){placeLetter(blank);};
+    blankArea.appendChild(blank);
+  }
+}
+
+function createLetters(jumble){
+  const letterArea=document.getElementById("letterArea");
+  letterArea.innerHTML="";
+  jumble.split("").forEach(letter=>{
+    const btn=document.createElement("button");
+    btn.className="letter"; btn.innerText=letter;
+    btn.onclick=function(){
+      selectedLetter=letter; selectedButton=btn;
+      document.querySelectorAll(".letter").forEach(b=>b.style.outline="none");
+      btn.style.outline="3px solid #1f3c88";
+    };
+    letterArea.appendChild(btn);
+  });
+}
+
+function placeLetter(blank){
+  if(!selectedLetter || blank.innerText!=="") return;
+  if(selectedLetter===blank.dataset.correct){
+    blank.innerText=selectedLetter;
+    selectedButton.classList.add("used");
+    selectedButton.style.outline="none";
+    selectedLetter=null; selectedButton=null;
+    filledCount++;
+    playSound("correctSound");
+    if(filledCount===questions[current].answer.length){
+      document.getElementById("message").innerText="Correct! 🌟";
+      setTimeout(()=>{
+        current++;
+        current<questions.length?loadQuestion():showFinalScreen();
+      },800);
+    }
+  }else{
+    playSound("wrongSound");
+    document.getElementById("message").innerText="Try again";
+    setTimeout(()=>{
+      document.getElementById("message").innerText="";
+    },700);
+  }
+}
+
+function showFinalScreen(){
+  gameScreen.style.display="none";
+  finalScreen.style.display="flex";
+  playSound("clapSound");
+  createConfetti();
+}
+
+function createConfetti(){
+  finalScreen.querySelectorAll(".confetti").forEach(c=>c.remove());
+  for(let i=0;i<45;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=["#4a90e2","#6ab0f5","#65d4ff","#3c6bbf","#2f8cde"][i%5];
+    c.style.animationDelay=Math.random()*2+"s";
+    finalScreen.appendChild(c);
+  }
+}
+
+function restartGame(){
+  current=0;
+  finalScreen.style.display="none";
+  logoScreen.style.display="flex";
+  setTimeout(()=>{
+    logoScreen.style.display="none";
+    gameScreen.style.display="flex";
+    loadQuestion();
+  },2000);
+}
+</script>
+</body>
+</html>
