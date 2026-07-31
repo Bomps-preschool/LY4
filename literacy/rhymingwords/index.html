@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+<title>Rhyming Words Match Game</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial, sans-serif;
+    background:#fff;
+}
+
+/* ================= SCREENS ================= */
+
+.screen{
+    position:absolute;
+    width:100%;
+    height:100vh;
+    top:0;
+    left:0;
+    display:none;
+}
+
+.active{
+    display:flex;
+}
+
+/* ================= SLIDE 1 ================= */
+
+#slide1{
+    background:white;
+    justify-content:center;
+    align-items:center;
+}
+
+#slide1 img{
+    width:min(60vw,260px);
+    object-fit:contain;
+}
+
+/* ================= SLIDE 2 ================= */
+
+#slide2{
+    flex-direction:column;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+    background:#fdf4fb;
+    padding:4px;
+}
+
+/* Background Decorations */
+
+.circle{
+    position:absolute;
+    border-radius:50%;
+    opacity:0.35;
+    z-index:0;
+}
+
+.c1{
+    width:80px;
+    height:80px;
+    background:#ff8fab;
+    top:-15px;
+    left:-15px;
+}
+
+.c2{
+    width:80px;
+    height:80px;
+    background:#ffd166;
+    top:-10px;
+    right:-10px;
+}
+
+.c3{
+    width:70px;
+    height:70px;
+    background:#90dbf4;
+    bottom:12%;
+    right:-10px;
+}
+
+.c4{
+    width:70px;
+    height:70px;
+    background:#ff85a1;
+    bottom:18%;
+    left:-10px;
+}
+
+/* Title */
+
+.title{
+    font-size:clamp(20px,4vw,34px);
+    font-weight:900;
+    color:#7b2cbf;
+    margin:4px 0;
+    text-align:center;
+    z-index:5;
+}
+
+/* ================= GAME AREA ================= */
+
+.game-wrapper{
+    width:100%;
+    height:100%;
+    max-width:1000px;
+    position:relative;
+    flex:1;
+}
+
+/* SVG FOR LINES */
+
+#lineSVG{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:20;
+    pointer-events:none;
+    overflow:visible;
+}
+
+/* Grid */
+
+.game-grid{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    position:relative;
+    z-index:2;
+}
+
+/* Columns */
+
+.column{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+    gap:4px;
+}
+
+/* Cards */
+
+.card{
+    width:100%;
+    min-height:66px;
+    background:#ffffffee;
+    border-radius:16px;
+    border:3px solid transparent;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    cursor:pointer;
+    transition:0.2s;
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
+}
+
+.card img{
+    width:min(11vw,42px);
+    height:min(11vw,42px);
+    object-fit:contain;
+    pointer-events:none;
+}
+
+.label{
+    margin-top:2px;
+    font-size:clamp(12px,2vw,20px);
+    font-weight:900;
+    color:#222;
+    text-transform:lowercase;
+    pointer-events:none;
+}
+
+.card.selected{
+    border-color:#ff4fa3;
+    background:#fff0f7;
+}
+
+.card.correct{
+    border-color:#00c853;
+    background:#eaffea;
+}
+
+/* Tick */
+
+.tick{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:60px;
+    color:#00c853;
+    display:none;
+    z-index:100;
+}
+
+/* ================= SLIDE 3 ================= */
+
+#slide3{
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    overflow:hidden;
+    background:linear-gradient(135deg,#ffd6e7,#fff5ba,#c8f7ff,#d9c2ff);
+}
+
+.goodjob{
+    font-size:clamp(40px,10vw,90px);
+    font-weight:900;
+    color:#ff1493;
+    text-shadow:2px 2px white;
+    z-index:5;
+}
+
+/* Confetti */
+
+.confetti{
+    position:absolute;
+    width:10px;
+    height:10px;
+    animation:fall linear infinite;
+}
+
+@keyframes fall{
+    from{
+        transform:translateY(-100px) rotate(0deg);
+    }
+    to{
+        transform:translateY(120vh) rotate(720deg);
+    }
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px){
+
+    .title{
+        font-size:20px;
+    }
+
+    .game-grid{
+        gap:4px;
+    }
+
+    .column{
+        gap:3px;
+    }
+
+    .card{
+        min-height:60px;
+        border-radius:14px;
+    }
+
+    .card img{
+        width:34px;
+        height:34px;
+    }
+
+    .label{
+        font-size:11px;
+    }
+
+    .tick{
+        font-size:50px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= SLIDE 1 ================= -->
+
+<div id="slide1" class="screen active">
+
+    <img src="assets/innovine-logo.png" alt="Innovine Logo">
+
+</div>
+
+<!-- ================= SLIDE 2 ================= -->
+
+<div id="slide2" class="screen">
+
+    <div class="circle c1"></div>
+    <div class="circle c2"></div>
+    <div class="circle c3"></div>
+    <div class="circle c4"></div>
+
+    <div class="title">Match the rhyming words</div>
+
+    <div class="game-wrapper">
+
+        <!-- SVG FOR LINES -->
+
+        <svg id="lineSVG"></svg>
+
+        <div class="game-grid">
+
+            <!-- LEFT COLUMN -->
+
+            <div class="column">
+
+                <div class="card" data-word="dog">
+                    <img src="assets/dog.png">
+                    <div class="label">dog</div>
+                </div>
+
+                <div class="card" data-word="cap">
+                    <img src="assets/cap.png">
+                    <div class="label">cap</div>
+                </div>
+
+                <div class="card" data-word="bat">
+                    <img src="assets/bat.png">
+                    <div class="label">bat</div>
+                </div>
+
+                <div class="card" data-word="fan">
+                    <img src="assets/fan.png">
+                    <div class="label">fan</div>
+                </div>
+
+                <div class="card" data-word="fox">
+                    <img src="assets/fox.png">
+                    <div class="label">fox</div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+
+            <div class="column">
+
+                <div class="card" data-word="hat">
+                    <img src="assets/hat.png">
+                    <div class="label">hat</div>
+                </div>
+
+                <div class="card" data-word="pan">
+                    <img src="assets/pan.png">
+                    <div class="label">pan</div>
+                </div>
+
+                <div class="card" data-word="box">
+                    <img src="assets/box.png">
+                    <div class="label">box</div>
+                </div>
+
+                <div class="card" data-word="log">
+                    <img src="assets/log.png">
+                    <div class="label">log</div>
+                </div>
+
+                <div class="card" data-word="tap">
+                    <img src="assets/tap.png">
+                    <div class="label">tap</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tick" id="tick">✔</div>
+
+</div>
+
+<!-- ================= SLIDE 3 ================= -->
+
+<div id="slide3" class="screen">
+
+    <div class="goodjob">Good Job!</div>
+
+</div>
+
+<!-- ================= AUDIO ================= -->
+
+<audio id="correctSound">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=correct-2-46134.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="wrongSound">
+    <source src="assets/wrong.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ================= SCRIPT ================= -->
+
+<script>
+
+/* ================= SLIDE CHANGE ================= */
+
+setTimeout(() => {
+
+    document.getElementById("slide1").classList.remove("active");
+
+    document.getElementById("slide2").classList.add("active");
+
+},3000);
+
+/* ================= MATCHING ================= */
+
+const pairs = {
+    dog:"log",
+    cap:"tap",
+    bat:"hat",
+    fan:"pan",
+    fox:"box"
+};
+
+let selectedCard = null;
+let matchedCount = 0;
+
+const cards = document.querySelectorAll(".card");
+
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const tick = document.getElementById("tick");
+
+cards.forEach(card => {
+
+    card.addEventListener("click", () => {
+
+        if(card.classList.contains("correct")){
+            return;
+        }
+
+        if(!selectedCard){
+
+            selectedCard = card;
+            card.classList.add("selected");
+            return;
+        }
+
+        if(selectedCard === card){
+            return;
+        }
+
+        const first = selectedCard.dataset.word;
+        const second = card.dataset.word;
+
+        if(pairs[first] === second){
+
+            selectedCard.classList.remove("selected");
+
+            selectedCard.classList.add("correct");
+            card.classList.add("correct");
+
+            drawLine(selectedCard, card);
+
+            tick.style.display = "block";
+
+            correctSound.currentTime = 0;
+            correctSound.play();
+
+            setTimeout(() => {
+                tick.style.display = "none";
+            },700);
+
+            matchedCount++;
+
+            if(matchedCount === 5){
+
+                setTimeout(() => {
+                    showFinalSlide();
+                },1500);
+            }
+
+        }else{
+
+            selectedCard.classList.remove("selected");
+
+            wrongSound.currentTime = 0;
+            wrongSound.play();
+        }
+
+        selectedCard = null;
+    });
+
+});
+
+/* ================= DRAW LINE ================= */
+
+function drawLine(card1, card2){
+
+    const svg = document.getElementById("lineSVG");
+
+    const svgRect = svg.getBoundingClientRect();
+
+    const rect1 = card1.getBoundingClientRect();
+    const rect2 = card2.getBoundingClientRect();
+
+    /* START POINT */
+
+    const x1 = rect1.left + rect1.width * 0.70 - svgRect.left;
+    const y1 = rect1.top + rect1.height/2 - svgRect.top;
+
+    /* END POINT */
+
+    const x2 = rect2.left + rect2.width * 0.30 - svgRect.left;
+    const y2 = rect2.top + rect2.height/2 - svgRect.top;
+
+    /* CREATE DIAGONAL LINE */
+
+    const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+    );
+
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+
+    line.setAttribute("stroke", "#ff0000");
+    line.setAttribute("stroke-width", "5");
+    line.setAttribute("stroke-linecap", "round");
+
+    svg.appendChild(line);
+}
+
+/* ================= FINAL SLIDE ================= */
+
+function showFinalSlide(){
+
+    document.getElementById("slide2").classList.remove("active");
+
+    document.getElementById("slide3").classList.add("active");
+
+    createConfetti();
+}
+
+/* ================= CONFETTI ================= */
+
+function createConfetti(){
+
+    const colors = [
+        "#ff1493",
+        "#ffd700",
+        "#00c853",
+        "#00b0ff",
+        "#ff6d00",
+        "#aa00ff"
+    ];
+
+    for(let i=0;i<100;i++){
+
+        const confetti = document.createElement("div");
+
+        confetti.classList.add("confetti");
+
+        confetti.style.left = Math.random()*100 + "vw";
+
+        confetti.style.background =
+        colors[Math.floor(Math.random()*colors.length)];
+
+        confetti.style.animationDuration =
+        (Math.random()*3 + 2) + "s";
+
+        confetti.style.opacity = Math.random();
+
+        document.getElementById("slide3").appendChild(confetti);
+    }
+}
+
+</script>
+
+</body>
+</html>
