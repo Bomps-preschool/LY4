@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Opposite Pair Hunt</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,"Trebuchet MS",sans-serif}
+button{font:inherit}
+.screen{position:fixed;inset:0;display:none}
+.screen.active{display:flex}
+ 
+#splash{align-items:center;justify-content:center;background:#fff}
+#splash img{width:min(52vw,250px);max-height:42vh;object-fit:contain}
+ 
+#game{
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  background:linear-gradient(135deg,#fff5d8,#dcf6ff 50%,#f2e3ff);
+}
+.shell{
+  width:min(980px,100%);
+  height:min(700px,100%);
+  min-height:0;
+  overflow:hidden;
+  border-radius:28px;
+  background:rgba(255,255,255,.96);
+  border:4px solid #fff;
+  box-shadow:0 18px 50px rgba(74,48,104,.18);
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  position:relative;
+}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:0 0 auto}
+.title{font-size:clamp(22px,4vw,38px);font-weight:900;color:#8e3eaa}
+.counter{font-size:clamp(13px,2vw,18px);font-weight:900;color:#d53c82;background:#fff0f7;border:2px solid #ffc4dc;border-radius:999px;padding:6px 12px}
+.progress{height:10px;background:#eee7f3;border-radius:999px;overflow:hidden;flex:0 0 auto}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff6ea8,#9965df,#53c9d2);transition:width .3s}
+.instruction{text-align:center;font-size:clamp(15px,2.3vw,22px);font-weight:800;color:#514b63;flex:0 0 auto}
+ 
+.questionCard{
+  flex:1 1 auto;
+  min-height:0;
+  border:3px solid #ffd0e3;
+  border-radius:24px;
+  background:linear-gradient(145deg,#fff,#fff9fc);
+  box-shadow:0 9px 22px rgba(219,83,145,.12);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  text-align:center;
+}
+.questionText{
+  font-size:clamp(20px,3.4vw,34px);
+  line-height:1.15;
+  font-weight:900;
+  color:#3f394f;
+  margin-bottom:8px;
+}
+.questionText strong{color:#d64086}
+.visual{display:flex;align-items:center;justify-content:center;min-height:70px}
+.emoji{font-size:clamp(52px,9vw,90px);line-height:1}
+.pencilVisual{display:flex;align-items:center;gap:12px}
+.pencil{font-size:clamp(45px,7vw,70px)}
+.line{height:7px;background:#25212c;border-radius:8px}
+.line.long{width:clamp(120px,28vw,280px)}
+.line.short{width:clamp(45px,10vw,90px)}
+ 
+.options{
+  flex:0 0 clamp(112px,25vh,175px);
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.option{
+  border:0;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 7px 0 #d9cee7,0 11px 20px rgba(70,50,92,.11);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:7px;
+  cursor:pointer;
+  min-width:0;
+}
+.option:active{transform:translateY(4px);box-shadow:0 3px 0 #d9cee7}
+.option .emoji{font-size:clamp(38px,7vw,70px)}
+.option .pencil{font-size:clamp(34px,6vw,60px)}
+.option .line.long{width:clamp(70px,14vw,150px)}
+.option .line.short{width:clamp(30px,7vw,65px)}
+.optionLabel{font-size:clamp(17px,2.7vw,25px);font-weight:900;color:#4c455c}
+.option.giggle{animation:giggle .38s}
+.option.glow{animation:glow .75s infinite alternate;border:4px solid #4fd28a}
+.option.correct{background:#eafff2;box-shadow:0 7px 0 #78dba2}
+ 
+.glass{
+  position:relative;
+  width:54px;
+  height:72px;
+  border:5px solid #9ca5b0;
+  border-top-width:3px;
+  border-radius:5px 5px 13px 13px;
+  background:rgba(255,255,255,.75);
+  overflow:hidden;
+}
+.glass:before{
+  content:"";
+  position:absolute;
+  left:5px;right:5px;bottom:5px;
+  height:0;
+  border-radius:2px 2px 8px 8px;
+}
+.glass.full:before{
+  height:50px;
+  background:linear-gradient(#ffb43b,#f18a22);
+}
+.option .glass{width:45px;height:61px;border-width:4px;border-top-width:3px}
+.option .glass.full:before{height:42px}
+ 
+.feedback{
+  position:absolute;inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.58);
+  z-index:5;
+  pointer-events:none;
+}
+.feedback.show{display:flex}
+.feedbackCard{
+  background:#fff;
+  border-radius:28px;
+  padding:18px 30px;
+  text-align:center;
+  box-shadow:0 18px 45px rgba(54,44,71,.24);
+  animation:pop .3s;
+}
+.tick{
+  width:84px;height:84px;border-radius:50%;
+  background:#43cf80;color:#fff;
+  font-size:60px;line-height:84px;font-weight:900;margin:auto;
+}
+.feedbackText{font-size:clamp(26px,5vw,42px);font-weight:900;color:#39a866;margin-top:7px}
+ 
+#end{
+  align-items:center;justify-content:center;text-align:center;padding:12px;
+  background:linear-gradient(145deg,#fff0c8,#dff8ff,#f2ddff);
+}
+.endCard{
+  width:min(650px,96%);
+  background:rgba(255,255,255,.96);
+  border:4px solid #fff;
+  border-radius:32px;
+  padding:30px 20px;
+  box-shadow:0 20px 50px rgba(76,47,109,.2);
+  z-index:2;
+}
+.trophy{font-size:clamp(75px,17vw,125px)}
+.endTitle{margin:0;font-size:clamp(40px,9vw,70px);font-weight:900;color:#8b3da4}
+.endText{font-size:clamp(19px,4vw,29px);font-weight:700;color:#575064;margin:10px 0 22px}
+.playAgain{
+  border:0;border-radius:999px;
+  background:linear-gradient(90deg,#ff5f9f,#8d61dd);
+  color:#fff;padding:14px 32px;
+  font-size:clamp(19px,4vw,27px);font-weight:900;
+  box-shadow:0 7px 0 #6c42ae;cursor:pointer;
+}
+.playAgain:active{transform:translateY(4px);box-shadow:0 3px 0 #6c42ae}
+ 
+.confetti{position:fixed;top:-20px;width:11px;height:17px;z-index:1;animation:fall linear forwards}
+@keyframes fall{to{transform:translate3d(var(--drift),110vh,0) rotate(720deg)}}
+@keyframes giggle{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px) rotate(-2deg)}
+  40%{transform:translateX(7px) rotate(2deg)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(4px)}
+}
+@keyframes glow{
+  from{box-shadow:0 0 7px #48d88c,0 7px 0 #83dbaa}
+  to{box-shadow:0 0 26px #48d88c,0 7px 0 #83dbaa;transform:scale(1.03)}
+}
+@keyframes pop{0%{transform:scale(.55);opacity:0}80%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+ 
+@media(max-width:560px){
+  #game{padding:6px}
+  .shell{padding:9px;border-radius:20px;gap:6px}
+  .title{font-size:22px}
+  .counter{padding:4px 8px}
+  .questionCard{border-radius:18px;padding:6px}
+  .options{gap:7px;flex-basis:120px}
+  .option{border-radius:17px;padding:4px}
+  .optionLabel{font-size:16px}
+}
+@media(max-height:580px){
+  .shell{padding:8px;gap:5px}
+  .title{font-size:21px}
+  .progress{height:7px}
+  .instruction{font-size:14px}
+  .questionText{font-size:19px;margin-bottom:3px}
+  .questionCard{padding:5px}
+  .visual{min-height:50px}
+  .emoji{font-size:47px}
+  .pencil{font-size:42px}
+  .glass{width:42px;height:56px;border-width:4px}
+  .glass.full:before{height:38px}
+  .options{flex-basis:94px;gap:6px}
+  .option{gap:2px}
+  .option .emoji{font-size:34px}
+  .option .glass{width:34px;height:46px}
+  .option .glass.full:before{height:31px}
+  .optionLabel{font-size:15px}
+}
+</style>
+</head>
+<body>
+ 
+<section id="splash" class="screen active">
+<img src="assets/innovine-logo.png" alt="Innovine logo">
+</section>
+ 
+<section id="game" class="screen">
+<div class="shell">
+<div class="topbar">
+<div class="title">Opposite Pair Hunt</div>
+<div class="counter" id="counter">1 / 6</div>
+</div>
+ 
+    <div class="progress"><span id="progressBar"></span></div>
+<div class="instruction">Tap the picture that shows the opposite.</div>
+ 
+    <div class="questionCard">
+<div class="questionText">Find the opposite of <strong id="promptWord"></strong>.</div>
+<div class="visual" id="promptVisual"></div>
+</div>
+ 
+    <div class="options" id="options"></div>
+ 
+    <div class="feedback" id="feedback">
+<div class="feedbackCard">
+<div class="tick">✓</div>
+<div class="feedbackText">Good job!</div>
+</div>
+</div>
+</div>
+</section>
+ 
+<section id="end" class="screen">
+<div class="endCard">
+<div class="trophy">🏆</div>
+<h1 class="endTitle">Good job!</h1>
+<div class="endText">You found all the opposite pairs!</div>
+<button class="playAgain" id="playAgain">Play Again</button>
+</div>
+</section>
+ 
+<audio id="clapAudio" preload="auto" src="assets/claps.mp3"></audio>
+<audio id="wrongAudio" preload="auto" src="assets/wrong.mp3"></audio>
+ 
+<script>
+(function(){
+var questions=[
+  {word:"fast",type:"emoji",value:"🐇",answer:"slow",choices:[
+    {label:"slow",type:"emoji",value:"🐢"},
+    {label:"hot",type:"emoji",value:"☕"},
+    {label:"short",type:"pencil",value:"short"}
+  ]},
+  {word:"long",type:"pencil",value:"long",answer:"short",choices:[
+    {label:"full",type:"glass",value:"full"},
+    {label:"night",type:"emoji",value:"🌙"},
+    {label:"short",type:"pencil",value:"short"}
+  ]},
+  {word:"cold",type:"emoji",value:"🧊",answer:"hot",choices:[
+    {label:"hot",type:"emoji",value:"☕"},
+    {label:"empty",type:"glass",value:"empty"},
+    {label:"open",type:"emoji",value:"🔓"}
+  ]},
+  {word:"full",type:"glass",value:"full",answer:"empty",choices:[
+    {label:"slow",type:"emoji",value:"🐢"},
+    {label:"empty",type:"glass",value:"empty"},
+    {label:"close",type:"emoji",value:"🔒"}
+  ]},
+  {word:"day",type:"emoji",value:"☀️",answer:"night",choices:[
+    {label:"night",type:"emoji",value:"🌙"},
+    {label:"long",type:"pencil",value:"long"},
+    {label:"cold",type:"emoji",value:"🧊"}
+  ]},
+  {word:"open",type:"emoji",value:"🔓",answer:"close",choices:[
+    {label:"fast",type:"emoji",value:"🐇"},
+    {label:"close",type:"emoji",value:"🔒"},
+    {label:"day",type:"emoji",value:"☀️"}
+  ]}
+];
+ 
+var order=[],current=0,wrongAttempts=0,locked=false;
+var splash=document.getElementById("splash");
+var game=document.getElementById("game");
+var end=document.getElementById("end");
+var options=document.getElementById("options");
+var promptWord=document.getElementById("promptWord");
+var promptVisual=document.getElementById("promptVisual");
+var counter=document.getElementById("counter");
+var progressBar=document.getElementById("progressBar");
+var feedback=document.getElementById("feedback");
+var clap=document.getElementById("clapAudio");
+var wrong=document.getElementById("wrongAudio");
+ 
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=arr[i];arr[i]=arr[j];arr[j]=temp;
+  }
+  return arr;
+}
+ 
+function visualHTML(type,value){
+  if(type==="glass"){
+    return '<div class="glass '+value+'"></div>';
+  }
+  if(type==="pencil"){
+    return '<div class="pencilVisual"><span class="pencil">✏️</span><span class="line '+value+'"></span></div>';
+  }
+  return '<div class="emoji">'+value+'</div>';
+}
+ 
+function showScreen(screen){
+  splash.className="screen";
+  game.className="screen";
+  end.className="screen";
+  screen.className="screen active";
+}
+ 
+function startGame(){
+  removeConfetti();
+  order=shuffle(questions.slice());
+  current=0;
+  wrongAttempts=0;
+  locked=false;
+  showScreen(game);
+  renderQuestion();
+}
+ 
+function renderQuestion(){
+  locked=false;
+  wrongAttempts=0;
+  feedback.className="feedback";
+ 
+  var q=order[current];
+  var choices=shuffle(q.choices.slice());
+ 
+  promptWord.textContent=q.word;
+  promptVisual.innerHTML=visualHTML(q.type,q.value);
+  counter.textContent=(current+1)+" / "+order.length;
+  progressBar.style.width=((current/order.length)*100)+"%";
+  options.innerHTML="";
+ 
+  for(var i=0;i<choices.length;i++){
+    var choice=choices[i];
+    var button=document.createElement("button");
+    button.className="option";
+    button.setAttribute("data-answer",choice.label);
+    button.innerHTML=visualHTML(choice.type,choice.value)+
+      '<div class="optionLabel">'+choice.label+'</div>';
+    button.onclick=choose;
+    button.ontouchstart=function(){};
+    options.appendChild(button);
+  }
+}
+ 
+function playAudio(audio){
+  try{
+    audio.pause();
+    audio.currentTime=0;
+    var promise=audio.play();
+    if(promise&&promise.catch){promise.catch(function(){});}
+  }catch(e){}
+}
+ 
+function choose(){
+  if(locked){return;}
+ 
+  var q=order[current];
+  var picked=this.getAttribute("data-answer");
+ 
+  if(picked===q.answer){
+    locked=true;
+    this.className+=" correct";
+    feedback.className="feedback show";
+    playAudio(clap);
+    progressBar.style.width=(((current+1)/order.length)*100)+"%";
+ 
+    setTimeout(function(){
+      current++;
+      if(current<order.length){renderQuestion();}
+      else{finishGame();}
+    },1200);
+  }else{
+    wrongAttempts++;
+    playAudio(wrong);
+ 
+    this.className=this.className.replace(" giggle","")+" giggle";
+    var button=this;
+    setTimeout(function(){
+      button.className=button.className.replace(" giggle","");
+    },430);
+ 
+    if(wrongAttempts>=2){
+      var all=options.getElementsByClassName("option");
+      for(var i=0;i<all.length;i++){
+        if(all[i].getAttribute("data-answer")===q.answer &&
+           all[i].className.indexOf("glow")===-1){
+          all[i].className+=" glow";
+        }
+      }
+    }
+  }
+}
+ 
+function finishGame(){
+  showScreen(end);
+  makeConfetti();
+}
+ 
+function makeConfetti(){
+  var colours=["#ff5f9f","#6c63ff","#42cfd2","#ffd34e","#7bd96c","#ff8a4d"];
+  for(var i=0;i<90;i++){
+    var piece=document.createElement("i");
+    piece.className="confetti";
+    piece.style.left=Math.random()*100+"vw";
+    piece.style.background=colours[i%colours.length];
+    piece.style.animationDuration=(2.4+Math.random()*2.5)+"s";
+    piece.style.animationDelay=(Math.random()*.7)+"s";
+    piece.style.setProperty("--drift",(Math.random()*180-90)+"px");
+    document.body.appendChild(piece);
+  }
+}
+ 
+function removeConfetti(){
+  var pieces=document.getElementsByClassName("confetti");
+  while(pieces.length){
+    pieces[0].parentNode.removeChild(pieces[0]);
+  }
+}
+ 
+document.getElementById("playAgain").onclick=startGame;
+setTimeout(startGame,2000);
+})();
+</script>
+</body>
+</html>
