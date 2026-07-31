@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Singular and Plural</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
+
+body{
+overflow:hidden;
+background:#fefcf7;
+}
+
+.slide{
+width:100vw;
+height:100vh;
+display:none;
+flex-direction:column;
+align-items:center;
+justify-content:flex-start;
+padding:12px;
+position:relative;
+}
+
+.slide.active{
+display:flex;
+}
+
+.logo{
+max-width:70%;
+max-height:45%;
+object-fit:contain;
+margin-top:20vh;
+}
+
+.instruction{
+font-size:clamp(18px,3vw,28px);
+font-weight:700;
+text-align:center;
+color:#333;
+margin:10px 0 12px;
+line-height:1.3;
+}
+
+.image-frame{
+width:min(85vw,420px);
+height:min(50vh,420px);
+border:10px dotted;
+border-color:#ff6b6b #ffd93d #6bcB77 #4d96ff;
+border-radius:25px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:10px;
+margin-top:10px;
+}
+
+.image-frame img{
+width:100%;
+height:100%;
+object-fit:contain;
+}
+
+.options{
+display:flex;
+gap:12px;
+width:100%;
+justify-content:center;
+margin-top:25px;
+flex-wrap:nowrap;
+}
+
+.option{
+width:42%;
+padding:22px 10px;
+border:none;
+border-radius:20px;
+font-size:clamp(24px,4vw,36px);
+font-weight:900;
+text-transform:lowercase;
+cursor:pointer;
+color:white;
+box-shadow:0 6px 10px rgba(0,0,0,.2);
+transition:.2s;
+}
+
+.option:nth-child(1){
+background:#ff7b54;
+}
+
+.option:nth-child(2){
+background:#5c7cfa;
+}
+
+.option:active{
+transform:scale(.95);
+}
+
+.feedback{
+position:absolute;
+font-size:min(25vw,180px);
+top:40%;
+left:50%;
+transform:translate(-50%,-50%);
+display:none;
+z-index:10;
+animation:pop .5s ease;
+}
+
+.tick{
+color:#2ecc71;
+}
+
+.cross{
+color:#e74c3c;
+}
+
+@keyframes pop{
+0%{
+transform:translate(-50%,-50%) scale(.2);
+opacity:0;
+}
+100%{
+transform:translate(-50%,-50%) scale(1);
+opacity:1;
+}
+}
+
+.final-slide{
+background:#fdf6ec;
+justify-content:center;
+}
+
+.good-job{
+font-size:clamp(40px,8vw,80px);
+font-weight:900;
+color:#ff6b6b;
+animation:bounce 1s infinite;
+text-align:center;
+}
+
+@keyframes bounce{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-15px);}
+}
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+border-radius:50%;
+animation:fall linear infinite;
+}
+
+@keyframes fall{
+0%{
+transform:translateY(-100px) rotate(0deg);
+}
+100%{
+transform:translateY(110vh) rotate(360deg);
+}
+}
+
+@media(max-height:700px){
+.image-frame{
+height:42vh;
+}
+
+.option{
+padding:18px 24px;
+font-size:clamp(28px,4vw,36px);
+}
+}
+</style>
+</head>
+<body>
+
+<!-- Slide 1 -->
+<section class="slide active" id="slide0">
+<img src="assets/innovine-logo.png" class="logo">
+</section>
+
+<!-- Slide 2 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/toys.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,true)">toys</button>
+<button class="option" onclick="checkAnswer(this,false)">toy</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 3 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/house.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,false)">houses</button>
+<button class="option" onclick="checkAnswer(this,true)">house</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 4 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/flowers.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,true)">flowers</button>
+<button class="option" onclick="checkAnswer(this,false)">flower</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 5 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/pen.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,true)">pen</button>
+<button class="option" onclick="checkAnswer(this,false)">pens</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 6 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/crayons.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,true)">crayons</button>
+<button class="option" onclick="checkAnswer(this,false)">crayon</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 7 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/animals.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,false)">animal</button>
+<button class="option" onclick="checkAnswer(this,true)">animals</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 8 -->
+<section class="slide question-slide">
+<div class="instruction">Identify the word that matches the picture</div>
+<div class="image-frame">
+<img src="assets/tree.png">
+</div>
+<div class="options">
+<button class="option" onclick="checkAnswer(this,true)">tree</button>
+<button class="option" onclick="checkAnswer(this,false)">trees</button>
+</div>
+<div class="feedback tick">✓</div>
+<div class="feedback cross">✗</div>
+</section>
+
+<!-- Slide 9 -->
+<section class="slide final-slide">
+<div class="good-job">🎉 Good job! 🎉</div>
+</section>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<script>
+const slides=document.querySelectorAll(".slide");
+let current=0;
+
+function nextSlide(){
+slides[current].classList.remove("active");
+current++;
+
+if(current<slides.length){
+slides[current].classList.add("active");
+}
+}
+
+setTimeout(()=>{
+nextSlide();
+},2500);
+
+function checkAnswer(button,isCorrect){
+
+const slide=button.closest(".slide");
+const tick=slide.querySelector(".tick");
+const cross=slide.querySelector(".cross");
+
+slide.querySelectorAll(".option").forEach(btn=>{
+btn.disabled=true;
+});
+
+if(isCorrect){
+
+document.getElementById("clap").currentTime=0;
+document.getElementById("clap").play();
+
+tick.style.display="block";
+
+setTimeout(()=>{
+tick.style.display="none";
+nextSlide();
+},1500);
+
+}else{
+
+document.getElementById("wrong").currentTime=0;
+document.getElementById("wrong").play();
+
+cross.style.display="block";
+
+setTimeout(()=>{
+cross.style.display="none";
+
+slide.querySelectorAll(".option").forEach(btn=>{
+btn.disabled=false;
+});
+
+},1000);
+}
+}
+
+const finalSlide=document.querySelector(".final-slide");
+
+for(let i=0;i<70;i++){
+
+let c=document.createElement("div");
+c.className="confetti";
+
+c.style.left=Math.random()*100+"%";
+c.style.background=
+["#ff6b6b","#ffd93d","#6bcB77","#4d96ff","#ff9ff3"]
+[Math.floor(Math.random()*5)];
+
+c.style.animationDuration=
+(3+Math.random()*3)+"s";
+
+c.style.animationDelay=
+(Math.random()*3)+"s";
+
+finalSlide.appendChild(c);
+}
+</script>
+
+</body>
+</html>
