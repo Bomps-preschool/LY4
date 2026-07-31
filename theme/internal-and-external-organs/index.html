@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Body Parts Game</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* SLIDES */
+.slide {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+.active {
+  display: flex;
+}
+
+/* SLIDE 1 */
+#slide1 {
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+#slide1 img {
+  width: 120px;
+}
+
+/* SLIDE 2 */
+#slide2 {
+  flex-direction: column;
+  background: linear-gradient(to bottom, #f7d9e3, #fdf1f5);
+  border: 5px solid #ffb6c1;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+/* INSTRUCTION */
+.instruction {
+  text-align: center;
+  font-family: 'Comic Neue', cursive;
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+/* TOP AREA */
+.top {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+/* DROP ZONES */
+.column {
+  flex: 1;
+  border: 2px dashed #555;
+  border-radius: 10px;
+  padding: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.column h3 {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+/* BOTTOM ITEMS */
+.bottom {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ITEMS */
+.item {
+  width: 60px;
+  height: 60px;
+  margin: 4px;
+  border-radius: 10px;
+  background: white;
+  border: 2px solid #ff8fa3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.item img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+}
+
+/* SMALL SCREEN ADJUSTMENT */
+@media (max-width: 400px) {
+  .item {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* SLIDE 3 */
+#slide3 {
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  background: white;
+}
+
+#message {
+  font-size: 24px;
+}
+
+/* CONFETTI */
+.confetti {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  top: -10px;
+  animation: fall 3s linear infinite;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO -->
+<audio id="correctSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<!-- SLIDE 1 -->
+<div id="slide1" class="slide active">
+  <img src="assets/innovine-logo.png">
+</div>
+
+<!-- SLIDE 2 -->
+<div id="slide2" class="slide">
+
+  <div class="instruction">
+    Sort the internal organs and external body parts
+  </div>
+
+  <div class="top">
+    <div class="column" id="internal">
+      <h3>Internal Organs</h3>
+    </div>
+
+    <div class="column" id="external">
+      <h3>External Body Parts</h3>
+    </div>
+  </div>
+
+  <div class="bottom" id="items"></div>
+
+</div>
+
+<!-- SLIDE 3 -->
+<div id="slide3" class="slide">
+  <div id="message">🎉 Good Job 🎉</div>
+</div>
+
+<script>
+
+/* SLIDE CHANGE */
+setTimeout(() => {
+  slide1.classList.remove("active");
+  slide2.classList.add("active");
+}, 2000);
+
+/* FIXED ORDER */
+const items = [
+  {name: "eyes", type: "external"},
+  {name: "brain", type: "internal"},
+  {name: "liver", type: "internal"},
+  {name: "nose", type: "external"},
+  {name: "heart", type: "internal"},
+  {name: "kidney", type: "internal"},
+  {name: "hand", type: "external"},
+  {name: "lungs", type: "internal"},
+  {name: "leg", type: "external"},
+  {name: "stomach", type: "internal"}
+];
+
+let correctCount = 0;
+const container = document.getElementById("items");
+
+/* CREATE ITEMS */
+items.forEach(item => {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.draggable = true;
+  div.dataset.type = item.type;
+
+  const img = document.createElement("img");
+  img.src = `assets/${item.name}.png`;
+
+  div.appendChild(img);
+  container.appendChild(div);
+
+  div.addEventListener("dragstart", () => draggedItem = div);
+  div.addEventListener("touchstart", () => touchItem = div);
+});
+
+let draggedItem = null;
+let touchItem = null;
+
+/* DROP LOGIC */
+["internal", "external"].forEach(id => {
+  const zone = document.getElementById(id);
+
+  zone.addEventListener("dragover", e => e.preventDefault());
+  zone.addEventListener("drop", () => handleDrop(zone, draggedItem));
+  zone.addEventListener("touchend", () => handleDrop(zone, touchItem));
+});
+
+function handleDrop(zone, item) {
+  if (!item) return;
+
+  if (item.dataset.type === zone.id) {
+    zone.appendChild(item);
+    correctSound.play();
+    correctCount++;
+
+    if (correctCount === items.length) finishGame();
+  } else {
+    wrongSound.play();
+  }
+
+  draggedItem = null;
+  touchItem = null;
+}
+
+/* FINISH */
+function finishGame() {
+  setTimeout(() => {
+    slide2.classList.remove("active");
+    slide3.classList.add("active");
+    clapSound.play();
+    createConfetti();
+  }, 400);
+}
+
+/* CONFETTI */
+function createConfetti() {
+  for (let i = 0; i < 40; i++) {
+    let c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDuration = (2 + Math.random()*2) + "s";
+    slide3.appendChild(c);
+  }
+}
+
+</script>
+
+</body>
+</html>
