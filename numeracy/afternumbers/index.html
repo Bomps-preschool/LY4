@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>After Numbers Game</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Arial Rounded MT Bold", Arial, sans-serif;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+}
+
+body{
+background:#fff;
+}
+
+.slide{
+position:absolute;
+width:100%;
+height:100%;
+display:none;
+flex-direction:column;
+align-items:center;
+justify-content:flex-start;
+padding:10px;
+overflow:hidden;
+}
+
+.slide.active{
+display:flex;
+}
+
+/* Intro */
+#intro{
+background:white;
+justify-content:center;
+align-items:center;
+}
+
+.logo{
+width:min(55vw,280px);
+max-width:280px;
+}
+
+/* Background inspired by reference image */
+.game-slide{
+background:
+radial-gradient(circle at 10% 15%, #ff5b00 0 4%, transparent 4.5%),
+radial-gradient(circle at 20% 25%, #7b61ff 0 4%, transparent 4.5%),
+radial-gradient(circle at 85% 15%, #00b894 0 4%, transparent 4.5%),
+radial-gradient(circle at 90% 80%, #ff9f1c 0 4%, transparent 4.5%),
+radial-gradient(circle at 15% 85%, #6c5ce7 0 4%, transparent 4.5%),
+linear-gradient(135deg,#fff7fb,#ffffff);
+background-size:220px 220px;
+}
+
+.abstract-shape{
+position:absolute;
+border-radius:40px;
+opacity:.9;
+z-index:0;
+}
+
+.s1{width:120px;height:120px;background:#5b3df5;top:8%;left:-20px;}
+.s2{width:140px;height:70px;background:#ff5500;top:5%;right:-30px;}
+.s3{width:130px;height:90px;background:#ffcc00;bottom:12%;right:-20px;}
+.s4{width:100px;height:100px;background:#42c853;bottom:0;left:-20px;}
+.s5{width:90px;height:90px;background:#4ec7e8;top:45%;right:10px;}
+.s6{width:70px;height:70px;background:#e843c3;bottom:25%;left:15px;}
+
+.instruction{
+position:relative;
+z-index:2;
+font-size:clamp(18px,3vw,28px);
+font-weight:bold;
+text-align:center;
+color:#222;
+margin-top:8px;
+margin-bottom:15px;
+background:white;
+padding:10px 15px;
+border-radius:20px;
+box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+
+.question{
+position:relative;
+z-index:2;
+display:flex;
+gap:25px;
+margin-top:15px;
+margin-bottom:25px;
+}
+
+.number-box{
+width:min(24vw,120px);
+height:min(24vw,120px);
+max-width:120px;
+max-height:120px;
+background:white;
+border:8px solid #ff8c00;
+border-radius:25px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:clamp(34px,7vw,60px);
+font-weight:bold;
+box-shadow:0 6px 15px rgba(0,0,0,.15);
+}
+
+.empty{
+border-color:#00b894;
+}
+
+.options-area{
+position:relative;
+z-index:2;
+width:min(90%,500px);
+background:white;
+border:8px solid #ff4d6d;
+border-radius:30px;
+padding:15px;
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+box-shadow:0 6px 15px rgba(0,0,0,.15);
+}
+
+.option{
+width:min(22vw,100px);
+height:min(22vw,100px);
+max-width:100px;
+max-height:100px;
+border:none;
+border-radius:25px;
+font-size:clamp(28px,6vw,50px);
+font-weight:bold;
+cursor:pointer;
+color:white;
+}
+
+.option:nth-child(1){background:#ff6b35;}
+.option:nth-child(2){background:#00b894;}
+.option:nth-child(3){background:#6c5ce7;}
+
+.feedback{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:110px;
+font-weight:bold;
+display:none;
+z-index:100;
+}
+
+.tick{
+color:#00c853;
+}
+
+.cross{
+color:#ff1744;
+}
+
+/* End slide */
+
+#end{
+background:linear-gradient(135deg,#ffefba,#ffffff,#c9ffbf);
+justify-content:center;
+align-items:center;
+overflow:hidden;
+}
+
+.goodjob{
+font-size:clamp(40px,8vw,90px);
+font-weight:bold;
+color:#ff6600;
+z-index:10;
+text-shadow:3px 3px 0 white;
+}
+
+.rain{
+position:absolute;
+top:-50px;
+font-size:40px;
+font-weight:bold;
+animation:fall linear infinite;
+}
+
+@keyframes fall{
+0%{
+transform:translateY(-50px);
+opacity:1;
+}
+100%{
+transform:translateY(110vh);
+opacity:0;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- Intro -->
+
+<div class="slide active" id="intro">
+<img src="assets/innovine-logo.png" class="logo">
+</div>
+
+<!-- Question Slides -->
+
+<div class="slide game-slide" id="slide1">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">44</div>
+<div class="number-box empty" id="ans1"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,45,'ans1',2)">42</button>
+<button class="option" onclick="checkAnswer(this,45,'ans1',2)">45</button>
+<button class="option" onclick="checkAnswer(this,45,'ans1',2)">40</button>
+</div>
+</div>
+
+<div class="slide game-slide" id="slide2">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">37</div>
+<div class="number-box empty" id="ans2"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,38,'ans2',3)">38</button>
+<button class="option" onclick="checkAnswer(this,38,'ans2',3)">32</button>
+<button class="option" onclick="checkAnswer(this,38,'ans2',3)">36</button>
+</div>
+</div>
+
+<div class="slide game-slide" id="slide3">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">21</div>
+<div class="number-box empty" id="ans3"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,22,'ans3',4)">19</button>
+<button class="option" onclick="checkAnswer(this,22,'ans3',4)">22</button>
+<button class="option" onclick="checkAnswer(this,22,'ans3',4)">28</button>
+</div>
+</div>
+
+<div class="slide game-slide" id="slide4">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">15</div>
+<div class="number-box empty" id="ans4"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,16,'ans4',5)">16</button>
+<button class="option" onclick="checkAnswer(this,16,'ans4',5)">20</button>
+<button class="option" onclick="checkAnswer(this,16,'ans4',5)">17</button>
+</div>
+</div>
+
+<div class="slide game-slide" id="slide5">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">32</div>
+<div class="number-box empty" id="ans5"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,33,'ans5',6)">37</button>
+<button class="option" onclick="checkAnswer(this,33,'ans5',6)">33</button>
+<button class="option" onclick="checkAnswer(this,33,'ans5',6)">29</button>
+</div>
+</div>
+
+<div class="slide game-slide" id="slide6">
+<div class="abstract-shape s1"></div>
+<div class="abstract-shape s2"></div>
+<div class="abstract-shape s3"></div>
+<div class="abstract-shape s4"></div>
+<div class="abstract-shape s5"></div>
+<div class="abstract-shape s6"></div>
+
+<div class="instruction">Identify the correct after number from the given options.</div>
+
+<div class="question">
+<div class="number-box">45</div>
+<div class="number-box empty" id="ans6"></div>
+</div>
+
+<div class="options-area">
+<button class="option" onclick="checkAnswer(this,46,'ans6',7)">46</button>
+<button class="option" onclick="checkAnswer(this,46,'ans6',7)">39</button>
+<button class="option" onclick="checkAnswer(this,46,'ans6',7)">48</button>
+</div>
+</div>
+
+<!-- End -->
+
+<div class="slide" id="end">
+<div class="goodjob">🎉 Good Job 🎉</div>
+</div>
+
+<div class="feedback tick" id="tick">✓</div>
+<div class="feedback cross" id="cross">✗</div>
+
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>
+
+setTimeout(()=>{
+document.getElementById("intro").classList.remove("active");
+document.getElementById("slide1").classList.add("active");
+},3000);
+
+function showTick(){
+const t=document.getElementById("tick");
+t.style.display="block";
+setTimeout(()=>t.style.display="none",800);
+}
+
+function showCross(){
+const c=document.getElementById("cross");
+c.style.display="block";
+setTimeout(()=>c.style.display="none",800);
+}
+
+function checkAnswer(btn,correct,answerBox,nextSlide){
+
+if(Number(btn.innerText)===correct){
+
+showTick();
+
+document.getElementById(answerBox).innerHTML=correct;
+btn.style.visibility="hidden";
+
+setTimeout(()=>{
+goToSlide(nextSlide);
+},1200);
+
+}else{
+
+showCross();
+
+const sound=document.getElementById("wrongSound");
+sound.currentTime=0;
+sound.play();
+
+}
+}
+
+function goToSlide(num){
+
+document.querySelectorAll(".slide").forEach(s=>{
+s.classList.remove("active");
+});
+
+if(num===7){
+document.getElementById("end").classList.add("active");
+startRain();
+}else{
+document.getElementById("slide"+num).classList.add("active");
+}
+}
+
+function startRain(){
+
+for(let i=0;i<70;i++){
+
+const n=document.createElement("div");
+
+n.className="rain";
+
+n.innerHTML=Math.floor(Math.random()*9)+1;
+
+n.style.left=Math.random()*100+"vw";
+
+n.style.animationDuration=(Math.random()*3+2)+"s";
+
+document.getElementById("end").appendChild(n);
+}
+}
+</script>
+
+</body>
+</html>
