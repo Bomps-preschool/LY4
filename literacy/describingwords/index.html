@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>Describing Words Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #ffffff;
+            touch-action: manipulation;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100svh;
+            overflow: hidden;
+        }
+
+        /* ---------------- SPLASH SCREEN ---------------- */
+
+        #splash-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+        }
+
+        #splash-screen.hide {
+            display: none;
+        }
+
+        #splash-logo {
+            width: min(60vw, 310px);
+            max-height: 55vh;
+            object-fit: contain;
+            animation: logoAppear 0.8s ease;
+        }
+
+        @keyframes logoAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ---------------- QUESTION SCREEN ---------------- */
+
+        #question-screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(10px, 2vh, 18px);
+            padding:
+                max(12px, env(safe-area-inset-top))
+                max(12px, env(safe-area-inset-right))
+                max(12px, env(safe-area-inset-bottom))
+                max(12px, env(safe-area-inset-left));
+            transition: background-color 0.4s ease;
+        }
+
+        #question-screen.show {
+            display: flex;
+        }
+
+        .instruction-box {
+            width: min(94%, 900px);
+            padding: clamp(10px, 2vh, 16px) clamp(12px, 3vw, 25px);
+            border: 3px solid rgba(83, 80, 116, 0.18);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 6px 0 rgba(91, 88, 128, 0.12);
+            text-align: center;
+            color: #443f62;
+            font-size: clamp(16px, 3vw, 27px);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .question-card {
+            width: min(94%, 900px);
+            max-height: calc(100vh - 105px);
+            max-height: calc(100svh - 105px);
+            padding: clamp(14px, 3vh, 30px);
+            border: 3px solid rgba(83, 80, 116, 0.16);
+            border-radius: clamp(20px, 4vw, 32px);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 10px 0 rgba(91, 88, 128, 0.12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(14px, 3vh, 28px);
+        }
+
+        .sentence-area {
+            width: 100%;
+            min-height: 145px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 24px);
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        #sentence {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(5px, 1vw, 10px);
+            color: #302c49;
+            font-size: clamp(24px, 4.8vw, 46px);
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        #answer-slot {
+            min-width: clamp(110px, 22vw, 190px);
+            min-height: 1.35em;
+            padding: 2px 10px 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 5px solid #767096;
+            color: #27844a;
+            font-weight: 900;
+        }
+
+        #answer-slot.filled {
+            border: 3px solid #74c991;
+            border-radius: 12px;
+            background: #e6f8ec;
+            animation: answerPop 0.35s ease;
+        }
+
+        @keyframes answerPop {
+            0% {
+                transform: scale(0.7);
+            }
+
+            70% {
+                transform: scale(1.12);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #question-image {
+            width: clamp(95px, 20vmin, 165px);
+            height: clamp(95px, 20vmin, 165px);
+            object-fit: contain;
+            filter: drop-shadow(0 7px 6px rgba(0, 0, 0, 0.12));
+        }
+
+        .options {
+            width: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: clamp(8px, 2vw, 18px);
+        }
+
+        .option-button {
+            flex: 1 1 0;
+            max-width: 235px;
+            min-height: clamp(58px, 10vh, 84px);
+            padding: 10px 8px;
+            border: 3px solid #8279aa;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 7px 0 #d7d1eb;
+            color: #413a65;
+            cursor: pointer;
+            font-size: clamp(19px, 3.8vw, 34px);
+            font-weight: 900;
+            text-transform: lowercase;
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease,
+                background 0.15s ease;
+        }
+
+        .option-button:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #d7d1eb;
+        }
+
+        .option-button.correct-choice {
+            border-color: #50ae72;
+            background: #dcf7e5;
+            color: #237444;
+            box-shadow: 0 7px 0 #a6dfba;
+        }
+
+        .option-button.hidden-option {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-button.wrong-choice {
+            border-color: #e36464;
+            background: #ffe7e7;
+            color: #b83d3d;
+            box-shadow: 0 7px 0 #f3b1b1;
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        /* ---------------- PROGRESS DOTS ---------------- */
+
+        #progress-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 15px;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(76, 69, 109, 0.22);
+        }
+
+        .progress-dot.active {
+            width: 14px;
+            height: 14px;
+            background: #62598b;
+        }
+
+        .progress-dot.completed {
+            background: #55b97a;
+        }
+
+        /* ---------------- FEEDBACK ---------------- */
+
+        #feedback-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 40;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #feedback-overlay.show {
+            display: flex;
+        }
+
+        #feedback-icon {
+            width: clamp(105px, 25vmin, 175px);
+            height: clamp(105px, 25vmin, 175px);
+            border: 8px solid #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+            color: #ffffff;
+            font-size: clamp(65px, 16vmin, 115px);
+            font-weight: 900;
+            line-height: 1;
+            animation: feedbackPop 0.4s ease;
+        }
+
+        #feedback-icon.correct {
+            background: #41b96c;
+        }
+
+        #feedback-icon.wrong {
+            background: #e65555;
+        }
+
+        @keyframes feedbackPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotate(-12deg);
+            }
+
+            65% {
+                opacity: 1;
+                transform: scale(1.15) rotate(5deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .shake {
+            animation: shake 0.42s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px);
+            }
+
+            40% {
+                transform: translateX(10px);
+            }
+
+            60% {
+                transform: translateX(-7px);
+            }
+
+            80% {
+                transform: translateX(7px);
+            }
+        }
+
+        /* ---------------- FINAL SCREEN ---------------- */
+
+        #final-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+            background:
+                radial-gradient(circle at 20% 25%, #fff5bd 0 9%, transparent 10%),
+                radial-gradient(circle at 80% 20%, #ffd8e7 0 10%, transparent 11%),
+                radial-gradient(circle at 15% 80%, #d8f3ff 0 10%, transparent 11%),
+                radial-gradient(circle at 85% 82%, #e5ddff 0 10%, transparent 11%),
+                #f7f2ff;
+        }
+
+        #final-screen.show {
+            display: flex;
+        }
+
+        .final-card {
+            position: relative;
+            z-index: 5;
+            width: min(90%, 620px);
+            padding: clamp(28px, 7vh, 65px) 20px;
+            border: 4px solid rgba(112, 93, 155, 0.17);
+            border-radius: 35px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 13px 0 rgba(111, 91, 154, 0.14);
+            text-align: center;
+        }
+
+        .good-job {
+            margin: 0;
+            font-size: clamp(48px, 12vw, 100px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .good-job span:nth-child(1) {
+            color: #ef5b63;
+        }
+
+        .good-job span:nth-child(2) {
+            color: #f39c3d;
+        }
+
+        .good-job span:nth-child(3) {
+            color: #f2c744;
+        }
+
+        .good-job span:nth-child(4) {
+            color: #5bbd75;
+        }
+
+        .good-job span:nth-child(5) {
+            color: #4e9bd8;
+        }
+
+        .good-job span:nth-child(6) {
+            color: #775fc0;
+        }
+
+        .good-job span:nth-child(7) {
+            color: #d65ca4;
+        }
+
+        .good-job span:nth-child(8) {
+            color: #ef5b63;
+        }
+
+        #play-again-button {
+            margin-top: clamp(25px, 6vh, 45px);
+            min-width: 190px;
+            min-height: 62px;
+            padding: 12px 30px;
+            border: 0;
+            border-radius: 50px;
+            background: #6855a3;
+            box-shadow: 0 7px 0 #423473;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 900;
+        }
+
+        #play-again-button:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #423473;
+        }
+
+        #letter-rain {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .rain-letter {
+            position: absolute;
+            top: -15%;
+            font-weight: 900;
+            animation-name: letterFall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes letterFall {
+            0% {
+                transform: translateY(-15vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(125vh) rotate(620deg);
+                opacity: 1;
+            }
+        }
+
+        /* ---------------- SMALL PHONE SUPPORT ---------------- */
+
+        @media (max-width: 480px) {
+            #question-screen {
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .instruction-box {
+                width: 100%;
+                border-radius: 14px;
+                border-width: 2px;
+                font-size: clamp(15px, 4.6vw, 19px);
+                box-shadow: 0 4px 0 rgba(91, 88, 128, 0.12);
+            }
+
+            .question-card {
+                width: 100%;
+                padding: 14px 10px;
+                gap: 15px;
+                border-radius: 20px;
+                border-width: 2px;
+                box-shadow: 0 7px 0 rgba(91, 88, 128, 0.12);
+            }
+
+            .sentence-area {
+                min-height: 170px;
+                gap: 5px;
+            }
+
+            #sentence {
+                width: 100%;
+                font-size: clamp(23px, 7vw, 32px);
+            }
+
+            #question-image {
+                width: clamp(90px, 29vw, 125px);
+                height: clamp(90px, 29vw, 125px);
+            }
+
+            .options {
+                gap: 7px;
+            }
+
+            .option-button {
+                min-height: 58px;
+                padding: 7px 3px;
+                border-width: 2px;
+                border-radius: 13px;
+                box-shadow: 0 5px 0 #d7d1eb;
+                font-size: clamp(18px, 5.3vw, 24px);
+            }
+
+            .option-button:active {
+                transform: translateY(3px);
+                box-shadow: 0 2px 0 #d7d1eb;
+            }
+        }
+
+        /* ---------------- SHORT LANDSCAPE SCREEN SUPPORT ---------------- */
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            #question-screen {
+                flex-direction: row;
+                align-items: stretch;
+                gap: 10px;
+                padding: 8px;
+            }
+
+            .instruction-box {
+                width: 26%;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: clamp(14px, 2.2vw, 20px);
+                border-radius: 15px;
+            }
+
+            .question-card {
+                width: 74%;
+                max-height: none;
+                padding: 10px 16px;
+                gap: 8px;
+                border-radius: 18px;
+            }
+
+            .sentence-area {
+                min-height: 95px;
+                flex-wrap: nowrap;
+                gap: 10px;
+            }
+
+            #sentence {
+                font-size: clamp(20px, 3.4vw, 31px);
+            }
+
+            #question-image {
+                width: clamp(70px, 17vh, 100px);
+                height: clamp(70px, 17vh, 100px);
+            }
+
+            .option-button {
+                min-height: 45px;
+                padding: 6px;
+                font-size: clamp(17px, 2.8vw, 25px);
+            }
+
+            #progress-dots {
+                min-height: 10px;
+            }
+
+            .progress-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            .progress-dot.active {
+                width: 11px;
+                height: 11px;
+            }
+        }
+
+        @media (max-height: 380px) and (orientation: landscape) {
+            .instruction-box {
+                font-size: 13px;
+            }
+
+            .question-card {
+                padding: 6px 12px;
+                gap: 5px;
+            }
+
+            .sentence-area {
+                min-height: 75px;
+            }
+
+            #sentence {
+                font-size: clamp(18px, 3vw, 25px);
+            }
+
+            #question-image {
+                width: 68px;
+                height: 68px;
+            }
+
+            .option-button {
+                min-height: 39px;
+                font-size: clamp(15px, 2.5vw, 20px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- Slide 1: Innovine Logo -->
+    <section id="splash-screen">
+        <img
+            id="splash-logo"
+            src="assets/innovine-logo.png"
+            alt="Innovine Logo"
+        >
+    </section>
+
+    <!-- Slides 2–9: Questions -->
+    <section id="question-screen">
+
+        <div class="instruction-box">
+            Tap on the correct describing word to complete the sentence.
+        </div>
+
+        <div class="question-card">
+
+            <div class="sentence-area">
+                <div id="sentence">
+                    <span id="sentence-start"></span>
+                    <span id="answer-slot">&nbsp;</span>
+                </div>
+
+                <img
+                    id="question-image"
+                    src=""
+                    alt=""
+                    draggable="false"
+                >
+            </div>
+
+            <div id="options" class="options"></div>
+
+            <div id="progress-dots"></div>
+
+        </div>
+    </section>
+
+    <!-- Correct and Wrong Feedback -->
+    <div id="feedback-overlay">
+        <div id="feedback-icon"></div>
+    </div>
+
+    <!-- Slide 10: Good Job -->
+    <section id="final-screen">
+
+        <div id="letter-rain"></div>
+
+        <div class="final-card">
+            <h1 class="good-job" aria-label="Good job!">
+                <span>G</span><span>o</span><span>o</span><span>d</span>
+                <span>&nbsp;</span>
+                <span>j</span><span>o</span><span>b</span><span>!</span>
+            </h1>
+
+            <button id="play-again-button" type="button">
+                Play Again
+            </button>
+        </div>
+
+    </section>
+
+    <!-- Audio -->
+    <audio id="clap-audio" preload="auto">
+        <source src="assets/clap.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="wrong-audio" preload="auto">
+        <source src="assets/wrong.mp3" type="audio/mpeg">
+    </audio>
+
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var questions = [
+        {
+            sentence: "The lemon is",
+            answer: "sour",
+            options: ["sour", "hot", "sweet"],
+            image: "assets/lemon.png",
+            imageAlt: "Lemon",
+            background: "#FFF4C9"
+        },
+        {
+            sentence: "The ant is very",
+            answer: "small",
+            options: ["tall", "small", "big"],
+            image: "assets/ant.png",
+            imageAlt: "Ant",
+            background: "#E9F8D7"
+        },
+        {
+            sentence: "The candy is",
+            answer: "sweet",
+            options: ["fast", "slow", "sweet"],
+            image: "assets/candy.png",
+            imageAlt: "Candy",
+            background: "#FFE0EA"
+        },
+        {
+            sentence: "The sky is",
+            answer: "blue",
+            options: ["blue", "pink", "red"],
+            image: "assets/sky.png",
+            imageAlt: "Sky",
+            background: "#DCEFFF"
+        },
+        {
+            sentence: "The giraffe is",
+            answer: "tall",
+            options: ["short", "tall", "small"],
+            image: "assets/giraffe.png",
+            imageAlt: "Giraffe",
+            background: "#FFE8C9"
+        },
+        {
+            sentence: "The soup is very",
+            answer: "hot",
+            options: ["slow", "cold", "hot"],
+            image: "assets/soup.png",
+            imageAlt: "Soup",
+            background: "#F7DECF"
+        },
+        {
+            sentence: "The apple is",
+            answer: "red",
+            options: ["red", "blue", "black"],
+            image: "assets/apple.png",
+            imageAlt: "Apple",
+            background: "#E1F4DF"
+        },
+        {
+            sentence: "The ball is",
+            answer: "round",
+            options: ["square", "round", "hard"],
+            image: "assets/ball.png",
+            imageAlt: "Ball",
+            background: "#EDE1FF"
+        }
+    ];
+
+    var currentQuestionIndex = 0;
+    var answerLocked = false;
+    var nextQuestionTimer = null;
+    var feedbackTimer = null;
+    var splashTimer = null;
+
+    var splashScreen = document.getElementById("splash-screen");
+    var questionScreen = document.getElementById("question-screen");
+    var finalScreen = document.getElementById("final-screen");
+
+    var sentenceStart = document.getElementById("sentence-start");
+    var answerSlot = document.getElementById("answer-slot");
+    var questionImage = document.getElementById("question-image");
+    var optionsContainer = document.getElementById("options");
+    var progressDots = document.getElementById("progress-dots");
+
+    var feedbackOverlay = document.getElementById("feedback-overlay");
+    var feedbackIcon = document.getElementById("feedback-icon");
+
+    var clapAudio = document.getElementById("clap-audio");
+    var wrongAudio = document.getElementById("wrong-audio");
+
+    var playAgainButton = document.getElementById("play-again-button");
+    var letterRain = document.getElementById("letter-rain");
+
+    function stopAudio(audioElement) {
+        try {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        } catch (error) {
+            /* Audio reset is not supported on some older browsers. */
+        }
+    }
+
+    function playAudio(audioElement) {
+        stopAudio(audioElement);
+
+        try {
+            var playPromise = audioElement.play();
+
+            if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(function () {
+                    /* The browser may block audio until a user interaction. */
+                });
+            }
+        } catch (error) {
+            /* Continue the game even when audio is unavailable. */
+        }
+    }
+
+    function clearTimers() {
+        if (nextQuestionTimer) {
+            window.clearTimeout(nextQuestionTimer);
+            nextQuestionTimer = null;
+        }
+
+        if (feedbackTimer) {
+            window.clearTimeout(feedbackTimer);
+            feedbackTimer = null;
+        }
+
+        if (splashTimer) {
+            window.clearTimeout(splashTimer);
+            splashTimer = null;
+        }
+    }
+
+    function preloadAssets() {
+        var imagePaths = [
+            "assets/innovine-logo.png",
+            "assets/lemon.png",
+            "assets/ant.png",
+            "assets/candy.png",
+            "assets/sky.png",
+            "assets/giraffe.png",
+            "assets/soup.png",
+            "assets/apple.png",
+            "assets/ball.png"
+        ];
+
+        var index;
+
+        for (index = 0; index < imagePaths.length; index += 1) {
+            var image = new Image();
+            image.src = imagePaths[index];
+        }
+
+        try {
+            clapAudio.load();
+            wrongAudio.load();
+        } catch (error) {
+            /* Continue if preload is unavailable. */
+        }
+    }
+
+    function createProgressDots() {
+        progressDots.innerHTML = "";
+
+        var index;
+
+        for (index = 0; index < questions.length; index += 1) {
+            var dot = document.createElement("span");
+            dot.className = "progress-dot";
+
+            if (index < currentQuestionIndex) {
+                dot.className += " completed";
+            } else if (index === currentQuestionIndex) {
+                dot.className += " active";
+            }
+
+            progressDots.appendChild(dot);
+        }
+    }
+
+    function showSplash() {
+        clearTimers();
+        stopAudio(clapAudio);
+        stopAudio(wrongAudio);
+
+        currentQuestionIndex = 0;
+        answerLocked = false;
+
+        finalScreen.className = "";
+        questionScreen.className = "";
+        splashScreen.className = "";
+
+        letterRain.innerHTML = "";
+
+        splashTimer = window.setTimeout(function () {
+            splashScreen.className = "hide";
+            startGame();
+        }, 5000);
+    }
+
+    function startGame() {
+        currentQuestionIndex = 0;
+        questionScreen.className = "show";
+        finalScreen.className = "";
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answerLocked = false;
+        hideFeedback();
+
+        var question = questions[currentQuestionIndex];
+
+        questionScreen.style.backgroundColor = question.background;
+        sentenceStart.textContent = question.sentence;
+        answerSlot.innerHTML = "&nbsp;";
+        answerSlot.className = "";
+
+        questionImage.src = question.image;
+        questionImage.alt = question.imageAlt;
+
+        optionsContainer.innerHTML = "";
+
+        var index;
+
+        for (index = 0; index < question.options.length; index += 1) {
+            createOptionButton(question.options[index]);
+        }
+
+        createProgressDots();
+    }
+
+    function createOptionButton(optionText) {
+        var button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "option-button";
+        button.textContent = optionText;
+        button.setAttribute(
+            "aria-label",
+            "Choose the word " + optionText
+        );
+
+        button.addEventListener("click", function () {
+            checkAnswer(optionText, button);
+        });
+
+        optionsContainer.appendChild(button);
+    }
+
+    function disableAllOptions() {
+        var buttons = optionsContainer.getElementsByTagName("button");
+        var index;
+
+        for (index = 0; index < buttons.length; index += 1) {
+            buttons[index].disabled = true;
+        }
+    }
+
+    function checkAnswer(selectedAnswer, selectedButton) {
+        if (answerLocked) {
+            return;
+        }
+
+        var question = questions[currentQuestionIndex];
+
+        if (selectedAnswer === question.answer) {
+            answerLocked = true;
+            disableAllOptions();
+
+            answerSlot.textContent = selectedAnswer;
+            answerSlot.className = "filled";
+
+            selectedButton.className += " correct-choice";
+
+            showFeedback("correct");
+            playAudio(clapAudio);
+
+            window.setTimeout(function () {
+                selectedButton.className += " hidden-option";
+            }, 350);
+
+            nextQuestionTimer = window.setTimeout(function () {
+                currentQuestionIndex += 1;
+
+                if (currentQuestionIndex < questions.length) {
+                    loadQuestion();
+                } else {
+                    showFinalScreen();
+                }
+            }, 2300);
+
+        } else {
+            selectedButton.className += " wrong-choice shake";
+
+            showFeedback("wrong");
+            playAudio(wrongAudio);
+
+            window.setTimeout(function () {
+                selectedButton.className = "option-button";
+            }, 600);
+        }
+    }
+
+    function showFeedback(type) {
+        if (feedbackTimer) {
+            window.clearTimeout(feedbackTimer);
+        }
+
+        feedbackOverlay.className = "show";
+
+        if (type === "correct") {
+            feedbackIcon.className = "correct";
+            feedbackIcon.textContent = "✓";
+        } else {
+            feedbackIcon.className = "wrong";
+            feedbackIcon.textContent = "✕";
+        }
+
+        feedbackTimer = window.setTimeout(function () {
+            hideFeedback();
+        }, type === "correct" ? 1000 : 750);
+    }
+
+    function hideFeedback() {
+        feedbackOverlay.className = "";
+        feedbackIcon.className = "";
+        feedbackIcon.textContent = "";
+    }
+
+    function showFinalScreen() {
+        answerLocked = true;
+        questionScreen.className = "";
+        splashScreen.className = "hide";
+        finalScreen.className = "show";
+
+        createLetterRain();
+    }
+
+    function createLetterRain() {
+        letterRain.innerHTML = "";
+
+        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var colours = [
+            "#ef5b63",
+            "#f39c3d",
+            "#f0c83e",
+            "#55b978",
+            "#4e9bd8",
+            "#775fc0",
+            "#d65ca4"
+        ];
+
+        var totalLetters = 48;
+        var index;
+
+        for (index = 0; index < totalLetters; index += 1) {
+            var letter = document.createElement("span");
+            var randomLetter = letters.charAt(
+                Math.floor(Math.random() * letters.length)
+            );
+
+            letter.className = "rain-letter";
+            letter.textContent = randomLetter;
+
+            letter.style.left = Math.floor(Math.random() * 96) + "%";
+            letter.style.color =
+                colours[Math.floor(Math.random() * colours.length)];
+            letter.style.fontSize =
+                (18 + Math.floor(Math.random() * 28)) + "px";
+            letter.style.animationDuration =
+                (3.5 + Math.random() * 4) + "s";
+            letter.style.animationDelay =
+                (-Math.random() * 7) + "s";
+
+            letterRain.appendChild(letter);
+        }
+    }
+
+    playAgainButton.addEventListener("click", function () {
+        showSplash();
+    });
+
+    document.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+    });
+
+    document.addEventListener("dragstart", function (event) {
+        event.preventDefault();
+    });
+
+    preloadAssets();
+    showSplash();
+
+}());
+</script>
+
+</body>
+</html>
