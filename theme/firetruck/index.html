@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fire Truck Components Game</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#fff7e8;
+  user-select:none;
+}
+
+.screen{
+  width:100vw;
+  height:100dvh;
+  display:none;
+  position:relative;
+  overflow:hidden;
+}
+
+.screen.active{
+  display:flex;
+}
+
+/* SPLASH */
+#splash{
+  background:white;
+  align-items:center;
+  justify-content:center;
+}
+
+.logo{
+  width:min(55vw,360px);
+  max-height:55vh;
+  object-fit:contain;
+}
+
+/* GAME SCREEN */
+#game{
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:1.5vh 2vw;
+  background:
+    radial-gradient(circle at top left, #fff5b8 0%, transparent 30%),
+    radial-gradient(circle at bottom right, #ffd6d6 0%, transparent 35%),
+    linear-gradient(180deg,#fff7db,#ffe9f0);
+}
+
+.game-title{
+  width:96%;
+  text-align:center;
+  font-size:clamp(18px,4vw,34px);
+  font-weight:900;
+  color:#b91c1c;
+  line-height:1.1;
+  background:white;
+  border:3px solid #f97316;
+  border-radius:20px;
+  padding:0.8vh 1vw;
+  box-shadow:0 5px 0 #fdba74;
+}
+
+.ref-truck{
+  width:min(34vw,170px);
+  max-height:12vh;
+  object-fit:contain;
+  margin:0.8vh 0 0.5vh;
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,0.18));
+}
+
+.main-area{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.8vh;
+}
+
+.grid-wrap{
+  background:#fff;
+  border:4px solid #fb7185;
+  border-radius:18px;
+  padding:0.8vh;
+  box-shadow:0 7px 0 #fda4af;
+}
+
+#wordGrid{
+  display:grid;
+  grid-template-columns:repeat(16, 1fr);
+  grid-template-rows:repeat(10, 1fr);
+  width:min(94vw,660px);
+  aspect-ratio:16/10;
+  gap:2px;
+  touch-action:none;
+}
+
+.cell{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff7ed;
+  border:1px solid #fb7185;
+  border-radius:6px;
+  font-size:clamp(12px,3.1vw,26px);
+  font-weight:900;
+  color:#1f2937;
+  text-transform:uppercase;
+}
+
+.cell.active{
+  background:#fde68a;
+  transform:scale(1.05);
+}
+
+.cell.found{
+  background:#86efac;
+  color:#064e3b;
+  border-color:#16a34a;
+}
+
+.word-bank{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:0.7vh 1.5vw;
+  width:min(94vw,660px);
+  margin-top:0.6vh;
+}
+
+.word-card{
+  background:white;
+  border:3px dashed #f97316;
+  border-radius:14px;
+  padding:0.7vh 0.5vw;
+  text-align:center;
+  font-size:clamp(12px,2.6vw,22px);
+  font-weight:800;
+  color:#7c2d12;
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.word-card.done{
+  background:#dcfce7;
+  border-color:#22c55e;
+  color:#166534;
+  text-decoration:line-through;
+}
+
+.mark{
+  font-size:1.2em;
+  color:#16a34a;
+}
+
+.tick-popup{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:20;
+}
+
+.tick-popup.show{
+  display:flex;
+}
+
+.big-tick{
+  width:min(28vw,160px);
+  height:min(28vw,160px);
+  border-radius:50%;
+  background:#22c55e;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(65px,15vw,130px);
+  font-weight:900;
+  box-shadow:0 0 0 14px rgba(34,197,94,0.25);
+  animation:popTick 0.8s ease forwards;
+}
+
+@keyframes popTick{
+  0%{transform:scale(0);}
+  45%{transform:scale(1.18);}
+  70%{transform:scale(0.95);}
+  100%{transform:scale(1); opacity:0;}
+}
+
+/* END SCREEN */
+#end{
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at top, #fff7ad 0%, transparent 32%),
+    linear-gradient(180deg,#dbeafe,#fff7ed);
+}
+
+.end-message{
+  position:absolute;
+  top:9vh;
+  font-size:clamp(42px,10vw,90px);
+  font-weight:1000;
+  color:#dc2626;
+  background:white;
+  border:5px solid #f97316;
+  border-radius:28px;
+  padding:1.5vh 5vw;
+  box-shadow:0 8px 0 #fdba74;
+  z-index:4;
+  animation:bounceText 1.1s ease infinite alternate;
+}
+
+@keyframes bounceText{
+  from{transform:translateY(0);}
+  to{transform:translateY(-8px);}
+}
+
+.road{
+  position:absolute;
+  bottom:11vh;
+  width:100%;
+  height:14vh;
+  background:#4b5563;
+  border-top:8px solid #374151;
+  border-bottom:8px solid #374151;
+}
+
+.road:after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:0;
+  width:100%;
+  height:6px;
+  background:repeating-linear-gradient(90deg,#fff 0 45px,transparent 45px 90px);
+  transform:translateY(-50%);
+}
+
+.css-truck{
+  position:absolute;
+  bottom:18vh;
+  width:min(70vw,560px);
+  height:min(28vw,210px);
+  animation:driveTruck 4s linear infinite;
+  z-index:3;
+}
+
+@keyframes driveTruck{
+  from{left:110vw;}
+  to{left:-80vw;}
+}
+
+.truck-body{
+  position:absolute;
+  left:28%;
+  top:38%;
+  width:63%;
+  height:38%;
+  background:#dc2626;
+  border:5px solid #991b1b;
+  border-radius:14px 18px 10px 10px;
+}
+
+.truck-cab{
+  position:absolute;
+  left:5%;
+  top:42%;
+  width:32%;
+  height:35%;
+  background:#ef4444;
+  border:5px solid #991b1b;
+  border-radius:20px 8px 8px 12px;
+  clip-path:polygon(0 18%,65% 18%,86% 0,100% 0,100% 100%,0 100%);
+}
+
+.window{
+  position:absolute;
+  left:16%;
+  top:46%;
+  width:14%;
+  height:13%;
+  background:#bae6fd;
+  border:4px solid #075985;
+  border-radius:8px;
+  z-index:5;
+}
+
+.ladder{
+  position:absolute;
+  left:28%;
+  top:20%;
+  width:58%;
+  height:15%;
+  background:
+    repeating-linear-gradient(90deg,#fef3c7 0 12px,#92400e 12px 16px);
+  border:5px solid #92400e;
+  border-radius:8px;
+  transform:rotate(-3deg);
+  z-index:5;
+}
+
+.ladder:before,
+.ladder:after{
+  content:"";
+  position:absolute;
+  left:0;
+  width:100%;
+  height:4px;
+  background:#78350f;
+}
+
+.ladder:before{top:22%;}
+.ladder:after{bottom:22%;}
+
+.light{
+  position:absolute;
+  left:38%;
+  top:32%;
+  width:8%;
+  height:8%;
+  background:#fde047;
+  border-radius:50%;
+  z-index:6;
+  animation:blink 0.35s infinite alternate;
+}
+
+.siren-light{
+  position:absolute;
+  left:14%;
+  top:34%;
+  width:10%;
+  height:8%;
+  background:#facc15;
+  border:3px solid #ca8a04;
+  border-radius:50% 50% 20% 20%;
+  z-index:6;
+  animation:blink 0.35s infinite alternate;
+}
+
+@keyframes blink{
+  from{box-shadow:0 0 4px #facc15;}
+  to{box-shadow:0 0 25px #facc15;}
+}
+
+.hose{
+  position:absolute;
+  left:50%;
+  top:47%;
+  width:18%;
+  height:18%;
+  border:6px solid #fef08a;
+  border-radius:50%;
+  z-index:6;
+}
+
+.wheel{
+  position:absolute;
+  bottom:4%;
+  width:17%;
+  aspect-ratio:1/1;
+  background:#111827;
+  border:7px solid #030712;
+  border-radius:50%;
+  z-index:7;
+  animation:spinWheel 0.65s linear infinite;
+}
+
+.wheel:after{
+  content:"";
+  position:absolute;
+  inset:28%;
+  background:#e5e7eb;
+  border-radius:50%;
+}
+
+.wheel.one{left:16%;}
+.wheel.two{right:15%;}
+
+@keyframes spinWheel{
+  to{transform:rotate(-360deg);}
+}
+
+.replay{
+  position:absolute;
+  bottom:3vh;
+  padding:1.3vh 5vw;
+  font-size:clamp(18px,4vw,30px);
+  font-weight:900;
+  border:0;
+  border-radius:22px;
+  background:#22c55e;
+  color:white;
+  box-shadow:0 6px 0 #15803d;
+  cursor:pointer;
+  z-index:6;
+}
+
+.replay:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 #15803d;
+}
+
+@media(max-height:620px){
+  .game-title{
+    font-size:clamp(15px,3vw,26px);
+    padding:0.5vh 1vw;
+  }
+
+  .ref-truck{
+    max-height:9vh;
+    margin:0.4vh 0;
+  }
+
+  #wordGrid{
+    width:min(92vw,590px);
+  }
+
+  .word-card{
+    min-height:28px;
+    padding:0.45vh 0.4vw;
+  }
+
+  .end-message{
+    top:5vh;
+  }
+
+  .css-truck{
+    bottom:21vh;
+    width:min(62vw,500px);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="clapSound" src="assets/clap.mp3" preload="auto"></audio>
+
+<section id="splash" class="screen active">
+  <img class="logo" src="assets/innovine-logo.png" alt="Innovine Logo">
+</section>
+
+<section id="game" class="screen">
+  <div class="game-title">Find the Fire Truck components hidden in the grid.</div>
+
+  <img class="ref-truck" src="assets/firetruck.png" alt="Fire Truck">
+
+  <div class="main-area">
+    <div class="grid-wrap">
+      <div id="wordGrid"></div>
+    </div>
+
+    <div class="word-bank" id="wordBank"></div>
+  </div>
+
+  <div class="tick-popup" id="tickPopup">
+    <div class="big-tick">✓</div>
+  </div>
+</section>
+
+<section id="end" class="screen">
+  <div class="end-message">Good job!</div>
+
+  <div class="css-truck">
+    <div class="ladder"></div>
+    <div class="truck-body"></div>
+    <div class="truck-cab"></div>
+    <div class="window"></div>
+    <div class="siren-light"></div>
+    <div class="light"></div>
+    <div class="hose"></div>
+    <div class="wheel one"></div>
+    <div class="wheel two"></div>
+  </div>
+
+  <div class="road"></div>
+
+  <button class="replay" onclick="restartGame()">Play Again</button>
+</section>
+
+<script>
+const ROWS = 10;
+const COLS = 16;
+
+const WORDS = [
+  { label:"ladder", key:"LADDER" },
+  { label:"hose", key:"HOSE" },
+  { label:"water tank", key:"WATERTANK" },
+  { label:"siren", key:"SIREN" },
+  { label:"tools", key:"TOOLS" },
+  { label:"fire extinguisher", key:"FIREEXTINGUISHER" }
+];
+
+const placements = [
+  { key:"WATERTANK", row:0, col:2, dr:0, dc:1 },
+  { key:"LADDER", row:1, col:0, dr:1, dc:0 },
+  { key:"HOSE", row:1, col:7, dr:1, dc:1 },
+  { key:"SIREN", row:1, col:15, dr:1, dc:0 },
+  { key:"TOOLS", row:6, col:5, dr:0, dc:1 },
+  { key:"FIREEXTINGUISHER", row:8, col:0, dr:0, dc:1 }
+];
+
+let gridLetters = [];
+let foundWords = new Set();
+let isSelecting = false;
+let startCell = null;
+let currentPath = [];
+let audioCtx = null;
+
+const gridEl = document.getElementById("wordGrid");
+const wordBank = document.getElementById("wordBank");
+const tickPopup = document.getElementById("tickPopup");
+const clapSound = document.getElementById("clapSound");
+
+window.addEventListener("load", () => {
+  buildGame();
+  setTimeout(() => {
+    showScreen("game");
+  }, 3000);
+});
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function buildGame(){
+  foundWords.clear();
+  gridLetters = Array.from({length: ROWS}, () => Array(COLS).fill(""));
+
+  placements.forEach(p => {
+    const word = p.key;
+    for(let i=0;i<word.length;i++){
+      const r = p.row + p.dr * i;
+      const c = p.col + p.dc * i;
+      gridLetters[r][c] = word[i];
+    }
+  });
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      if(!gridLetters[r][c]){
+        gridLetters[r][c] = letters[Math.floor(Math.random()*letters.length)];
+      }
+    }
+  }
+
+  drawGrid();
+  drawWordBank();
+}
+
+function drawGrid(){
+  gridEl.innerHTML = "";
+
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = gridLetters[r][c];
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      cell.id = `cell-${r}-${c}`;
+
+      cell.addEventListener("pointerdown", startSelection);
+      cell.addEventListener("pointermove", moveSelection);
+
+      gridEl.appendChild(cell);
+    }
+  }
+}
+
+function drawWordBank(){
+  wordBank.innerHTML = "";
+
+  WORDS.forEach(w => {
+    const card = document.createElement("div");
+    card.className = "word-card";
+    card.id = `word-${w.key}`;
+    card.innerHTML = `<span class="mark"></span><span>${w.label}</span>`;
+    wordBank.appendChild(card);
+  });
+}
+
+function startSelection(e){
+  e.preventDefault();
+  prepareAudio();
+
+  const cell = e.currentTarget;
+  isSelecting = true;
+  startCell = cell;
+  updatePath([cell]);
+}
+
+function moveSelection(e){
+  if(!isSelecting || !startCell) return;
+
+  const cell = document.elementFromPoint(e.clientX, e.clientY);
+  if(!cell || !cell.classList.contains("cell")) return;
+
+  const path = getStraightPath(startCell, cell);
+  if(path.length > 0){
+    updatePath(path);
+  }
+}
+
+document.addEventListener("pointerup", finishSelection);
+document.addEventListener("pointercancel", clearActivePath);
+
+function finishSelection(){
+  if(!isSelecting) return;
+
+  isSelecting = false;
+
+  if(currentPath.length < 2){
+    clearActivePath();
+    return;
+  }
+
+  const selectedWord = currentPath.map(cell => cell.textContent).join("");
+  const reversedWord = selectedWord.split("").reverse().join("");
+
+  const matched = WORDS.find(w =>
+    !foundWords.has(w.key) &&
+    (selectedWord === w.key || reversedWord === w.key)
+  );
+
+  if(matched){
+    foundWords.add(matched.key);
+
+    currentPath.forEach(cell => {
+      cell.classList.remove("active");
+      cell.classList.add("found");
+    });
+
+    const card = document.getElementById(`word-${matched.key}`);
+    card.classList.add("done");
+    card.querySelector(".mark").textContent = "✓";
+
+    playClap();
+    showTick();
+
+    if(foundWords.size === WORDS.length){
+      playTruckSound();
+      setTimeout(() => {
+        showScreen("end");
+      }, 900);
+    }
+  }else{
+    clearActivePath();
+  }
+
+  startCell = null;
+  currentPath = [];
+}
+
+function getStraightPath(fromCell, toCell){
+  const r1 = Number(fromCell.dataset.row);
+  const c1 = Number(fromCell.dataset.col);
+  const r2 = Number(toCell.dataset.row);
+  const c2 = Number(toCell.dataset.col);
+
+  const rowDiff = r2 - r1;
+  const colDiff = c2 - c1;
+
+  const absR = Math.abs(rowDiff);
+  const absC = Math.abs(colDiff);
+
+  const isStraight =
+    rowDiff === 0 ||
+    colDiff === 0 ||
+    absR === absC;
+
+  if(!isStraight) return [];
+
+  const steps = Math.max(absR, absC);
+  const dr = rowDiff === 0 ? 0 : rowDiff / absR;
+  const dc = colDiff === 0 ? 0 : colDiff / absC;
+
+  const path = [];
+  for(let i=0;i<=steps;i++){
+    const r = r1 + dr * i;
+    const c = c1 + dc * i;
+    const cell = document.getElementById(`cell-${r}-${c}`);
+    if(cell) path.push(cell);
+  }
+
+  return path;
+}
+
+function updatePath(path){
+  document.querySelectorAll(".cell.active").forEach(cell => {
+    cell.classList.remove("active");
+  });
+
+  currentPath = path;
+
+  currentPath.forEach(cell => {
+    if(!cell.classList.contains("found")){
+      cell.classList.add("active");
+    }
+  });
+}
+
+function clearActivePath(){
+  document.querySelectorAll(".cell.active").forEach(cell => {
+    cell.classList.remove("active");
+  });
+  currentPath = [];
+}
+
+function showTick(){
+  tickPopup.classList.remove("show");
+  void tickPopup.offsetWidth;
+  tickPopup.classList.add("show");
+
+  setTimeout(() => {
+    tickPopup.classList.remove("show");
+  }, 850);
+}
+
+function prepareAudio(){
+  try{
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(audioCtx.state === "suspended"){
+      audioCtx.resume();
+    }
+  }catch(e){}
+}
+
+function playClap(){
+  try{
+    clapSound.currentTime = 0;
+    clapSound.play().catch(() => playSmallBeep());
+  }catch(e){
+    playSmallBeep();
+  }
+}
+
+function playSmallBeep(){
+  try{
+    prepareAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(700, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.15);
+
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  }catch(e){}
+}
+
+function playTruckSound(){
+  try{
+    prepareAudio();
+
+    const duration = 3.2;
+    const now = audioCtx.currentTime;
+
+    const siren = audioCtx.createOscillator();
+    const sirenGain = audioCtx.createGain();
+
+    siren.type = "sine";
+    siren.frequency.setValueAtTime(520, now);
+
+    for(let i=0;i<8;i++){
+      siren.frequency.linearRampToValueAtTime(880, now + i*0.38 + 0.18);
+      siren.frequency.linearRampToValueAtTime(520, now + i*0.38 + 0.36);
+    }
+
+    sirenGain.gain.setValueAtTime(0.16, now);
+    sirenGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    siren.connect(sirenGain);
+    sirenGain.connect(audioCtx.destination);
+
+    const engine = audioCtx.createOscillator();
+    const engineGain = audioCtx.createGain();
+
+    engine.type = "sawtooth";
+    engine.frequency.setValueAtTime(90, now);
+
+    engineGain.gain.setValueAtTime(0.045, now);
+    engineGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    engine.connect(engineGain);
+    engineGain.connect(audioCtx.destination);
+
+    siren.start(now);
+    engine.start(now);
+
+    siren.stop(now + duration);
+    engine.stop(now + duration);
+  }catch(e){}
+}
+
+function restartGame(){
+  buildGame();
+  showScreen("splash");
+
+  setTimeout(() => {
+    showScreen("game");
+  }, 3000);
+}
+</script>
+
+</body>
+</html>
