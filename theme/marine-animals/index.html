@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:Comic Sans MS;overflow:hidden;}
+
+.slide{
+width:100vw;height:100vh;position:absolute;display:none;
+}
+.active{display:flex;}
+
+/* SLIDE 1 */
+#slide1{
+background:white;justify-content:center;align-items:center;
+}
+#slide1 img{width:250px;}
+
+/* SLIDE 2 */
+#slide2{
+background:url("assets/slide 2 background.png") no-repeat center/cover;
+flex-direction:column;
+}
+
+#title{
+text-align:center;
+font-size:26px;
+font-weight:bold;
+color:white;
+margin:10px;
+}
+
+/* LAYOUT */
+.container{display:flex;height:90%;}
+
+/* LEFT */
+#left{
+width:30%;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:15px;
+}
+
+/* BUBBLE */
+.animal{
+width:110px;height:110px;
+border-radius:50%;
+background:rgba(255,255,255,0.6);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+animation:bounce 2s infinite;
+}
+
+.animal img{
+width:80px;height:80px;
+object-fit:contain;
+}
+
+.label{font-size:12px;}
+
+@keyframes bounce{
+50%{transform:translateY(-8px);}
+}
+
+/* RIGHT */
+#right{width:70%;position:relative;}
+
+#ocean{
+width:100%;
+height:100%;
+object-fit:contain;
+}
+
+/* ZONES */
+.zone{
+position:absolute;
+width:60%;
+height:20%;
+border:2px dashed white;
+border-radius:10px;
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+padding:5px;
+}
+
+#sun{top:12%;left:20%;}
+#twi{top:40%;left:20%;}
+#mid{top:68%;left:20%;}
+
+.zone img{
+width:70px;height:70px;
+}
+
+/* SLIDE 3 */
+#slide3{
+background:linear-gradient(#4facfe,#00f2fe);
+justify-content:center;
+align-items:center;
+flex-direction:column;
+color:white;
+font-size:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SLIDE 1 -->
+<div id="slide1" class="slide active">
+<img src="assets/innovine_logo.png">
+</div>
+
+<!-- SLIDE 2 -->
+<div id="slide2" class="slide">
+
+<div id="title">Match the marine animal to the correct ocean zone</div>
+
+<div class="container">
+
+<div id="left"></div>
+
+<div id="right">
+<img id="ocean" src="assets/ocean_zone.png">
+
+<div id="sun" class="zone" data-zone="sunlight"></div>
+<div id="twi" class="zone" data-zone="twilight"></div>
+<div id="mid" class="zone" data-zone="midnight"></div>
+
+</div>
+</div>
+</div>
+
+<!-- SLIDE 3 -->
+<div id="slide3" class="slide">
+🎉 Great Job! 🐠
+</div>
+
+<script>
+
+/* SLIDE SWITCH */
+setTimeout(()=>{
+slide1.classList.remove("active");
+slide2.classList.add("active");
+},2000);
+
+/* AUDIO */
+const correct=new Audio("assets/clapping music.mp3");
+const wrong=new Audio("assets/wrong music.mp3");
+
+/* DATA (EXACT FILE NAMES) */
+const animals=[
+["anglerfish.png","midnight","anglerfish"],
+["clownfish.png","sunlight","clownfish"],
+["dolphin.png","sunlight","dolphin"],
+["eel.png","midnight","eel"],
+["jellyfish.png","twilight","jellyfish"],
+["octopus.png","twilight","octopus"],
+["sea turtle.png","sunlight","seaturtle"],  // IMPORTANT
+["shrimp.png","twilight","shrimp"],
+["squid.png","twilight","squid"],
+["starfish.png","sunlight","starfish"]
+];
+
+const left=document.getElementById("left");
+
+/* CREATE */
+animals.forEach(a=>{
+let d=document.createElement("div");
+d.className="animal";
+d.innerHTML=`
+<img src="assets/${a[0]}">
+<div class="label">${a[2]}</div>
+`;
+d.dataset.zone=a[1];
+drag(d);
+left.appendChild(d);
+});
+
+/* DRAG */
+function drag(el){
+let ox,oy;
+
+el.onpointerdown=e=>{
+ox=e.offsetX;oy=e.offsetY;
+el.setPointerCapture(e.pointerId);
+el.style.position="absolute";
+}
+
+el.onpointermove=e=>{
+if(el.hasPointerCapture(e.pointerId)){
+el.style.left=e.clientX-ox+"px";
+el.style.top=e.clientY-oy+"px";
+}
+}
+
+el.onpointerup=e=>{
+el.releasePointerCapture(e.pointerId);
+drop(el);
+}
+}
+
+/* DROP */
+function drop(el){
+document.querySelectorAll(".zone").forEach(z=>{
+let r=z.getBoundingClientRect();
+let e=el.getBoundingClientRect();
+
+if(e.left<r.right && e.right>r.left && e.top<r.bottom && e.bottom>r.top){
+
+if(z.dataset.zone===el.dataset.zone){
+correct.play();
+z.appendChild(el);
+el.style.position="relative";
+}else{
+wrong.play();
+reset(el);
+}
+}
+});
+}
+
+function reset(el){
+el.style.position="relative";
+el.style.left="";
+el.style.top="";
+}
+
+</script>
+
+</body>
+</html>
