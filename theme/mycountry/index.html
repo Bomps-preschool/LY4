@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Country Game</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Comic Sans MS", "Arial Rounded MT Bold", Arial, sans-serif;
+  background: #ffffff;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Logo Slide */
+.logo-slide {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.logo-slide img {
+  width: min(55vw, 360px);
+  max-height: 45vh;
+  object-fit: contain;
+}
+
+.start-btn {
+  margin-top: 28px;
+  padding: 16px 34px;
+  border: none;
+  border-radius: 35px;
+  background: linear-gradient(135deg, #ffb703, #fb8500);
+  color: white;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #c46b00, 0 12px 20px rgba(0,0,0,0.25);
+  display: none;
+}
+
+.start-btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 #c46b00;
+}
+
+/* Question Slides */
+.question-slide {
+  width: 100%;
+  height: 100%;
+  background-image: url("assets/background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(10px, 2vw, 18px);
+  position: relative;
+}
+
+.instruction-box {
+  width: min(95vw, 1100px);
+  background: rgba(255, 255, 255, 0.92);
+  border: 5px solid #ffb703;
+  border-radius: 24px;
+  padding: clamp(10px, 2vw, 16px);
+  margin-top: clamp(5px, 1vh, 12px);
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.instruction {
+  font-size: clamp(25px, 4.5vw, 48px);
+  font-weight: 900;
+  color: #1d3557;
+  text-shadow: 2px 2px 0 #ffffff;
+}
+
+.progress {
+  margin-top: 6px;
+  font-size: clamp(14px, 2vw, 22px);
+  font-weight: bold;
+  color: #e76f51;
+}
+
+.options {
+  width: min(96vw, 1120px);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 24px);
+  padding-bottom: clamp(12px, 3vh, 35px);
+}
+
+.option-card {
+  width: 31%;
+  height: min(48vh, 340px);
+  background: rgba(255,255,255,0.96);
+  border-radius: 28px;
+  border: 7px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.option-card:nth-child(1) {
+  border-color: #ff595e;
+}
+
+.option-card:nth-child(2) {
+  border-color: #1982c4;
+}
+
+.option-card:nth-child(3) {
+  border-color: #8ac926;
+}
+
+.option-card:hover {
+  transform: scale(1.04);
+}
+
+.option-card img {
+  max-width: 90%;
+  max-height: 88%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.feedback-mark {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(70px, 12vw, 150px);
+  font-weight: bold;
+  z-index: 5;
+  background: rgba(255,255,255,0.45);
+}
+
+.tick {
+  color: #06b200;
+  text-shadow: 0 0 12px white;
+}
+
+.cross {
+  color: #e60012;
+  text-shadow: 0 0 12px white;
+}
+
+.wiggle {
+  animation: wiggle 0.45s ease;
+}
+
+@keyframes wiggle {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-12px); }
+  40% { transform: translateX(12px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+.correct-glow {
+  animation: correctGlow 1s ease infinite alternate;
+}
+
+@keyframes correctGlow {
+  from {
+    box-shadow: 0 0 15px #06b200, 0 10px 22px rgba(0,0,0,0.22);
+  }
+  to {
+    box-shadow: 0 0 40px #06b200, 0 10px 22px rgba(0,0,0,0.22);
+  }
+}
+
+/* Final Slide */
+.final-slide {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #87ceeb, #ffffff);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.final-message {
+  position: relative;
+  z-index: 20;
+  background: rgba(255,255,255,0.92);
+  border: 6px solid #ffb703;
+  border-radius: 35px;
+  padding: clamp(20px, 4vw, 45px);
+  text-align: center;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+}
+
+.final-message h1 {
+  font-size: clamp(44px, 8vw, 92px);
+  color: #ff6700;
+  text-shadow: 3px 3px 0 #fff3b0;
+}
+
+.final-message p {
+  margin-top: 10px;
+  font-size: clamp(22px, 4vw, 42px);
+  color: #1d3557;
+  font-weight: bold;
+}
+
+.play-again {
+  margin-top: 22px;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #06d6a0, #118ab2);
+  color: white;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 7px 0 #0b6b78;
+}
+
+.play-again:active {
+  transform: translateY(4px);
+  box-shadow: 0 3px 0 #0b6b78;
+}
+
+/* Fighter Jets */
+.jet {
+  position: absolute;
+  bottom: -130px;
+  width: clamp(90px, 14vw, 180px);
+  height: 70px;
+  z-index: 8;
+  animation: flyUp 5s linear infinite;
+}
+
+.jet::before {
+  content: "✈";
+  font-size: clamp(70px, 12vw, 150px);
+  color: #555;
+  display: block;
+  transform: rotate(-90deg);
+  text-shadow: 3px 3px 0 white;
+}
+
+.trail {
+  position: absolute;
+  width: 12px;
+  height: 210px;
+  bottom: -205px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 30px;
+  background: linear-gradient(to bottom, #ff7a00 0 33%, #ffffff 33% 66%, #138808 66% 100%);
+  opacity: 0.9;
+}
+
+.jet1 {
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.jet2 {
+  left: 45%;
+  animation-delay: 0.8s;
+}
+
+.jet3 {
+  left: 70%;
+  animation-delay: 1.6s;
+}
+
+@keyframes flyUp {
+  0% {
+    bottom: -150px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    bottom: 110vh;
+    opacity: 0;
+  }
+}
+
+/* Small screens */
+@media (max-width: 700px) {
+  .question-slide {
+    padding: 8px;
+  }
+
+  .instruction-box {
+    border-width: 4px;
+    border-radius: 18px;
+  }
+
+  .options {
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+
+  .option-card {
+    width: 32%;
+    height: 42vh;
+    border-width: 5px;
+    border-radius: 20px;
+  }
+
+  .option-card img {
+    max-width: 92%;
+    max-height: 82%;
+  }
+}
+
+@media (max-height: 500px) {
+  .instruction {
+    font-size: clamp(22px, 4vw, 38px);
+  }
+
+  .instruction-box {
+    padding: 7px;
+  }
+
+  .progress {
+    font-size: 14px;
+  }
+
+  .option-card {
+    height: 43vh;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="game"></div>
+
+<audio id="clapSound" src="assets/clap.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+
+<script>
+const game = document.getElementById("game");
+const clapSound = document.getElementById("clapSound");
+const wrongSound = document.getElementById("wrongSound");
+
+let currentQuestion = 0;
+let isLocked = false;
+
+const questions = [
+  {
+    instruction: "Identify the national animal.",
+    options: [
+      { img: "lion.png", correct: false },
+      { img: "tiger.png", correct: true },
+      { img: "cheetah.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national bird.",
+    options: [
+      { img: "peacock.png", correct: true },
+      { img: "penguin.png", correct: false },
+      { img: "parrot.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national flag.",
+    options: [
+      { img: "nigerflag.png", correct: false },
+      { img: "indianflag.png", correct: true },
+      { img: "italyflag.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national fruit.",
+    options: [
+      { img: "apple.png", correct: false },
+      { img: "orange.png", correct: false },
+      { img: "mango.png", correct: true }
+    ]
+  },
+  {
+    instruction: "Identify the national emblem.",
+    options: [
+      { img: "nationalemblem.png", correct: true },
+      { img: "americaemblem.png", correct: false },
+      { img: "chinaemblem.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national tree.",
+    options: [
+      { img: "mangotree.png", correct: false },
+      { img: "banyantree.png", correct: true },
+      { img: "coconuttree.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national aquatic animal.",
+    options: [
+      { img: "seal.png", correct: false },
+      { img: "shark.png", correct: false },
+      { img: "dolphin.png", correct: true }
+    ]
+  },
+  {
+    instruction: "Identify the national currency.",
+    options: [
+      { img: "yen.png", correct: false },
+      { img: "rupee.png", correct: true },
+      { img: "dollar.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national flower.",
+    options: [
+      { img: "sunflower.png", correct: false },
+      { img: "lotus.png", correct: true },
+      { img: "lily.png", correct: false }
+    ]
+  },
+  {
+    instruction: "Identify the national game.",
+    options: [
+      { img: "cricket.png", correct: false },
+      { img: "hockey.png", correct: true },
+      { img: "football.png", correct: false }
+    ]
+  }
+];
+
+function safePlay(audio) {
+  try {
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {});
+    }
+  } catch (e) {}
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+
+  try {
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-IN";
+    utterance.rate = 0.82;
+    utterance.pitch = 1.15;
+    utterance.volume = 1;
+
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 350);
+  } catch (e) {}
+}
+
+function showLogoSlide() {
+  game.innerHTML = `
+    <div class="logo-slide">
+      <img src="assets/innovine-logo.png" alt="Innovine Logo">
+      <button class="start-btn" id="startBtn">Start Game</button>
+    </div>
+  `;
+
+  const startBtn = document.getElementById("startBtn");
+
+  setTimeout(() => {
+    startBtn.style.display = "block";
+  }, 3000);
+
+  startBtn.addEventListener("click", () => {
+    currentQuestion = 0;
+    showQuestion();
+  });
+}
+
+function showQuestion() {
+  isLocked = false;
+  const q = questions[currentQuestion];
+
+  game.innerHTML = `
+    <div class="question-slide">
+      <div class="instruction-box">
+        <div class="instruction">${q.instruction}</div>
+        <div class="progress">${currentQuestion + 1} / ${questions.length}</div>
+      </div>
+
+      <div class="options">
+        ${q.options.map((option, index) => `
+          <div class="option-card" data-correct="${option.correct}" data-index="${index}">
+            <img src="assets/${option.img}" alt="option image">
+            <div class="feedback-mark"></div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  speak(q.instruction);
+
+  document.querySelectorAll(".option-card").forEach(card => {
+    card.addEventListener("click", () => handleAnswer(card));
+  });
+}
+
+function handleAnswer(card) {
+  if (isLocked) return;
+
+  const isCorrect = card.dataset.correct === "true";
+  const mark = card.querySelector(".feedback-mark");
+
+  if (isCorrect) {
+    isLocked = true;
+    mark.textContent = "✓";
+    mark.className = "feedback-mark tick";
+    mark.style.display = "flex";
+    card.classList.add("correct-glow");
+    safePlay(clapSound);
+
+    setTimeout(() => {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showFinalSlide();
+      }
+    }, 1600);
+
+  } else {
+    mark.textContent = "✕";
+    mark.className = "feedback-mark cross";
+    mark.style.display = "flex";
+    card.classList.add("wiggle");
+    safePlay(wrongSound);
+
+    setTimeout(() => {
+      mark.style.display = "none";
+      card.classList.remove("wiggle");
+    }, 900);
+  }
+}
+
+function showFinalSlide() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+
+  game.innerHTML = `
+    <div class="final-slide">
+      <div class="jet jet1"><div class="trail"></div></div>
+      <div class="jet jet2"><div class="trail"></div></div>
+      <div class="jet jet3"><div class="trail"></div></div>
+
+      <div class="final-message">
+        <h1>Amazing!!</h1>
+        <p>You know your country so well!</p>
+        <button class="play-again" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  `;
+
+  safePlay(clapSound);
+
+  document.getElementById("playAgainBtn").addEventListener("click", () => {
+    currentQuestion = 0;
+    showQuestion();
+  });
+}
+
+showLogoSlide();
+</script>
+</body>
+</html>
