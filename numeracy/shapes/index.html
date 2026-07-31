@@ -4,108 +4,209 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LY4 Tap on Shapes</title>
+
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
-    margin:0;
-    font-family:'Arbutus', cursive;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
-    overflow:hidden;
+    margin: 0;
+    font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    background: white;
 }
-#splash, #game, #endScreen {
-    width:100%;
-    height:100vh;
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    position:relative;
+
+#splash,
+#game,
+#endScreen {
+    width: 100%;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
-#splash img { width:200px; height:auto; }
+
+#splash {
+    background: white;
+}
+
+#splash img {
+    width: 220px;
+    height: auto;
+}
 
 #game {
-    background: url('assets/background_tile.png') center/cover no-repeat;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
+    background: url("assets/background_tile.png") center center / cover no-repeat;
 }
 
-/* Main box behind instructions and options */
+/* Main game box */
 #questionArea {
-    position:relative;
-    z-index:1;
-    background: rgba(255,255,255,0.95);
-    border: 10px solid #ff80ff; /* pink border */
-    border-radius:25px;
-    padding:30px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    max-width:750px;
-    margin-top:40px;
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.96);
+    border: 10px solid #ff73f8;
+    border-radius: 28px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(90vw, 760px);
 }
 
 #instructionBox {
-    background:#f8d152;
-    padding:12px 20px;
-    border-radius:12px;
-    margin-bottom:25px;
-    text-align:center;
-    font-size:1.3em;
+    background: #ffd54f;
+    padding: 12px 24px;
+    border-radius: 14px;
+    margin-bottom: 28px;
+    text-align: center;
+    font-size: clamp(22px, 3vw, 32px);
+    color: #000;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.12);
 }
 
 #questionBox {
     width: 100%;
-    display:flex;
-    justify-content:space-around;
-    gap:25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(18px, 4vw, 34px);
+    flex-wrap: nowrap;
 }
 
 .optionWrapper {
-    width:130px;
-    height:130px;
-    background: linear-gradient(145deg,#a16945,#f0d9b5);
-    border-radius:20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+    width: clamp(118px, 16vw, 150px);
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #a86d47, #f0d6b4);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 9px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease, border 0.2s ease;
 }
-.optionWrapper.correct { border: 4px solid green; }
-.optionWrapper.wrong { border: 4px solid red; }
 
 .option {
-    width:95px;
-    height:95px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:50%;
-    cursor:pointer;
-    background:white;
-    border:2px solid #ccc;
-    transition: transform 0.2s;
+    width: 78%;
+    aspect-ratio: 1 / 1;
+    background: white;
+    border: 3px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: visible;
 }
-.option.correct { border-color:green; }
-.option.wrong { border-color:red; animation:shake 0.3s; }
+
+/* IMPORTANT FIX:
+   Do not force image width and height directly.
+   This preserves the original image ratio, so circle will not become oval. */
+.option img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.option.correct {
+    border: 5px solid #1fa64a;
+    border-radius: 12px;
+}
+
+.option.wrong {
+    border: 5px solid #e53935;
+    border-radius: 12px;
+    animation: shake 0.35s;
+}
+
+.glow {
+    animation: glow 0.8s infinite alternate;
+}
 
 @keyframes shake {
-    0% { transform: translateX(0px); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0px); }
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    50% { transform: translateX(7px); }
+    75% { transform: translateX(-7px); }
+    100% { transform: translateX(0); }
 }
 
-#endScreen h1 { font-size:2em; margin:10px; color:#4b2e83; }
-#playAgain { margin-top:20px; padding:12px 25px; font-size:1.3em; cursor:pointer; border:none; border-radius:10px; background:#ff99cc; color:white; }
-canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
+@keyframes glow {
+    from {
+        box-shadow: 0 0 8px #33cc66;
+        transform: scale(1);
+    }
+    to {
+        box-shadow: 0 0 25px #33cc66;
+        transform: scale(1.06);
+    }
+}
+
+#endScreen {
+    background: linear-gradient(180deg, #fff7d6, #ffe1f3);
+}
+
+#endScreen h1 {
+    font-size: clamp(38px, 7vw, 70px);
+    margin: 10px;
+    color: #4b2e83;
+}
+
+#playAgain {
+    margin-top: 24px;
+    padding: 14px 32px;
+    font-size: 26px;
+    cursor: pointer;
+    border: none;
+    border-radius: 14px;
+    background: #ff79bd;
+    color: white;
+    box-shadow: 0 5px 0 #c94a8a;
+}
+
+#playAgain:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c94a8a;
+}
+
+canvas#confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 600px) {
+    #questionArea {
+        width: 94vw;
+        padding: 22px 14px;
+        border-width: 7px;
+    }
+
+    #questionBox {
+        gap: 10px;
+    }
+
+    .optionWrapper {
+        width: 30vw;
+        max-width: 120px;
+    }
+
+    #instructionBox {
+        margin-bottom: 20px;
+    }
+}
 </style>
 </head>
+
 <body>
 
 <div id="splash">
@@ -113,10 +214,10 @@ canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
 </div>
 
 <div id="game">
-  <div id="questionArea">
-    <div id="instructionBox">Tap the correct shape!</div>
-    <div id="questionBox"></div>
-  </div>
+    <div id="questionArea">
+        <div id="instructionBox">Tap the correct shape!</div>
+        <div id="questionBox"></div>
+    </div>
 </div>
 
 <div id="endScreen">
@@ -130,105 +231,187 @@ canvas#confetti { position:absolute; top:0; left:0; pointer-events:none; }
 <audio id="clapSound" src="assets/freesound_community-claps-44774.mp3"></audio>
 
 <script>
-const splash = document.getElementById('splash');
-const game = document.getElementById('game');
-const endScreen = document.getElementById('endScreen');
-const questionBox = document.getElementById('questionBox');
-const instructionBox = document.getElementById('instructionBox');
-const playAgain = document.getElementById('playAgain');
-const correctSound = document.getElementById('correctSound');
-const wrongSound = document.getElementById('wrongSound');
-const clapSound = document.getElementById('clapSound');
+const splash = document.getElementById("splash");
+const game = document.getElementById("game");
+const endScreen = document.getElementById("endScreen");
+const questionBox = document.getElementById("questionBox");
+const instructionBox = document.getElementById("instructionBox");
+const playAgain = document.getElementById("playAgain");
 
-const confettiCanvas = document.getElementById('confetti');
-const confettiCtx = confettiCanvas.getContext('2d');
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+const clapSound = document.getElementById("clapSound");
+
+const confettiCanvas = document.getElementById("confetti");
+const confettiCtx = confettiCanvas.getContext("2d");
+
 let confettiParticles = [];
-function initConfetti() {
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-    confettiParticles = [];
-    for(let i=0;i<150;i++){
-        confettiParticles.push({x:Math.random()*confettiCanvas.width,y:Math.random()*confettiCanvas.height- confettiCanvas.height,r:Math.random()*6+4,d:Math.random()*150+50,color:`hsl(${Math.random()*360},70%,60%)`,tilt:Math.random()*10-10});
-    }
-}
-function drawConfetti(){
-    confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-    confettiParticles.forEach(p=>{
-        confettiCtx.beginPath();
-        confettiCtx.moveTo(p.x+p.tilt+p.r/2,p.y);
-        confettiCtx.lineTo(p.x+p.tilt,p.y+p.r);
-        confettiCtx.lineTo(p.x+p.tilt-p.r/2,p.y);
-        confettiCtx.closePath();
-        confettiCtx.fillStyle = p.color;
-        confettiCtx.fill();
-    });
-}
-function updateConfetti(){
-    confettiParticles.forEach(p=>{p.y+=Math.cos(0.01*p.d)+1+p.r/2;p.x+=Math.sin(0.01*p.d);if(p.y>confettiCanvas.height){p.y=-10;p.x=Math.random()*confettiCanvas.width;}});
-    drawConfetti();
-    requestAnimationFrame(updateConfetti);
-}
+let currentQuestion = 0;
+let attempts = 0;
 
-// Questions array without the moon question
+const ASSET_VERSION = "v2";
+
 const questions = [
-    {options:['circle','triangle','square'],answer:'circle'},
-    {options:['star','rectangle','semicircle'],answer:'star'},
-    {options:['circle','diamond','semicircle'],answer:'diamond'},
-    {options:['oval','triangle','rectangle'],answer:'rectangle'},
-    {options:['star','diamond','circle'],answer:'circle'},
-    {options:['triangle','star','square'],answer:'triangle'},
-    {options:['square','oval','star'],answer:'star'},
-    {options:['triangle','circle','diamond'],answer:'circle'},
-    {options:['semicircle','star','diamond'],answer:'semicircle'}
+    { options: ["circle", "triangle", "square"], answer: "circle" },
+    { options: ["star", "rectangle", "semicircle"], answer: "star" },
+    { options: ["circle", "diamond", "semicircle"], answer: "diamond" },
+    { options: ["oval", "triangle", "rectangle"], answer: "rectangle" },
+    { options: ["star", "diamond", "circle"], answer: "circle" },
+    { options: ["triangle", "star", "square"], answer: "triangle" },
+    { options: ["square", "oval", "star"], answer: "star" },
+    { options: ["triangle", "circle", "diamond"], answer: "circle" },
+    { options: ["semicircle", "star", "diamond"], answer: "semicircle" }
 ];
 
-let currentQuestion=0, attempts=0;
+function playSound(sound) {
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+}
 
-function showQuestion(){
-    questionBox.innerHTML=''; attempts=0;
-    const q=questions[currentQuestion];
-    instructionBox.innerHTML=`Tap the <strong>${q.answer}</strong>!`;
-    q.options.forEach((opt)=>{
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('optionWrapper');
-        const div = document.createElement('div');
-        div.classList.add('option');
-        div.dataset.shape = opt;
-        div.innerHTML = `<img src="assets/${opt}.png" alt="${opt}" style="width:95px;height:95px;">`;
-        div.addEventListener('click', checkAnswer);
-        wrapper.appendChild(div);
+function showQuestion() {
+    questionBox.innerHTML = "";
+    attempts = 0;
+
+    const q = questions[currentQuestion];
+    instructionBox.innerHTML = `Tap the <strong>${q.answer}</strong>!`;
+
+    q.options.forEach((opt) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "optionWrapper";
+
+        const option = document.createElement("div");
+        option.className = "option";
+        option.dataset.shape = opt;
+
+        const img = document.createElement("img");
+        img.src = `assets/${opt}.png?${ASSET_VERSION}`;
+        img.alt = opt;
+
+        option.appendChild(img);
+        option.addEventListener("click", checkAnswer);
+
+        wrapper.appendChild(option);
         questionBox.appendChild(wrapper);
     });
 }
 
-function checkAnswer(e){
-    const selected = e.currentTarget.dataset.shape;
+function checkAnswer(e) {
+    const selectedOption = e.currentTarget;
+    const selected = selectedOption.dataset.shape;
     const correct = questions[currentQuestion].answer;
-    if(selected===correct){
-        e.currentTarget.classList.add('correct');
-        correctSound.play(); clapSound.play();
-        setTimeout(()=>{
+
+    if (selected === correct) {
+        selectedOption.classList.add("correct");
+
+        playSound(correctSound);
+        setTimeout(() => playSound(clapSound), 120);
+
+        setTimeout(() => {
             currentQuestion++;
-            if(currentQuestion<questions.length) showQuestion(); else endGame();
-        },1000);
+
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }, 1000);
+
     } else {
-        e.currentTarget.classList.add('wrong'); wrongSound.play(); attempts++;
-        if(attempts>=2){
-            Array.from(document.querySelectorAll('.option')).forEach(opt=>{
-                if(opt.dataset.shape===correct) opt.classList.add('correct');
+        selectedOption.classList.add("wrong");
+        playSound(wrongSound);
+        attempts++;
+
+        setTimeout(() => {
+            selectedOption.classList.remove("wrong");
+        }, 500);
+
+        if (attempts >= 2) {
+            document.querySelectorAll(".option").forEach((option) => {
+                if (option.dataset.shape === correct) {
+                    option.classList.add("correct", "glow");
+                }
             });
         }
     }
 }
 
-function endGame(){ game.style.display='none'; endScreen.style.display='flex'; initConfetti(); updateConfetti(); }
+function initConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    confettiParticles = [];
 
-playAgain.addEventListener('click',()=>{
-    currentQuestion=0; endScreen.style.display='none'; game.style.display='flex'; showQuestion();
+    for (let i = 0; i < 150; i++) {
+        confettiParticles.push({
+            x: Math.random() * confettiCanvas.width,
+            y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * 150 + 50,
+            color: `hsl(${Math.random() * 360}, 75%, 60%)`,
+            tilt: Math.random() * 10 - 10
+        });
+    }
+}
+
+function drawConfetti() {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+    confettiParticles.forEach((p) => {
+        confettiCtx.beginPath();
+        confettiCtx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+        confettiCtx.lineTo(p.x + p.tilt, p.y + p.r);
+        confettiCtx.lineTo(p.x + p.tilt - p.r / 2, p.y);
+        confettiCtx.closePath();
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.fill();
+    });
+}
+
+function updateConfetti() {
+    confettiParticles.forEach((p) => {
+        p.y += Math.cos(0.01 * p.d) + 1 + p.r / 2;
+        p.x += Math.sin(0.01 * p.d);
+
+        if (p.y > confettiCanvas.height) {
+            p.y = -10;
+            p.x = Math.random() * confettiCanvas.width;
+        }
+    });
+
+    drawConfetti();
+    requestAnimationFrame(updateConfetti);
+}
+
+function endGame() {
+    game.style.display = "none";
+    endScreen.style.display = "flex";
+    initConfetti();
+    updateConfetti();
+}
+
+playAgain.addEventListener("click", () => {
+    currentQuestion = 0;
+    endScreen.style.display = "none";
+    game.style.display = "flex";
+    showQuestion();
 });
 
-function startGame(){ splash.style.display='flex'; setTimeout(()=>{ splash.style.display='none'; game.style.display='flex'; showQuestion(); },2000); }
+function startGame() {
+    splash.style.display = "flex";
+
+    setTimeout(() => {
+        splash.style.display = "none";
+        game.style.display = "flex";
+        showQuestion();
+    }, 2000);
+}
+
+window.addEventListener("resize", () => {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+});
+
 startGame();
 </script>
+
 </body>
 </html>
