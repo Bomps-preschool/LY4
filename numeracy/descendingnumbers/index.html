@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Descending Order Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            touch-action: manipulation;
+        }
+
+        button {
+            font-family: Arial, Helvetica, sans-serif;
+            touch-action: manipulation;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* =====================================================
+           SLIDE 1: INNOVINE LOGO
+        ===================================================== */
+
+        #splashSlide {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #ffffff;
+
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+
+        #splashSlide.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #splashLogo {
+            width: 280px;
+            width: min(58vw, 340px);
+            max-width: 80%;
+            max-height: 55%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* =====================================================
+           SLIDES 2 TO 9
+        ===================================================== */
+
+        #activitySlide {
+            position: absolute;
+            inset: 0;
+
+            display: none;
+            flex-direction: column;
+            align-items: center;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255, 255, 255, 0.95) 0,
+                    rgba(255, 255, 255, 0.15) 22%,
+                    transparent 38%
+                ),
+                radial-gradient(
+                    circle at 90% 20%,
+                    rgba(255, 238, 188, 0.8) 0,
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 20% 90%,
+                    rgba(216, 245, 255, 0.85) 0,
+                    transparent 35%
+                ),
+                linear-gradient(
+                    145deg,
+                    #fff6dc 0%,
+                    #eaf8ff 38%,
+                    #f7ebff 70%,
+                    #fff0f5 100%
+                );
+        }
+
+        #activitySlide.visible {
+            display: flex;
+        }
+
+        /* Decorative number background */
+
+        #numberBackdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .background-number {
+            position: absolute;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 58px;
+            height: 58px;
+
+            border-radius: 50%;
+
+            font-weight: 900;
+            text-align: center;
+
+            opacity: 0.18;
+
+            transform: rotate(var(--rotation));
+            animation: backgroundFloat var(--duration) ease-in-out infinite alternate;
+        }
+
+        .background-number.circle-one {
+            background: #ff8fbd;
+            color: #a63e70;
+        }
+
+        .background-number.circle-two {
+            background: #75dff0;
+            color: #237a96;
+        }
+
+        .background-number.circle-three {
+            background: #ffd36f;
+            color: #a56800;
+        }
+
+        .background-number.circle-four {
+            background: #93e69c;
+            color: #287b3a;
+        }
+
+        .background-number.circle-five {
+            background: #c6a7ff;
+            color: #6541a7;
+        }
+
+        @keyframes backgroundFloat {
+            from {
+                transform:
+                    translateY(-5px)
+                    rotate(var(--rotation));
+            }
+
+            to {
+                transform:
+                    translateY(9px)
+                    rotate(var(--rotation));
+            }
+        }
+
+        /* Decorative dots */
+
+        .background-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            opacity: 0.2;
+            background: #ff8aaa;
+        }
+
+        .background-dot:nth-child(2n) {
+            background: #4bc7df;
+        }
+
+        .background-dot:nth-child(3n) {
+            background: #ffbd45;
+        }
+
+        .background-dot:nth-child(4n) {
+            background: #7dd98e;
+        }
+
+        /* Main content */
+
+        .top-panel {
+            position: relative;
+            z-index: 5;
+
+            width: 94%;
+            max-width: 950px;
+
+            flex: 0 0 auto;
+
+            margin-top: 8px;
+            margin-top: max(8px, env(safe-area-inset-top));
+
+            padding: 10px 16px;
+
+            text-align: center;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            border: 3px solid rgba(255, 255, 255, 0.98);
+            border-radius: 19px;
+
+            box-shadow:
+                0 6px 18px rgba(67, 74, 120, 0.17),
+                inset 0 0 0 2px rgba(122, 208, 228, 0.14);
+        }
+
+        #instruction {
+            margin: 0;
+
+            color: #39446e;
+
+            font-size: 22px;
+            font-size: clamp(16px, 2.5vw, 27px);
+
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        #instruction strong {
+            color: #d84684;
+        }
+
+        .progress-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+
+            margin-top: 7px;
+        }
+
+        .progress-dot {
+            width: 11px;
+            height: 11px;
+
+            border-radius: 50%;
+
+            background: #d9deec;
+            border: 1px solid rgba(50, 61, 100, 0.15);
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .progress-dot.completed {
+            background: #38bd72;
+        }
+
+        .progress-dot.current {
+            background: #ffac35;
+            transform: scale(1.28);
+        }
+
+        .play-area {
+            position: relative;
+            z-index: 5;
+
+            width: 96%;
+            max-width: 920px;
+
+            flex: 1 1 auto;
+            min-height: 0;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+
+            padding:
+                8px
+                8px
+                max(8px, env(safe-area-inset-bottom));
+        }
+
+        .round-label {
+            flex: 0 0 auto;
+
+            padding: 6px 19px;
+
+            border-radius: 999px;
+
+            background: rgba(255, 255, 255, 0.94);
+            color: #48527b;
+
+            font-size: 17px;
+            font-size: clamp(14px, 2vw, 20px);
+
+            font-weight: 800;
+
+            box-shadow: 0 4px 12px rgba(58, 69, 113, 0.15);
+        }
+
+        /* Answer slots */
+
+        .answer-area {
+            width: 100%;
+            flex: 0 0 auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 15px;
+            gap: clamp(7px, 2vw, 18px);
+        }
+
+        .answer-slot {
+            width: 90px;
+            height: 90px;
+
+            width: clamp(55px, 12vw, 105px);
+            height: clamp(55px, 12vw, 105px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 4px dashed #89a4d3;
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.88);
+
+            color: #34416c;
+
+            font-size: 42px;
+            font-size: clamp(26px, 5.2vw, 50px);
+
+            font-weight: 900;
+
+            box-shadow:
+                inset 0 3px 8px rgba(52, 66, 108, 0.08),
+                0 5px 12px rgba(74, 84, 131, 0.12);
+        }
+
+        .answer-slot.filled {
+            border-style: solid;
+            border-color: #40bd73;
+
+            background: #e9fff0;
+
+            animation: slotPop 0.3s ease;
+        }
+
+        @keyframes slotPop {
+            0% {
+                transform: scale(0.75);
+            }
+
+            70% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Hint message */
+
+        #hintBox {
+            width: 92%;
+            max-width: 600px;
+
+            min-height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 5px 10px;
+
+            color: #7d4900;
+
+            font-size: 18px;
+            font-size: clamp(14px, 2.3vw, 22px);
+
+            font-weight: 800;
+            text-align: center;
+        }
+
+        /* Number cards */
+
+        .number-options {
+            width: 100%;
+            flex: 0 0 auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 18px;
+            gap: clamp(8px, 2.5vw, 24px);
+        }
+
+        .number-card {
+            position: relative;
+
+            width: 105px;
+            height: 105px;
+
+            width: clamp(62px, 14vw, 120px);
+            height: clamp(62px, 14vw, 120px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0;
+            padding: 0;
+
+            border: 4px solid #ffffff;
+            border-radius: 25px;
+
+            color: #4f3878;
+
+            font-size: 50px;
+            font-size: clamp(30px, 6vw, 58px);
+
+            font-weight: 900;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .number-card:nth-child(1) {
+            background: linear-gradient(145deg, #fff8af, #ffc856);
+
+            box-shadow:
+                0 7px 0 #d99735,
+                0 12px 20px rgba(61, 67, 112, 0.2);
+        }
+
+        .number-card:nth-child(2) {
+            background: linear-gradient(145deg, #d9f8ff, #75d6eb);
+
+            box-shadow:
+                0 7px 0 #3ca9c0,
+                0 12px 20px rgba(61, 67, 112, 0.2);
+        }
+
+        .number-card:nth-child(3) {
+            background: linear-gradient(145deg, #ffe0ed, #ff8fbd);
+
+            box-shadow:
+                0 7px 0 #d8588a,
+                0 12px 20px rgba(61, 67, 112, 0.2);
+        }
+
+        .number-card:nth-child(4) {
+            background: linear-gradient(145deg, #e2ffdd, #89e47e);
+
+            box-shadow:
+                0 7px 0 #4cae55,
+                0 12px 20px rgba(61, 67, 112, 0.2);
+        }
+
+        .number-card:active {
+            transform: translateY(5px) scale(0.97);
+        }
+
+        .number-card.used {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.45);
+        }
+
+        .number-card.wrong {
+            animation: cardJiggle 0.42s ease;
+        }
+
+        @keyframes cardJiggle {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px) rotate(-4deg);
+            }
+
+            40% {
+                transform: translateX(10px) rotate(4deg);
+            }
+
+            60% {
+                transform: translateX(-7px) rotate(-3deg);
+            }
+
+            80% {
+                transform: translateX(7px) rotate(3deg);
+            }
+        }
+
+        .number-card.hint {
+            animation: hintGlow 0.75s ease-in-out infinite alternate;
+        }
+
+        @keyframes hintGlow {
+            from {
+                transform: scale(1);
+                outline: 3px solid rgba(255, 245, 80, 0.25);
+            }
+
+            to {
+                transform: scale(1.1);
+
+                outline: 7px solid rgba(255, 237, 34, 0.96);
+
+                box-shadow:
+                    0 0 25px rgba(255, 229, 25, 0.98),
+                    0 7px 0 #ce8b36;
+            }
+        }
+
+        /* =====================================================
+           CORRECT AND WRONG FEEDBACK
+        ===================================================== */
+
+        #feedback {
+            position: fixed;
+            left: 50%;
+            top: 51%;
+            z-index: 100;
+
+            width: 120px;
+            height: 120px;
+
+            width: clamp(82px, 17vw, 145px);
+            height: clamp(82px, 17vw, 145px);
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            color: #ffffff;
+
+            font-size: 90px;
+            font-size: clamp(56px, 12vw, 108px);
+
+            font-weight: 900;
+            line-height: 1;
+
+            transform: translate(-50%, -50%);
+
+            pointer-events: none;
+        }
+
+        #feedback.show {
+            display: flex;
+            animation: feedbackPop 0.55s ease;
+        }
+
+        #feedback.correct {
+            background: #2fc36c;
+
+            border: 7px solid #ffffff;
+
+            box-shadow:
+                0 0 0 6px rgba(47, 195, 108, 0.25),
+                0 9px 26px rgba(20, 95, 52, 0.35);
+        }
+
+        #feedback.incorrect {
+            background: #eb4d4d;
+
+            border: 7px solid #ffffff;
+
+            box-shadow:
+                0 0 0 6px rgba(235, 77, 77, 0.25),
+                0 9px 26px rgba(123, 29, 29, 0.32);
+        }
+
+        @keyframes feedbackPop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.35);
+            }
+
+            65% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.18);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* =====================================================
+           SLIDE 10
+        ===================================================== */
+
+        #finalSlide {
+            position: absolute;
+            inset: 0;
+            z-index: 60;
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255, 255, 255, 0.95) 0,
+                    transparent 31%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(255, 214, 235, 0.9) 0,
+                    transparent 36%
+                ),
+                linear-gradient(
+                    145deg,
+                    #d9f7ff 0%,
+                    #fff5c9 46%,
+                    #f4e5ff 100%
+                );
+        }
+
+        #finalSlide.visible {
+            display: flex;
+        }
+
+        #numberRain {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+
+            overflow: hidden;
+
+            pointer-events: none;
+        }
+
+        .rain-number {
+            position: absolute;
+            top: -18vh;
+
+            font-weight: 900;
+            line-height: 1;
+
+            text-shadow: 0 3px 0 rgba(255, 255, 255, 0.75);
+
+            animation-name: numberFall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes numberFall {
+            0% {
+                transform:
+                    translateY(-18vh)
+                    rotate(0deg);
+            }
+
+            100% {
+                transform:
+                    translateY(125vh)
+                    rotate(540deg);
+            }
+        }
+
+        .final-card {
+            position: relative;
+            z-index: 5;
+
+            width: 88%;
+            max-width: 650px;
+
+            padding: 40px 30px;
+
+            text-align: center;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            border: 5px solid #ffffff;
+            border-radius: 34px;
+
+            box-shadow: 0 16px 38px rgba(55, 66, 110, 0.22);
+
+            animation: finalCardPop 0.65s ease;
+        }
+
+        @keyframes finalCardPop {
+            from {
+                opacity: 0;
+                transform: scale(0.65);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #excellentText {
+            margin: 0 0 27px;
+
+            color: #e34287;
+
+            font-size: 76px;
+            font-size: clamp(46px, 11vw, 94px);
+
+            font-weight: 900;
+            line-height: 1;
+
+            text-shadow:
+                0 4px 0 #ffffff,
+                0 7px 0 rgba(130, 49, 101, 0.16);
+        }
+
+        #playAgainButton {
+            min-width: 180px;
+            min-height: 56px;
+
+            padding: 13px 29px;
+
+            border: 4px solid #ffffff;
+            border-radius: 999px;
+
+            background: linear-gradient(145deg, #55da8e, #20ad65);
+
+            color: #ffffff;
+
+            font-size: 22px;
+            font-size: clamp(18px, 3vw, 25px);
+
+            font-weight: 900;
+
+            box-shadow:
+                0 7px 0 #158149,
+                0 12px 18px rgba(29, 107, 69, 0.23);
+
+            cursor: pointer;
+        }
+
+        #playAgainButton:active {
+            transform: translateY(5px);
+
+            box-shadow:
+                0 2px 0 #158149,
+                0 5px 9px rgba(29, 107, 69, 0.2);
+        }
+
+        /* =====================================================
+           RESPONSIVE ADJUSTMENTS
+        ===================================================== */
+
+        @media (max-width: 430px) {
+            .top-panel {
+                width: 95%;
+                padding: 9px 10px;
+            }
+
+            #instruction {
+                font-size: 16px;
+                font-size: clamp(15px, 4.1vw, 19px);
+            }
+
+            .answer-area,
+            .number-options {
+                gap: 7px;
+                gap: clamp(6px, 2.2vw, 10px);
+            }
+
+            .answer-slot {
+                width: 66px;
+                height: 66px;
+
+                width: clamp(53px, 19vw, 77px);
+                height: clamp(53px, 19vw, 77px);
+
+                border-radius: 16px;
+            }
+
+            .number-card {
+                width: 70px;
+                height: 70px;
+
+                width: clamp(58px, 20vw, 81px);
+                height: clamp(58px, 20vw, 81px);
+
+                border-radius: 19px;
+            }
+
+            .background-number {
+                width: 47px;
+                height: 47px;
+            }
+        }
+
+        @media (max-height: 570px) {
+            .top-panel {
+                margin-top: 5px;
+                padding: 6px 10px;
+                border-radius: 14px;
+            }
+
+            #instruction {
+                font-size: 15px;
+                font-size: clamp(14px, 3.5vh, 19px);
+            }
+
+            .progress-row {
+                margin-top: 4px;
+            }
+
+            .progress-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            .play-area {
+                padding-top: 4px;
+                padding-bottom: 5px;
+            }
+
+            .round-label {
+                padding: 4px 14px;
+
+                font-size: 13px;
+                font-size: clamp(12px, 3.1vh, 16px);
+            }
+
+            .answer-slot {
+                width: 65px;
+                height: 65px;
+
+                width: clamp(49px, 12vh, 76px);
+                height: clamp(49px, 12vh, 76px);
+
+                font-size: 31px;
+                font-size: clamp(23px, 7vh, 39px);
+            }
+
+            .number-card {
+                width: 72px;
+                height: 72px;
+
+                width: clamp(55px, 15vh, 84px);
+                height: clamp(55px, 15vh, 84px);
+
+                font-size: 35px;
+                font-size: clamp(26px, 8vh, 44px);
+
+                border-radius: 18px;
+            }
+
+            #hintBox {
+                min-height: 23px;
+
+                font-size: 14px;
+                font-size: clamp(13px, 3.4vh, 17px);
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .top-panel {
+                width: 97%;
+            }
+
+            .play-area {
+                width: 97%;
+            }
+
+            .answer-slot {
+                width: 61px;
+                height: 61px;
+
+                width: clamp(50px, 15vh, 72px);
+                height: clamp(50px, 15vh, 72px);
+            }
+
+            .number-card {
+                width: 66px;
+                height: 66px;
+
+                width: clamp(55px, 17vh, 80px);
+                height: clamp(55px, 17vh, 80px);
+            }
+
+            #hintBox {
+                min-height: 20px;
+                padding: 2px 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- Slide 1: Logo only -->
+    <section id="splashSlide">
+        <img
+            id="splashLogo"
+            src="assets/innovine-logo.png"
+            alt="Innovine"
+            draggable="false"
+        >
+    </section>
+
+    <!-- Slides 2 to 9 -->
+    <section id="activitySlide">
+
+        <!-- CSS and JavaScript generated number background -->
+        <div id="numberBackdrop"></div>
+
+        <header class="top-panel">
+
+            <p id="instruction">
+                Arrange the numbers in
+                <strong>descending order</strong>.
+            </p>
+
+            <div
+                id="progressRow"
+                class="progress-row"
+                aria-label="Game progress"
+            ></div>
+
+        </header>
+
+        <main class="play-area">
+
+            <div id="roundLabel" class="round-label">
+                Round 1 of 8
+            </div>
+
+            <div
+                id="answerArea"
+                class="answer-area"
+                aria-label="Answer spaces"
+            ></div>
+
+            <div
+                id="hintBox"
+                aria-live="polite"
+            ></div>
+
+            <div
+                id="numberOptions"
+                class="number-options"
+                aria-label="Number choices"
+            ></div>
+
+        </main>
+
+    </section>
+
+    <!-- Slide 10 -->
+    <section id="finalSlide">
+
+        <div id="numberRain"></div>
+
+        <div class="final-card">
+
+            <h1 id="excellentText">
+                Excellent!
+            </h1>
+
+            <button
+                id="playAgainButton"
+                type="button"
+            >
+                Play Again
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- Tick and cross feedback -->
+    <div
+        id="feedback"
+        role="status"
+        aria-live="assertive"
+    ></div>
+
+    <!-- Audio -->
+    <audio
+        id="wrongAudio"
+        src="assets/wrong.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="clapAudio"
+        src="assets/clap.mp3"
+        preload="auto"
+    ></audio>
+
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    /*
+        Eight questions for slides 2 to 9.
+        Every question has four different numbers
+        between 1 and 10.
+    */
+
+    var originalQuestions = [
+        [3, 9, 5, 7],
+        [10, 4, 8, 6],
+        [1, 6, 3, 9],
+        [7, 2, 10, 5],
+        [4, 1, 8, 3],
+        [9, 2, 6, 4],
+        [5, 10, 1, 7],
+        [8, 6, 2, 3]
+    ];
+
+    var questions = [];
+
+    var currentRound = 0;
+    var correctOrder = [];
+    var currentPosition = 0;
+    var wrongAttempts = 0;
+    var inputLocked = false;
+
+    var feedbackTimer = null;
+    var nextRoundTimer = null;
+
+    var splashSlide =
+        document.getElementById("splashSlide");
+
+    var activitySlide =
+        document.getElementById("activitySlide");
+
+    var finalSlide =
+        document.getElementById("finalSlide");
+
+    var numberBackdrop =
+        document.getElementById("numberBackdrop");
+
+    var roundLabel =
+        document.getElementById("roundLabel");
+
+    var answerArea =
+        document.getElementById("answerArea");
+
+    var numberOptions =
+        document.getElementById("numberOptions");
+
+    var hintBox =
+        document.getElementById("hintBox");
+
+    var progressRow =
+        document.getElementById("progressRow");
+
+    var feedback =
+        document.getElementById("feedback");
+
+    var playAgainButton =
+        document.getElementById("playAgainButton");
+
+    var numberRain =
+        document.getElementById("numberRain");
+
+    var wrongAudio =
+        document.getElementById("wrongAudio");
+
+    var clapAudio =
+        document.getElementById("clapAudio");
+
+    /*
+        Shuffle an array without changing
+        the original array.
+    */
+
+    function shuffleArray(array) {
+        var copy = array.slice();
+        var i;
+        var randomIndex;
+        var temporaryValue;
+
+        for (i = copy.length - 1; i > 0; i--) {
+            randomIndex =
+                Math.floor(Math.random() * (i + 1));
+
+            temporaryValue = copy[i];
+            copy[i] = copy[randomIndex];
+            copy[randomIndex] = temporaryValue;
+        }
+
+        return copy;
+    }
+
+    /*
+        Randomise the order of the eight rounds.
+    */
+
+    function prepareQuestions() {
+        var shuffledRounds =
+            shuffleArray(originalQuestions);
+
+        questions = [];
+
+        for (
+            var i = 0;
+            i < shuffledRounds.length;
+            i++
+        ) {
+            questions.push(
+                shuffledRounds[i].slice()
+            );
+        }
+    }
+
+    /*
+        Play audio safely.
+        The game continues even when a browser
+        blocks or cannot load audio.
+    */
+
+    function safelyPlay(audioElement) {
+        if (!audioElement) {
+            return;
+        }
+
+        try {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+
+            var playPromise =
+                audioElement.play();
+
+            if (
+                playPromise &&
+                typeof playPromise.catch === "function"
+            ) {
+                playPromise.catch(function () {
+                    /* Audio may require a learner tap. */
+                });
+            }
+        } catch (error) {
+            /* Keep the activity running. */
+        }
+    }
+
+    /*
+        Create the decorative number-themed
+        background for slides 2 to 9.
+    */
+
+    function createNumberBackground() {
+        numberBackdrop.innerHTML = "";
+
+        var screenWidth =
+            window.innerWidth ||
+            document.documentElement.clientWidth;
+
+        var numberCount =
+            screenWidth < 450 ? 16 : 24;
+
+        var classes = [
+            "circle-one",
+            "circle-two",
+            "circle-three",
+            "circle-four",
+            "circle-five"
+        ];
+
+        for (
+            var i = 0;
+            i < numberCount;
+            i++
+        ) {
+            var numberElement =
+                document.createElement("span");
+
+            var randomNumber =
+                Math.floor(Math.random() * 10) + 1;
+
+            var randomSize =
+                35 + Math.random() * 45;
+
+            var randomLeft =
+                Math.random() * 94;
+
+            var randomTop =
+                Math.random() * 92;
+
+            var randomRotation =
+                -25 + Math.random() * 50;
+
+            var randomDuration =
+                2.5 + Math.random() * 3;
+
+            var randomClass =
+                classes[
+                    Math.floor(
+                        Math.random() * classes.length
+                    )
+                ];
+
+            numberElement.className =
+                "background-number " + randomClass;
+
+            numberElement.textContent =
+                randomNumber;
+
+            numberElement.style.left =
+                randomLeft + "%";
+
+            numberElement.style.top =
+                randomTop + "%";
+
+            numberElement.style.width =
+                randomSize + "px";
+
+            numberElement.style.height =
+                randomSize + "px";
+
+            numberElement.style.fontSize =
+                randomSize * 0.55 + "px";
+
+            numberElement.style.setProperty(
+                "--rotation",
+                randomRotation + "deg"
+            );
+
+            numberElement.style.setProperty(
+                "--duration",
+                randomDuration + "s"
+            );
+
+            numberElement.style.animationDelay =
+                Math.random() * -3 + "s";
+
+            numberBackdrop.appendChild(
+                numberElement
+            );
+        }
+
+        /*
+            Add small decorative dots.
+        */
+
+        for (var j = 0; j < 28; j++) {
+            var dot =
+                document.createElement("span");
+
+            dot.className =
+                "background-dot";
+
+            dot.style.left =
+                Math.random() * 97 + "%";
+
+            dot.style.top =
+                Math.random() * 96 + "%";
+
+            dot.style.transform =
+                "scale(" +
+                (0.5 + Math.random() * 1.4) +
+                ")";
+
+            numberBackdrop.appendChild(dot);
+        }
+    }
+
+    /*
+        Start the activity after the logo slide.
+    */
+
+    function startGame() {
+        clearTimeout(feedbackTimer);
+        clearTimeout(nextRoundTimer);
+
+        prepareQuestions();
+
+        currentRound = 0;
+        currentPosition = 0;
+        wrongAttempts = 0;
+        inputLocked = false;
+
+        hideFeedback();
+
+        splashSlide.style.display = "none";
+        finalSlide.className = "";
+        activitySlide.className = "visible";
+
+        createNumberBackground();
+        createProgressDots();
+        loadRound();
+    }
+
+    /*
+        Create eight progress dots.
+    */
+
+    function createProgressDots() {
+        progressRow.innerHTML = "";
+
+        for (
+            var i = 0;
+            i < questions.length;
+            i++
+        ) {
+            var dot =
+                document.createElement("span");
+
+            dot.className = "progress-dot";
+
+            progressRow.appendChild(dot);
+        }
+    }
+
+    /*
+        Update completed and current round dots.
+    */
+
+    function updateProgressDots() {
+        var dots =
+            progressRow.getElementsByClassName(
+                "progress-dot"
+            );
+
+        for (
+            var i = 0;
+            i < dots.length;
+            i++
+        ) {
+            dots[i].className =
+                "progress-dot";
+
+            if (i < currentRound) {
+                dots[i].className +=
+                    " completed";
+            } else if (i === currentRound) {
+                dots[i].className +=
+                    " current";
+            }
+        }
+    }
+
+    /*
+        Load one activity round.
+    */
+
+    function loadRound() {
+        inputLocked = false;
+        currentPosition = 0;
+        wrongAttempts = 0;
+
+        hintBox.textContent = "";
+
+        roundLabel.textContent =
+            "Round " +
+            (currentRound + 1) +
+            " of " +
+            questions.length;
+
+        updateProgressDots();
+
+        var questionNumbers =
+            shuffleArray(
+                questions[currentRound]
+            );
+
+        correctOrder =
+            questionNumbers
+                .slice()
+                .sort(function (a, b) {
+                    return b - a;
+                });
+
+        createAnswerSlots();
+        createNumberCards(questionNumbers);
+    }
+
+    /*
+        Create four empty answer spaces.
+    */
+
+    function createAnswerSlots() {
+        answerArea.innerHTML = "";
+
+        for (var i = 0; i < 4; i++) {
+            var slot =
+                document.createElement("div");
+
+            slot.className =
+                "answer-slot";
+
+            slot.setAttribute(
+                "aria-label",
+                "Answer position " + (i + 1)
+            );
+
+            answerArea.appendChild(slot);
+        }
+    }
+
+    /*
+        Create the four number choices.
+    */
+
+    function createNumberCards(numbers) {
+        numberOptions.innerHTML = "";
+
+        for (
+            var i = 0;
+            i < numbers.length;
+            i++
+        ) {
+            var card =
+                document.createElement("button");
+
+            card.type = "button";
+            card.className = "number-card";
+            card.textContent = numbers[i];
+
+            card.setAttribute(
+                "aria-label",
+                "Number " + numbers[i]
+            );
+
+            card.onclick =
+                createCardHandler(
+                    card,
+                    numbers[i]
+                );
+
+            numberOptions.appendChild(card);
+        }
+    }
+
+    /*
+        Create a separate click handler
+        for every card.
+    */
+
+    function createCardHandler(card, number) {
+        return function () {
+            selectNumber(card, number);
+        };
+    }
+
+    /*
+        Check the selected number.
+    */
+
+    function selectNumber(card, number) {
+        if (
+            inputLocked ||
+            card.className.indexOf("used") !== -1
+        ) {
+            return;
+        }
+
+        var expectedNumber =
+            correctOrder[currentPosition];
+
+        if (number === expectedNumber) {
+            handleCorrectChoice(card, number);
+        } else {
+            handleWrongChoice(card);
+        }
+    }
+
+    /*
+        Correct number selected.
+    */
+
+    function handleCorrectChoice(card, number) {
+        clearHintHighlights();
+
+        wrongAttempts = 0;
+        hintBox.textContent = "";
+
+        var slots =
+            answerArea.getElementsByClassName(
+                "answer-slot"
+            );
+
+        var activeSlot =
+            slots[currentPosition];
+
+        activeSlot.textContent = number;
+        activeSlot.className =
+            "answer-slot filled";
+
+        card.className += " used";
+        card.disabled = true;
+
+        /*
+            Show a green tick after every
+            correctly selected number.
+        */
+
+        showFeedback(true, false);
+
+        currentPosition++;
+
+        if (
+            currentPosition ===
+            correctOrder.length
+        ) {
+            completeRound();
+        }
+    }
+
+    /*
+        Wrong number selected.
+    */
+
+    function handleWrongChoice(card) {
+        wrongAttempts++;
+
+        card.className =
+            card.className.replace(
+                " wrong",
+                ""
+            );
+
+        /*
+            Restart the jiggle animation.
+        */
+
+        void card.offsetWidth;
+
+        card.className += " wrong";
+
+        showFeedback(false, false);
+        safelyPlay(wrongAudio);
+
+        if (wrongAttempts >= 2) {
+            showHint();
+        }
+    }
+
+    /*
+        After two wrong attempts,
+        highlight and name the correct number.
+    */
+
+    function showHint() {
+        var expectedNumber =
+            correctOrder[currentPosition];
+
+        var cards =
+            numberOptions.getElementsByClassName(
+                "number-card"
+            );
+
+        clearHintHighlights();
+
+        hintBox.textContent =
+            "Hint: Tap number " +
+            expectedNumber +
+            ".";
+
+        for (
+            var i = 0;
+            i < cards.length;
+            i++
+        ) {
+            var cardNumber =
+                parseInt(
+                    cards[i].textContent,
+                    10
+                );
+
+            if (
+                cardNumber === expectedNumber &&
+                cards[i].className.indexOf(
+                    "used"
+                ) === -1
+            ) {
+                cards[i].className +=
+                    " hint";
+
+                break;
+            }
+        }
+    }
+
+    /*
+        Remove the glow from cards.
+    */
+
+    function clearHintHighlights() {
+        var cards =
+            numberOptions.getElementsByClassName(
+                "number-card"
+            );
+
+        for (
+            var i = 0;
+            i < cards.length;
+            i++
+        ) {
+            cards[i].className =
+                cards[i].className.replace(
+                    " hint",
+                    ""
+                );
+        }
+    }
+
+    /*
+        Complete one full descending-order sum.
+    */
+
+    function completeRound() {
+        inputLocked = true;
+
+        hintBox.textContent =
+            "Great! The numbers are in descending order.";
+
+        /*
+            Show a larger tick and play clap audio.
+        */
+
+        setTimeout(function () {
+            showFeedback(true, true);
+            safelyPlay(clapAudio);
+        }, 300);
+
+        nextRoundTimer =
+            setTimeout(function () {
+                currentRound++;
+
+                if (
+                    currentRound <
+                    questions.length
+                ) {
+                    loadRound();
+                } else {
+                    showFinalSlide();
+                }
+            }, 2100);
+    }
+
+    /*
+        Show tick or cross.
+    */
+
+    function showFeedback(
+        isCorrect,
+        isRoundComplete
+    ) {
+        clearTimeout(feedbackTimer);
+
+        feedback.className = "";
+        feedback.innerHTML = "";
+
+        if (isCorrect) {
+            feedback.innerHTML = "✓";
+            feedback.className =
+                "correct show";
+        } else {
+            feedback.innerHTML = "×";
+            feedback.className =
+                "incorrect show";
+        }
+
+        var displayTime;
+
+        if (isRoundComplete) {
+            displayTime = 1150;
+        } else {
+            displayTime = isCorrect ? 430 : 700;
+        }
+
+        feedbackTimer =
+            setTimeout(function () {
+                hideFeedback();
+            }, displayTime);
+    }
+
+    function hideFeedback() {
+        feedback.className = "";
+        feedback.innerHTML = "";
+    }
+
+    /*
+        Display Slide 10.
+    */
+
+    function showFinalSlide() {
+        hideFeedback();
+
+        activitySlide.className = "";
+        finalSlide.className = "visible";
+
+        createNumberRain();
+    }
+
+    /*
+        Create colourful falling numbers.
+    */
+
+    function createNumberRain() {
+        numberRain.innerHTML = "";
+
+        var colours = [
+            "#f34e87",
+            "#ff9e1a",
+            "#20bcae",
+            "#6d61f2",
+            "#009ee1",
+            "#70bd3c",
+            "#df55ed",
+            "#ff595e"
+        ];
+
+        var screenWidth =
+            window.innerWidth ||
+            document.documentElement.clientWidth;
+
+        var totalNumbers =
+            screenWidth < 450 ? 28 : 40;
+
+        for (
+            var i = 0;
+            i < totalNumbers;
+            i++
+        ) {
+            var number =
+                document.createElement("span");
+
+            var randomDigit =
+                Math.floor(Math.random() * 10) + 1;
+
+            var randomLeft =
+                Math.random() * 96;
+
+            var randomDelay =
+                Math.random() * -8;
+
+            var randomDuration =
+                4.5 + Math.random() * 4;
+
+            var randomSize =
+                24 + Math.random() * 38;
+
+            var randomColour =
+                colours[
+                    Math.floor(
+                        Math.random() *
+                        colours.length
+                    )
+                ];
+
+            number.className =
+                "rain-number";
+
+            number.textContent =
+                randomDigit;
+
+            number.style.left =
+                randomLeft + "%";
+
+            number.style.animationDelay =
+                randomDelay + "s";
+
+            number.style.animationDuration =
+                randomDuration + "s";
+
+            number.style.fontSize =
+                randomSize + "px";
+
+            number.style.color =
+                randomColour;
+
+            numberRain.appendChild(number);
+        }
+    }
+
+    /*
+        Restart the complete game.
+    */
+
+    function restartGame() {
+        finalSlide.className = "";
+        numberRain.innerHTML = "";
+
+        startGame();
+    }
+
+    playAgainButton.onclick =
+        restartGame;
+
+    /*
+        Show the Innovine logo for five seconds.
+    */
+
+    window.setTimeout(function () {
+        splashSlide.className = "hide";
+
+        window.setTimeout(function () {
+            startGame();
+        }, 400);
+
+    }, 5000);
+
+})();
+</script>
+
+</body>
+</html>
