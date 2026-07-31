@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Before Number Match Game</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Arial Rounded MT Bold", Arial, sans-serif;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+}
+
+body{
+background:#fff;
+}
+
+.screen{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:none;
+}
+
+.screen.active{
+display:flex;
+}
+
+/* ---------------- SLIDE 1 ---------------- */
+
+#slide1{
+background:white;
+justify-content:center;
+align-items:center;
+}
+
+.logo{
+width:min(70vw,350px);
+max-width:90%;
+}
+
+/* ---------------- SLIDE 2 ---------------- */
+
+#slide2{
+flex-direction:column;
+background:url("assets/background.png") center center/cover no-repeat;
+padding:10px;
+position:relative;
+}
+
+.overlay{
+position:absolute;
+inset:0;
+background:rgba(255,255,255,0.20);
+backdrop-filter:blur(2px);
+}
+
+.game-area{
+position:relative;
+z-index:2;
+width:100%;
+height:100%;
+display:flex;
+flex-direction:column;
+}
+
+.instruction{
+text-align:center;
+font-size:clamp(18px,2.8vw,30px);
+font-weight:bold;
+color:#222;
+background:white;
+padding:10px;
+border-radius:20px;
+border:4px solid #ff4fa2;
+margin-bottom:8px;
+}
+
+.matching-container{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+overflow:hidden;
+}
+
+.columns{
+width:100%;
+max-width:900px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 5px;
+}
+
+.column{
+display:flex;
+flex-direction:column;
+gap:10px;
+width:35%;
+}
+
+.number-box{
+height:58px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
+font-weight:bold;
+border-radius:18px;
+cursor:pointer;
+border:4px solid white;
+box-shadow:0 5px 12px rgba(0,0,0,.25);
+transition:.2s;
+user-select:none;
+}
+
+/* SAME STYLE FOR ALL LEFT NUMBERS */
+.left-column .number-box{
+background:linear-gradient(135deg,#7c4dff,#536dfe);
+color:white;
+}
+
+/* SAME STYLE FOR ALL RIGHT NUMBERS */
+.right-column .number-box{
+background:linear-gradient(135deg,#00b8d4,#00acc1);
+color:white;
+}
+
+.number-box:hover{
+transform:scale(1.05);
+}
+
+.selected{
+outline:6px solid #ffd600;
+transform:scale(1.08);
+}
+
+.done{
+cursor:default;
+}
+
+#lineCanvas{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+}
+
+.feedback{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:90px;
+font-weight:bold;
+display:none;
+z-index:100;
+}
+
+.tick{
+color:#00c853;
+}
+
+.cross{
+color:#ff1744;
+}
+
+/* ---------------- SLIDE 3 ---------------- */
+
+#slide3{
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(135deg,#ff6ec4,#7873f5);
+overflow:hidden;
+}
+
+.goodjob{
+font-size:clamp(40px,8vw,80px);
+font-weight:bold;
+color:white;
+text-shadow:4px 4px 10px rgba(0,0,0,.25);
+z-index:5;
+}
+
+.confetti{
+position:absolute;
+width:12px;
+height:12px;
+animation:fall linear infinite;
+}
+
+@keyframes fall{
+0%{
+transform:translateY(-100vh) rotate(0deg);
+}
+100%{
+transform:translateY(110vh) rotate(720deg);
+}
+}
+
+@media(max-width:768px){
+
+.number-box{
+height:50px;
+font-size:24px;
+}
+
+.column{
+width:38%;
+}
+
+.instruction{
+font-size:18px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- SLIDE 1 -->
+
+<div id="slide1" class="screen active">
+<img src="assets/innovine-logo.png" class="logo">
+</div>
+
+<!-- SLIDE 2 -->
+
+<div id="slide2" class="screen">
+
+<div class="overlay"></div>
+
+<div class="game-area">
+
+<div class="instruction">
+Match the correct before numbers.
+</div>
+
+<div class="matching-container">
+
+<canvas id="lineCanvas"></canvas>
+
+<div class="columns">
+
+<div class="column left-column">
+
+<div class="number-box" data-left="45">45</div>
+<div class="number-box" data-left="38">38</div>
+<div class="number-box" data-left="22">22</div>
+<div class="number-box" data-left="20">20</div>
+<div class="number-box" data-left="17">17</div>
+<div class="number-box" data-left="31">31</div>
+
+</div>
+
+<div class="column right-column">
+
+<div class="number-box" data-right="16">16</div>
+<div class="number-box" data-right="44">44</div>
+<div class="number-box" data-right="19">19</div>
+<div class="number-box" data-right="37">37</div>
+<div class="number-box" data-right="21">21</div>
+<div class="number-box" data-right="30">30</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="feedback tick" id="tick">✓</div>
+<div class="feedback cross" id="cross">✗</div>
+
+</div>
+
+<!-- SLIDE 3 -->
+
+<div id="slide3" class="screen">
+<div class="goodjob">🎉 Good Job! 🎉</div>
+</div>
+
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>
+
+const slide1=document.getElementById("slide1");
+const slide2=document.getElementById("slide2");
+const slide3=document.getElementById("slide3");
+
+setTimeout(()=>{
+slide1.classList.remove("active");
+slide2.classList.add("active");
+resizeCanvas();
+},3000);
+
+/* ---------------- GAME DATA ---------------- */
+
+const answers={
+45:44,
+38:37,
+22:21,
+20:19,
+17:16,
+31:30
+};
+
+let selectedLeft=null;
+let matchedCount=0;
+let drawnLines=[];
+
+const tick=document.getElementById("tick");
+const cross=document.getElementById("cross");
+const wrongSound=document.getElementById("wrongSound");
+
+const canvas=document.getElementById("lineCanvas");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
+redrawLines();
+}
+
+window.addEventListener("resize",resizeCanvas);
+
+document.querySelectorAll("[data-left]").forEach(box=>{
+
+box.addEventListener("click",()=>{
+
+if(box.classList.contains("done")) return;
+
+document.querySelectorAll("[data-left]").forEach(b=>b.classList.remove("selected"));
+
+selectedLeft=box;
+box.classList.add("selected");
+
+});
+
+});
+
+document.querySelectorAll("[data-right]").forEach(box=>{
+
+box.addEventListener("click",()=>{
+
+if(!selectedLeft) return;
+if(box.classList.contains("done")) return;
+
+const leftValue=parseInt(selectedLeft.dataset.left);
+const rightValue=parseInt(box.dataset.right);
+
+if(answers[leftValue]===rightValue){
+
+drawnLines.push({
+left:selectedLeft,
+right:box
+});
+
+redrawLines();
+
+selectedLeft.classList.add("done");
+box.classList.add("done");
+
+selectedLeft.style.opacity="0.75";
+box.style.opacity="0.75";
+
+showTick();
+
+matchedCount++;
+
+if(matchedCount===6){
+
+setTimeout(()=>{
+slide2.classList.remove("active");
+slide3.classList.add("active");
+createConfetti();
+},1200);
+
+}
+
+}else{
+
+showCross();
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+}
+
+selectedLeft.classList.remove("selected");
+selectedLeft=null;
+
+});
+
+});
+
+/* ---------------- DRAW LINES ---------------- */
+
+function redrawLines(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+drawnLines.forEach(pair=>{
+drawLine(pair.left,pair.right);
+});
+
+}
+
+function drawLine(left,right){
+
+const container=canvas.getBoundingClientRect();
+
+const r1=left.getBoundingClientRect();
+const r2=right.getBoundingClientRect();
+
+const x1=r1.right-container.left;
+const y1=r1.top+r1.height/2-container.top;
+
+const x2=r2.left-container.left;
+const y2=r2.top+r2.height/2-container.top;
+
+ctx.strokeStyle="#00c853";
+ctx.lineWidth=6;
+ctx.lineCap="round";
+
+ctx.beginPath();
+ctx.moveTo(x1,y1);
+ctx.lineTo(x2,y2);
+ctx.stroke();
+}
+
+/* ---------------- FEEDBACK ---------------- */
+
+function showTick(){
+
+tick.style.display="block";
+
+setTimeout(()=>{
+tick.style.display="none";
+},700);
+
+}
+
+function showCross(){
+
+cross.style.display="block";
+
+setTimeout(()=>{
+cross.style.display="none";
+},700);
+
+}
+
+/* ---------------- CONFETTI ---------------- */
+
+function createConfetti(){
+
+for(let i=0;i<150;i++){
+
+const piece=document.createElement("div");
+
+piece.className="confetti";
+
+piece.style.left=Math.random()*100+"%";
+
+piece.style.background=
+`hsl(${Math.random()*360},100%,50%)`;
+
+piece.style.animationDuration=
+(3+Math.random()*4)+"s";
+
+piece.style.animationDelay=
+Math.random()*2+"s";
+
+slide3.appendChild(piece);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
