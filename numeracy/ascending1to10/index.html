@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1,
+        maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    >
+
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Ascending Order Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* --------------------------------
+           COMMON SLIDE SETTINGS
+        -------------------------------- */
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* --------------------------------
+           SLIDE 1: LOGO ONLY
+        -------------------------------- */
+
+        #logoSlide {
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: #ffffff;
+        }
+
+        #logoSlide img {
+            display: block;
+            width: min(55vw, 320px);
+            max-width: 320px;
+            max-height: 45vh;
+            object-fit: contain;
+            animation: logoAppear 0.8s ease;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 9px;
+            margin-top: 25px;
+        }
+
+        .loading-dots span {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #5aaee8;
+            animation: loadingBounce 1s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes logoAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes loadingBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-9px);
+            }
+        }
+
+        /* --------------------------------
+           SLIDES 2–9: ACTIVITY
+        -------------------------------- */
+
+        #playSlide {
+            align-items: center;
+            justify-content: center;
+            padding:
+                max(8px, env(safe-area-inset-top))
+                max(8px, env(safe-area-inset-right))
+                max(8px, env(safe-area-inset-bottom))
+                max(8px, env(safe-area-inset-left));
+
+            background-color: #dff5ff;
+            background-image: url("assets/background.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.13);
+            pointer-events: none;
+        }
+
+        .game-panel {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: min(94%, 900px);
+            height: min(94%, 720px);
+            min-height: 0;
+            padding: clamp(10px, 2vh, 20px);
+            border: 4px solid rgba(255, 255, 255, 0.96);
+            border-radius: clamp(20px, 4vw, 36px);
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow:
+                0 10px 30px rgba(45, 103, 143, 0.22),
+                inset 0 0 0 3px rgba(99, 183, 255, 0.16);
+            overflow: hidden;
+        }
+
+        .top-row {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .round-counter {
+            padding: 7px 17px;
+            border: 2px solid #ffd86b;
+            border-radius: 999px;
+            background: #fff6c9;
+            color: #735000;
+            font-size: clamp(13px, 2.5vw, 20px);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .instruction {
+            flex: 0 0 auto;
+            width: 100%;
+            margin: clamp(7px, 1.4vh, 13px) 0 0;
+            padding: 0 4px;
+            color: #26375d;
+            text-align: center;
+            font-size: clamp(17px, 3.2vw, 28px);
+            font-weight: 800;
+            line-height: 1.18;
+        }
+
+        .support-text {
+            flex: 0 0 auto;
+            min-height: 23px;
+            margin-top: 4px;
+            color: #5a6888;
+            text-align: center;
+            font-size: clamp(12px, 2.2vw, 18px);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            display: flex;
+            flex: 0 0 auto;
+            justify-content: center;
+            gap: clamp(4px, 1.2vw, 9px);
+            margin-top: clamp(5px, 1vh, 9px);
+        }
+
+        .progress-dot {
+            width: clamp(11px, 2vw, 17px);
+            height: clamp(11px, 2vw, 17px);
+            border: 2px solid #6ab6e9;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: 0.25s;
+        }
+
+        .progress-dot.completed {
+            border-color: #39b86b;
+            background: #54d782;
+        }
+
+        .progress-dot.current {
+            border-color: #f4aa29;
+            background: #ffd75e;
+            transform: scale(1.18);
+        }
+
+        .sequence-area {
+            display: flex;
+            flex: 1 1 auto;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 0;
+        }
+
+        .sequence-card {
+            width: min(100%, 720px);
+            padding: clamp(10px, 2vh, 18px);
+            border: 3px solid #bce2f8;
+            border-radius: clamp(17px, 3vw, 28px);
+            background: rgba(245, 252, 255, 0.97);
+            box-shadow: 0 7px 16px rgba(47, 124, 172, 0.13);
+        }
+
+        .section-label {
+            margin: 0 0 clamp(7px, 1.2vh, 11px);
+            color: #455476;
+            text-align: center;
+            font-size: clamp(14px, 2.4vw, 20px);
+            font-weight: 800;
+        }
+
+        .answer-slots {
+            display: flex;
+            justify-content: center;
+            gap: clamp(6px, 1.8vw, 14px);
+            width: 100%;
+        }
+
+        .answer-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(50px, 12vw, 92px);
+            height: clamp(50px, 12vw, 92px);
+            border: 3px dashed #8fb9d2;
+            border-radius: clamp(13px, 3vw, 23px);
+            background: #ffffff;
+            color: #26375d;
+            font-size: clamp(25px, 6vw, 47px);
+            font-weight: 900;
+            box-shadow: inset 0 3px 8px rgba(47, 124, 172, 0.08);
+            transition: 0.25s ease;
+        }
+
+        .answer-slot.filled {
+            border-style: solid;
+            border-color: #55c77b;
+            background: #e5ffed;
+            animation: slotPop 0.35s ease;
+        }
+
+        @keyframes slotPop {
+            0% {
+                transform: scale(0.7);
+            }
+
+            70% {
+                transform: scale(1.12);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .divider {
+            width: 88%;
+            height: 2px;
+            margin: clamp(9px, 1.7vh, 15px) auto;
+            border-radius: 20px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #b9dff4,
+                transparent
+            );
+        }
+
+        .number-options {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(7px, 2vw, 16px);
+            width: 100%;
+        }
+
+        .number-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(57px, 14vw, 105px);
+            height: clamp(57px, 14vw, 105px);
+            padding: 0;
+            border: 3px solid #ffffff;
+            border-radius: clamp(15px, 3vw, 25px);
+            color: #ffffff;
+            font-size: clamp(28px, 7vw, 55px);
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow:
+                0 6px 0 rgba(54, 96, 132, 0.2),
+                0 8px 16px rgba(54, 96, 132, 0.16);
+            transition:
+                transform 0.15s ease,
+                opacity 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .number-button:nth-child(4n + 1) {
+            background: #ff7587;
+        }
+
+        .number-button:nth-child(4n + 2) {
+            background: #f5a633;
+        }
+
+        .number-button:nth-child(4n + 3) {
+            background: #58c88d;
+        }
+
+        .number-button:nth-child(4n + 4) {
+            background: #6697ec;
+        }
+
+        .number-button:active {
+            transform: translateY(4px) scale(0.96);
+            box-shadow:
+                0 2px 0 rgba(54, 96, 132, 0.18),
+                0 4px 8px rgba(54, 96, 132, 0.15);
+        }
+
+        .number-button.used {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.65);
+        }
+
+        .number-button.shake {
+            animation: shake 0.42s ease;
+        }
+
+        .number-button.hint-glow {
+            z-index: 5;
+            animation: hintGlow 0.85s infinite alternate;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px) rotate(-4deg);
+            }
+
+            40% {
+                transform: translateX(10px) rotate(4deg);
+            }
+
+            60% {
+                transform: translateX(-7px) rotate(-3deg);
+            }
+
+            80% {
+                transform: translateX(7px) rotate(3deg);
+            }
+        }
+
+        @keyframes hintGlow {
+            from {
+                transform: scale(1);
+                box-shadow:
+                    0 0 0 4px #ffffff,
+                    0 0 12px 6px #ffe654;
+            }
+
+            to {
+                transform: scale(1.1);
+                box-shadow:
+                    0 0 0 5px #ffffff,
+                    0 0 24px 11px #ffca38;
+            }
+        }
+
+        .feedback-line {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            min-height: clamp(32px, 6vh, 48px);
+            width: 100%;
+            margin-top: clamp(4px, 1vh, 8px);
+            color: #52627f;
+            text-align: center;
+            font-size: clamp(14px, 2.7vw, 22px);
+            font-weight: 800;
+        }
+
+        /* --------------------------------
+           CORRECT AND WRONG SYMBOLS
+        -------------------------------- */
+
+        .feedback-popup {
+            position: fixed;
+            z-index: 50;
+            top: 50%;
+            left: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: clamp(85px, 20vw, 145px);
+            height: clamp(85px, 20vw, 145px);
+            border: 7px solid #ffffff;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: clamp(53px, 13vw, 95px);
+            font-weight: 900;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .feedback-popup.show {
+            display: flex;
+            animation: feedbackPop 0.68s ease forwards;
+        }
+
+        .feedback-popup.correct {
+            background: #36c96d;
+        }
+
+        .feedback-popup.wrong {
+            background: #ef4e59;
+        }
+
+        @keyframes feedbackPop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.25);
+            }
+
+            45% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.18);
+            }
+
+            75% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.85);
+            }
+        }
+
+        /* --------------------------------
+           SLIDE 10: FINAL SCREEN
+        -------------------------------- */
+
+        #endSlide {
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding:
+                max(10px, env(safe-area-inset-top))
+                max(10px, env(safe-area-inset-right))
+                max(10px, env(safe-area-inset-bottom))
+                max(10px, env(safe-area-inset-left));
+
+            background:
+                radial-gradient(
+                    circle at 20% 20%,
+                    #fff7bb 0 7%,
+                    transparent 8%
+                ),
+                radial-gradient(
+                    circle at 80% 25%,
+                    #ffd5e5 0 8%,
+                    transparent 9%
+                ),
+                radial-gradient(
+                    circle at 25% 85%,
+                    #d5f6ff 0 9%,
+                    transparent 10%
+                ),
+                linear-gradient(145deg, #fffdf2, #e8f9ff);
+        }
+
+        .end-content {
+            position: relative;
+            z-index: 4;
+            width: min(88%, 700px);
+            padding:
+                clamp(30px, 6vh, 58px)
+                clamp(18px, 5vw, 48px);
+
+            border: 5px solid #ffffff;
+            border-radius: clamp(26px, 6vw, 48px);
+            background: rgba(255, 255, 255, 0.92);
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(63, 125, 162, 0.2);
+            animation: endCardAppear 0.7s ease;
+        }
+
+        .end-content h1 {
+            margin: 0 0 15px;
+            color: #384f94;
+            font-size: clamp(43px, 11vw, 86px);
+            line-height: 1;
+            text-shadow: 0 4px 0 #dceaff;
+        }
+
+        .end-content p {
+            margin: 8px 0 clamp(20px, 4vh, 32px);
+            color: #51617f;
+            font-size: clamp(18px, 3.5vw, 28px);
+            font-weight: 800;
+        }
+
+        #playAgainButton {
+            min-width: clamp(170px, 45vw, 260px);
+            padding: clamp(13px, 2.5vh, 18px) 25px;
+            border: 4px solid #ffffff;
+            border-radius: 999px;
+            background: #48c97c;
+            color: #ffffff;
+            font-size: clamp(19px, 4vw, 29px);
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow:
+                0 7px 0 #269c55,
+                0 10px 22px rgba(38, 156, 85, 0.25);
+        }
+
+        #playAgainButton:active {
+            transform: translateY(5px);
+            box-shadow:
+                0 2px 0 #269c55,
+                0 5px 12px rgba(38, 156, 85, 0.2);
+        }
+
+        @keyframes endCardAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.72) rotate(-3deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        /* --------------------------------
+           RAINING COLOURFUL NUMBERS
+        -------------------------------- */
+
+        #numberRain {
+            position: absolute;
+            z-index: 2;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .falling-number {
+            position: absolute;
+            top: -80px;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow:
+                2px 2px 0 #ffffff,
+                -2px -2px 0 #ffffff,
+                2px -2px 0 #ffffff,
+                -2px 2px 0 #ffffff;
+
+            animation-name: numberFall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes numberFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(125vh) rotate(420deg);
+            }
+        }
+
+        /* --------------------------------
+           SMALL HEIGHT DEVICES
+        -------------------------------- */
+
+        @media (max-height: 580px) {
+            .game-panel {
+                width: min(95%, 850px);
+                height: 96%;
+                padding: 7px 12px;
+            }
+
+            .round-counter {
+                padding: 4px 11px;
+                font-size: 13px;
+            }
+
+            .instruction {
+                margin-top: 3px;
+                font-size: clamp(14px, 3.6vh, 20px);
+            }
+
+            .support-text {
+                min-height: 17px;
+                margin-top: 1px;
+                font-size: clamp(11px, 2.5vh, 15px);
+            }
+
+            .progress-bar {
+                margin-top: 2px;
+            }
+
+            .progress-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .sequence-card {
+                padding: 7px 10px;
+            }
+
+            .section-label {
+                margin-bottom: 5px;
+                font-size: 13px;
+            }
+
+            .answer-slot {
+                width: clamp(44px, 13vh, 67px);
+                height: clamp(44px, 13vh, 67px);
+                font-size: clamp(23px, 8vh, 37px);
+            }
+
+            .divider {
+                margin: 6px auto;
+            }
+
+            .number-button {
+                width: clamp(49px, 15vh, 74px);
+                height: clamp(49px, 15vh, 74px);
+                font-size: clamp(27px, 9vh, 42px);
+            }
+
+            .feedback-line {
+                min-height: 25px;
+                margin-top: 2px;
+                font-size: clamp(12px, 3vh, 17px);
+            }
+        }
+
+        /* --------------------------------
+           NARROW MOBILE DEVICES
+        -------------------------------- */
+
+        @media (max-width: 380px) {
+            .game-panel {
+                width: 96%;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .answer-slots,
+            .number-options {
+                gap: 5px;
+            }
+
+            .answer-slot {
+                width: 54px;
+                height: 54px;
+                border-width: 2px;
+            }
+
+            .number-button {
+                width: 59px;
+                height: 59px;
+                border-width: 2px;
+            }
+
+            .instruction {
+                font-size: 16px;
+            }
+        }
+
+        /* --------------------------------
+           LANDSCAPE MOBILE DEVICES
+        -------------------------------- */
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .game-panel {
+                width: min(90%, 820px);
+                height: 97%;
+            }
+
+            .instruction {
+                margin-top: 2px;
+            }
+
+            .progress-bar {
+                margin-top: 1px;
+            }
+
+            .feedback-line {
+                min-height: 21px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- SLIDE 1: INNOVINE LOGO ONLY -->
+    <section id="logoSlide" class="slide active">
+
+        <img
+            src="assets/innovine-logo.png"
+            alt="Innovine"
+            draggable="false"
+        >
+
+        <div class="loading-dots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </section>
+
+
+    <!-- SLIDES 2 TO 9: ASCENDING ORDER GAME -->
+    <section id="playSlide" class="slide">
+
+        <div class="background-overlay"></div>
+
+        <main class="game-panel">
+
+            <div class="top-row">
+                <div id="roundCounter" class="round-counter">
+                    Question 1 of 8
+                </div>
+            </div>
+
+            <h1 class="instruction">
+                Arrange the numbers in ascending order.
+            </h1>
+
+            <div id="supportText" class="support-text">
+                Start with the smallest number.
+            </div>
+
+            <div
+                id="progressBar"
+                class="progress-bar"
+                aria-label="Question progress"
+            ></div>
+
+            <div class="sequence-area">
+
+                <div class="sequence-card">
+
+                    <p class="section-label">
+                        Your ascending order
+                    </p>
+
+                    <div id="answerSlots" class="answer-slots">
+
+                        <div class="answer-slot"></div>
+                        <div class="answer-slot"></div>
+                        <div class="answer-slot"></div>
+                        <div class="answer-slot"></div>
+
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <p class="section-label">
+                        Tap the smallest number first
+                    </p>
+
+                    <div
+                        id="numberOptions"
+                        class="number-options"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div id="feedbackLine" class="feedback-line">
+                Which number comes first?
+            </div>
+
+        </main>
+
+    </section>
+
+
+    <!-- SLIDE 10: GOOD JOB -->
+    <section id="endSlide" class="slide">
+
+        <div id="numberRain"></div>
+
+        <div class="end-content">
+
+            <h1>Good job!</h1>
+
+            <p>
+                You arranged all the numbers correctly!
+            </p>
+
+            <button id="playAgainButton" type="button">
+                Play Again
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- CORRECT FEEDBACK -->
+    <div
+        id="correctPopup"
+        class="feedback-popup correct"
+        aria-hidden="true"
+    >
+        ✓
+    </div>
+
+
+    <!-- WRONG FEEDBACK -->
+    <div
+        id="wrongPopup"
+        class="feedback-popup wrong"
+        aria-hidden="true"
+    >
+        ✕
+    </div>
+
+
+    <!-- AUDIO FILES -->
+    <audio
+        id="clapSound"
+        src="assets/clap.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="wrongSound"
+        src="assets/wrong.mp3"
+        preload="auto"
+    ></audio>
+
+</div>
+
+
+<script>
+(function () {
+    "use strict";
+
+    /*
+        Eight activity rounds represent Slides 2 to 9.
+        Every round includes four different numbers from 1 to 10.
+    */
+
+    var rounds = [
+        [7, 2, 9, 4],
+        [10, 1, 6, 3],
+        [8, 5, 2, 7],
+        [9, 4, 1, 6],
+        [3, 10, 5, 8],
+        [7, 1, 4, 6],
+        [2, 9, 5, 10],
+        [8, 3, 6, 1]
+    ];
+
+    var currentRound = 0;
+    var correctPosition = 0;
+    var wrongAttempts = 0;
+    var inputLocked = false;
+
+    var logoSlide = document.getElementById("logoSlide");
+    var playSlide = document.getElementById("playSlide");
+    var endSlide = document.getElementById("endSlide");
+
+    var roundCounter = document.getElementById("roundCounter");
+    var progressBar = document.getElementById("progressBar");
+    var answerSlots = document.getElementById("answerSlots");
+    var numberOptions = document.getElementById("numberOptions");
+    var feedbackLine = document.getElementById("feedbackLine");
+    var supportText = document.getElementById("supportText");
+
+    var correctPopup = document.getElementById("correctPopup");
+    var wrongPopup = document.getElementById("wrongPopup");
+
+    var clapSound = document.getElementById("clapSound");
+    var wrongSound = document.getElementById("wrongSound");
+
+    var playAgainButton =
+        document.getElementById("playAgainButton");
+
+    var numberRain =
+        document.getElementById("numberRain");
+
+
+    /*
+        Shuffle the positions of number buttons.
+    */
+    function shuffleArray(array) {
+        var copiedArray = array.slice();
+        var currentIndex = copiedArray.length;
+        var randomIndex;
+        var temporaryValue;
+
+        while (currentIndex !== 0) {
+            randomIndex =
+                Math.floor(Math.random() * currentIndex);
+
+            currentIndex -= 1;
+
+            temporaryValue = copiedArray[currentIndex];
+
+            copiedArray[currentIndex] =
+                copiedArray[randomIndex];
+
+            copiedArray[randomIndex] =
+                temporaryValue;
+        }
+
+        return copiedArray;
+    }
+
+
+    /*
+        Display only one slide at a time.
+    */
+    function showOnlySlide(slideToShow) {
+        logoSlide.classList.remove("active");
+        playSlide.classList.remove("active");
+        endSlide.classList.remove("active");
+
+        slideToShow.classList.add("active");
+    }
+
+
+    /*
+        Play audio safely.
+    */
+    function safelyPlayAudio(audioElement) {
+        if (!audioElement) {
+            return;
+        }
+
+        try {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+
+            var playPromise = audioElement.play();
+
+            if (
+                playPromise &&
+                typeof playPromise.catch === "function"
+            ) {
+                playPromise.catch(function () {
+                    /*
+                        Some browsers block audio until
+                        the learner interacts with the screen.
+                    */
+                });
+            }
+        } catch (error) {
+            /*
+                The game continues even when sound is unavailable.
+            */
+        }
+    }
+
+
+    /*
+        Display green tick or red cross.
+    */
+    function showPopup(popup) {
+        popup.classList.remove("show");
+
+        void popup.offsetWidth;
+
+        popup.classList.add("show");
+
+        window.setTimeout(function () {
+            popup.classList.remove("show");
+        }, 680);
+    }
+
+
+    /*
+        Create eight progress circles.
+    */
+    function createProgressDots() {
+        var index;
+        var dot;
+
+        progressBar.innerHTML = "";
+
+        for (
+            index = 0;
+            index < rounds.length;
+            index += 1
+        ) {
+            dot = document.createElement("span");
+            dot.className = "progress-dot";
+
+            if (index < currentRound) {
+                dot.classList.add("completed");
+            } else if (index === currentRound) {
+                dot.classList.add("current");
+            }
+
+            progressBar.appendChild(dot);
+        }
+    }
+
+
+    /*
+        Empty the ascending-order answer boxes.
+    */
+    function clearAnswerSlots() {
+        var slots =
+            answerSlots.getElementsByClassName("answer-slot");
+
+        var index;
+
+        for (
+            index = 0;
+            index < slots.length;
+            index += 1
+        ) {
+            slots[index].textContent = "";
+            slots[index].classList.remove("filled");
+        }
+    }
+
+
+    /*
+        Remove the hint glow from every number.
+    */
+    function removeHintGlow() {
+        var buttons =
+            numberOptions.getElementsByClassName(
+                "number-button"
+            );
+
+        var index;
+
+        for (
+            index = 0;
+            index < buttons.length;
+            index += 1
+        ) {
+            buttons[index].classList.remove("hint-glow");
+        }
+    }
+
+
+    /*
+        Highlight the correct number after two wrong attempts.
+    */
+    function highlightCorrectNumber() {
+        var sortedNumbers =
+            rounds[currentRound]
+                .slice()
+                .sort(function (a, b) {
+                    return a - b;
+                });
+
+        var nextCorrectNumber =
+            sortedNumbers[correctPosition];
+
+        var buttons =
+            numberOptions.getElementsByClassName(
+                "number-button"
+            );
+
+        var index;
+
+        removeHintGlow();
+
+        for (
+            index = 0;
+            index < buttons.length;
+            index += 1
+        ) {
+            if (
+                Number(
+                    buttons[index].getAttribute(
+                        "data-number"
+                    )
+                ) === nextCorrectNumber
+            ) {
+                buttons[index].classList.add(
+                    "hint-glow"
+                );
+
+                break;
+            }
+        }
+
+        supportText.textContent =
+            "Hint: Tap " +
+            nextCorrectNumber +
+            " next.";
+
+        feedbackLine.textContent =
+            "Look for the glowing number!";
+    }
+
+
+    /*
+        Create the four number buttons.
+    */
+    function createNumberButtons(numbers) {
+        numberOptions.innerHTML = "";
+
+        numbers.forEach(function (number) {
+            var button =
+                document.createElement("button");
+
+            button.type = "button";
+            button.className = "number-button";
+            button.textContent = number;
+
+            button.setAttribute(
+                "data-number",
+                number
+            );
+
+            button.setAttribute(
+                "aria-label",
+                "Number " + number
+            );
+
+            button.addEventListener(
+                "click",
+                function () {
+                    handleNumberSelection(
+                        button,
+                        number
+                    );
+                }
+            );
+
+            numberOptions.appendChild(button);
+        });
+    }
+
+
+    /*
+        Load a new activity question.
+    */
+    function loadRound() {
+        var shuffledNumbers;
+
+        correctPosition = 0;
+        wrongAttempts = 0;
+        inputLocked = false;
+
+        clearAnswerSlots();
+        createProgressDots();
+
+        roundCounter.textContent =
+            "Question " +
+            (currentRound + 1) +
+            " of " +
+            rounds.length;
+
+        supportText.textContent =
+            "Start with the smallest number.";
+
+        feedbackLine.textContent =
+            "Which number comes first?";
+
+        shuffledNumbers =
+            shuffleArray(rounds[currentRound]);
+
+        createNumberButtons(shuffledNumbers);
+    }
+
+
+    /*
+        Check the number tapped by the learner.
+    */
+    function handleNumberSelection(
+        button,
+        selectedNumber
+    ) {
+        var sortedNumbers;
+        var expectedNumber;
+        var slots;
+
+        if (
+            inputLocked ||
+            button.classList.contains("used")
+        ) {
+            return;
+        }
+
+        sortedNumbers =
+            rounds[currentRound]
+                .slice()
+                .sort(function (a, b) {
+                    return a - b;
+                });
+
+        expectedNumber =
+            sortedNumbers[correctPosition];
+
+        if (selectedNumber === expectedNumber) {
+            wrongAttempts = 0;
+
+            removeHintGlow();
+
+            slots =
+                answerSlots.getElementsByClassName(
+                    "answer-slot"
+                );
+
+            slots[correctPosition].textContent =
+                selectedNumber;
+
+            slots[correctPosition].classList.add(
+                "filled"
+            );
+
+            button.classList.add("used");
+
+            correctPosition += 1;
+
+            showPopup(correctPopup);
+
+            supportText.textContent =
+                "Great! Keep going from small to big.";
+
+            if (
+                correctPosition <
+                sortedNumbers.length
+            ) {
+                feedbackLine.textContent =
+                    "Now tap the next smallest number.";
+            } else {
+                completeRound();
+            }
+
+        } else {
+            wrongAttempts += 1;
+
+            safelyPlayAudio(wrongSound);
+            showPopup(wrongPopup);
+
+            button.classList.remove("shake");
+
+            void button.offsetWidth;
+
+            button.classList.add("shake");
+
+            feedbackLine.textContent =
+                "Oops! Try a smaller number.";
+
+            supportText.textContent =
+                "Ascending order goes from small to big.";
+
+            window.setTimeout(function () {
+                button.classList.remove("shake");
+            }, 430);
+
+            if (wrongAttempts >= 2) {
+                wrongAttempts = 0;
+
+                window.setTimeout(function () {
+                    highlightCorrectNumber();
+                }, 250);
+            }
+        }
+    }
+
+
+    /*
+        Complete one full ascending-order question.
+    */
+    function completeRound() {
+        inputLocked = true;
+
+        removeHintGlow();
+
+        feedbackLine.textContent =
+            "Wonderful! The order is correct.";
+
+        supportText.textContent =
+            "Well done!";
+
+        showPopup(correctPopup);
+        safelyPlayAudio(clapSound);
+
+        window.setTimeout(function () {
+            currentRound += 1;
+
+            if (currentRound < rounds.length) {
+                loadRound();
+            } else {
+                showEndScreen();
+            }
+        }, 1800);
+    }
+
+
+    /*
+        Create colourful raining numbers.
+    */
+    function createNumberRain() {
+        var colours = [
+            "#ef4e59",
+            "#ff9f32",
+            "#f4cf38",
+            "#38bd73",
+            "#3a9de8",
+            "#795edc",
+            "#ec64a4"
+        ];
+
+        var index;
+        var number;
+        var leftPosition;
+        var duration;
+        var delay;
+        var size;
+        var fallingNumber;
+
+        numberRain.innerHTML = "";
+
+        for (index = 0; index < 45; index += 1) {
+            number =
+                Math.floor(Math.random() * 10) + 1;
+
+            leftPosition =
+                Math.random() * 96;
+
+            duration =
+                4.5 + Math.random() * 4;
+
+            delay =
+                Math.random() * -8;
+
+            size =
+                24 + Math.random() * 34;
+
+            fallingNumber =
+                document.createElement("span");
+
+            fallingNumber.className =
+                "falling-number";
+
+            fallingNumber.textContent = number;
+
+            fallingNumber.style.left =
+                leftPosition + "%";
+
+            fallingNumber.style.fontSize =
+                size + "px";
+
+            fallingNumber.style.color =
+                colours[index % colours.length];
+
+            fallingNumber.style.animationDuration =
+                duration + "s";
+
+            fallingNumber.style.animationDelay =
+                delay + "s";
+
+            numberRain.appendChild(
+                fallingNumber
+            );
+        }
+    }
+
+
+    /*
+        Show final Good job screen.
+    */
+    function showEndScreen() {
+        showOnlySlide(endSlide);
+
+        createNumberRain();
+
+        safelyPlayAudio(clapSound);
+    }
+
+
+    /*
+        Restart the game from Question 1.
+    */
+    function restartGame() {
+        currentRound = 0;
+        correctPosition = 0;
+        wrongAttempts = 0;
+        inputLocked = false;
+
+        numberRain.innerHTML = "";
+
+        showOnlySlide(playSlide);
+
+        loadRound();
+    }
+
+
+    playAgainButton.addEventListener(
+        "click",
+        restartGame
+    );
+
+
+    /*
+        The Innovine logo appears only on Slide 1.
+        It stays on screen for five seconds.
+    */
+    window.setTimeout(function () {
+        showOnlySlide(playSlide);
+        loadRound();
+    }, 5000);
+
+
+    /*
+        Prevent accidental double-tap zoom
+        on some older mobile devices.
+    */
+    var lastTouchEnd = 0;
+
+    document.addEventListener(
+        "touchend",
+        function (event) {
+            var now = new Date().getTime();
+
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+
+            lastTouchEnd = now;
+        },
+        false
+    );
+
+})();
+</script>
+
+</body>
+</html>
