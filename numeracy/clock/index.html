@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Clock Game</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+
+overflow:hidden;
+background:#FDF6EC;
+
+}
+
+.slide{
+
+display:none;
+width:100vw;
+height:100vh;
+
+justify-content:center;
+align-items:center;
+flex-direction:column;
+padding:20px;
+text-align:center;
+
+}
+
+.active{
+
+display:flex;
+
+}
+
+.white{
+
+background:white;
+
+}
+
+.pastel{
+
+background:#FFF8E8;
+
+}
+
+.logo{
+
+width:70%;
+max-width:350px;
+
+}
+
+h2{
+
+font-size:30px;
+margin-bottom:25px;
+color:#333;
+
+}
+
+.clock{
+
+width:65vw;
+max-width:260px;
+border:10px solid transparent;
+border-image:linear-gradient(45deg,#ff4d6d,#ffbe0b,#00c853,#2196f3,#9c27b0) 1;
+border-radius:30px;
+padding:10px;
+background:white;
+margin-bottom:35px;
+
+}
+
+.options{
+
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+justify-content:center;
+
+}
+
+button{
+
+font-size:28px;
+padding:18px 35px;
+border:none;
+border-radius:18px;
+background:#4FC3F7;
+color:white;
+cursor:pointer;
+font-weight:bold;
+min-width:140px;
+
+}
+
+button:active{
+
+transform:scale(.95);
+
+}
+
+.popup{
+
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:130px;
+display:none;
+z-index:100;
+
+}
+
+.correct{
+
+color:#00C853;
+
+}
+
+.wrong{
+
+color:red;
+
+}
+
+.final{
+
+font-size:60px;
+font-weight:bold;
+color:#ff4081;
+
+}
+
+.confetti{
+
+position:absolute;
+font-size:40px;
+animation:fall 4s linear infinite;
+
+}
+
+@keyframes fall{
+
+0%{transform:translateY(-100vh);}
+100%{transform:translateY(110vh);}
+
+}
+
+@media(max-width:600px){
+
+h2{
+font-size:24px;
+}
+
+button{
+font-size:24px;
+padding:15px 25px;
+}
+
+.clock{
+width:75vw;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="tick" class="popup correct">✔</div>
+<div id="cross" class="popup wrong">✖</div>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<!-- Slide 1 -->
+
+<div class="slide white active">
+
+<img src="assets/innovine-logo.png" class="logo">
+
+</div>
+
+<!-- Slides generated -->
+
+<div id="game"></div>
+
+<!-- Final -->
+
+<div class="slide pastel" id="final">
+
+<div class="final">
+🎉 Good Job! 🎉
+</div>
+
+<div id="confetti"></div>
+
+</div>
+
+<script>
+
+const questions=[
+
+{
+img:"5oclock.png",
+options:["5:00","3:00"],
+answer:"5:00"
+},
+
+{
+img:"8oclock.png",
+options:["1:00","8:00"],
+answer:"8:00"
+},
+
+{
+img:"2oclock.png",
+options:["2:00","7:00"],
+answer:"2:00"
+},
+
+{
+img:"9oclock.png",
+options:["6:00","9:00"],
+answer:"9:00"
+},
+
+{
+img:"1oclock.png",
+options:["3:00","1:00"],
+answer:"1:00"
+},
+
+{
+img:"4oclock.png",
+options:["4:00","6:00"],
+answer:"4:00"
+},
+
+{
+img:"7oclock.png",
+options:["2:00","7:00"],
+answer:"7:00"
+},
+
+{
+img:"12oclock.png",
+options:["12:00","6:00"],
+answer:"12:00"
+}
+
+];
+
+const game=document.getElementById("game");
+
+questions.forEach((q)=>{
+
+let slide=document.createElement("div");
+
+slide.className="slide pastel";
+
+slide.innerHTML=`
+
+<h2>
+Read the clock and tap on the correct time.
+</h2>
+
+<img class="clock" src="assets/${q.img}">
+
+<div class="options">
+
+<button onclick="check(this,'${q.answer}')">${q.options[0]}</button>
+
+<button onclick="check(this,'${q.answer}')">${q.options[1]}</button>
+
+</div>
+
+`;
+
+game.appendChild(slide);
+
+});
+
+const slides=document.querySelectorAll(".slide");
+
+let current=0;
+
+setTimeout(()=>{
+
+slides[current].classList.remove("active");
+current=1;
+slides[current].classList.add("active");
+
+},2000);
+
+function check(btn,answer){
+
+if(btn.innerHTML==answer){
+
+document.getElementById("tick").style.display="block";
+
+document.getElementById("clap").play();
+
+setTimeout(()=>{
+
+document.getElementById("tick").style.display="none";
+
+slides[current].classList.remove("active");
+
+current++;
+
+if(current<slides.length){
+
+slides[current].classList.add("active");
+
+}
+
+if(current==slides.length-1){
+
+celebrate();
+
+}
+
+},1200);
+
+}
+
+else{
+
+document.getElementById("cross").style.display="block";
+
+document.getElementById("wrong").play();
+
+setTimeout(()=>{
+
+document.getElementById("cross").style.display="none";
+
+},1000);
+
+}
+
+}
+
+function celebrate(){
+
+let area=document.getElementById("confetti");
+
+for(let i=0;i<60;i++){
+
+let c=document.createElement("div");
+
+c.className="confetti";
+
+c.innerHTML=["🎊","🎉","✨","🎈"][Math.floor(Math.random()*4)];
+
+c.style.left=Math.random()*100+"vw";
+
+c.style.animationDelay=Math.random()*4+"s";
+
+area.appendChild(c);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
