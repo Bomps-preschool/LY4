@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>Addition 1 to 10</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+
+background-image:
+radial-gradient(circle at 10% 20%,#ffef8b 0 4%,transparent 4.5%),
+radial-gradient(circle at 30% 80%,#ffd6ea 0 4%,transparent 4.5%),
+radial-gradient(circle at 90% 30%,#c8f7c5 0 4%,transparent 4.5%),
+radial-gradient(circle at 80% 70%,#bde0fe 0 4%,transparent 4.5%),
+linear-gradient(#fffdf5,#fff5e5);
+
+background-size:180px 180px;
+
+}
+
+.slide{
+
+position:absolute;
+left:0;
+top:0;
+width:100%;
+height:100%;
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:15px;
+
+}
+
+.slide.active{
+
+display:flex;
+
+}
+
+.white{
+
+background:white;
+
+}
+
+.title{
+
+font-size:7vw;
+font-weight:bold;
+color:#ffd400;
+text-shadow:
+3px 3px #ff7f50;
+
+margin-bottom:20px;
+
+}
+
+.equation{
+
+display:flex;
+align-items:center;
+justify-content:center;
+gap:15px;
+width:100%;
+margin-bottom:25px;
+
+}
+
+.picBox{
+
+width:22vw;
+height:22vw;
+max-width:130px;
+max-height:130px;
+
+background:white;
+
+border:6px solid hotpink;
+border-radius:25px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+box-shadow:0 4px 10px rgba(0,0,0,.25);
+
+}
+
+.picBox img{
+
+width:90%;
+height:90%;
+object-fit:contain;
+
+}
+
+.sign{
+
+font-size:7vw;
+font-weight:bold;
+color:#ff5722;
+
+}
+
+.answerBox{
+
+width:22vw;
+height:22vw;
+
+max-width:130px;
+max-height:130px;
+
+border:6px dashed #00bcd4;
+
+border-radius:25px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+background:white;
+
+font-size:45px;
+font-weight:bold;
+color:#2196f3;
+
+}
+
+.options{
+
+display:flex;
+gap:25px;
+margin-top:20px;
+
+}
+
+.option{
+
+width:90px;
+height:90px;
+
+border-radius:22px;
+
+background:white;
+
+border:6px solid orange;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+font-size:40px;
+font-weight:bold;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.option:nth-child(2){
+
+border-color:#00bcd4;
+
+}
+
+.option:nth-child(3){
+
+border-color:#4caf50;
+
+}
+
+.option:hover{
+
+transform:scale(1.08);
+
+}
+
+.popup{
+
+position:absolute;
+left:50%;
+top:45%;
+transform:translate(-50%,-50%) scale(0);
+
+font-size:140px;
+
+transition:.3s;
+
+z-index:100;
+
+}
+
+.popup.show{
+
+transform:translate(-50%,-50%) scale(1);
+
+}
+
+.tick{
+
+color:#00c853;
+
+}
+
+.cross{
+
+color:#ff1744;
+
+}
+
+.logo{
+
+width:65%;
+max-width:350px;
+
+}
+
+.good{
+
+font-size:70px;
+font-weight:bold;
+color:#ff9800;
+margin-bottom:30px;
+
+}
+
+.playAgain{
+
+padding:18px 40px;
+
+font-size:32px;
+
+border:none;
+border-radius:20px;
+
+background:#00c853;
+color:white;
+
+cursor:pointer;
+
+}
+
+.rain{
+
+position:absolute;
+
+font-size:45px;
+
+animation:fall linear infinite;
+
+}
+
+@keyframes fall{
+
+0%{
+transform:translateY(-120px);
+}
+
+100%{
+transform:translateY(120vh);
+}
+
+}
+
+@media(max-width:700px){
+
+.title{
+
+font-size:10vw;
+
+}
+
+.sign{
+
+font-size:10vw;
+
+}
+
+.option{
+
+width:70px;
+height:70px;
+font-size:32px;
+
+}
+
+.answerBox{
+
+font-size:32px;
+
+}
+
+.popup{
+
+font-size:100px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<div id="tick" class="popup tick">✔</div>
+<div id="cross" class="popup cross">✖</div>
+
+<!-- ========================= -->
+
+<div class="slide white active" id="slide0">
+
+<img src="assets/innovine-logo.png" class="logo">
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide1">
+
+<div class="title">
+
+Addition
+
+</div>
+
+<div class="equation">
+
+<div class="picBox">
+<img src="assets/6carrots.png">
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+<img src="assets/4carrots.png">
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box1"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="checkAnswer(this,10,'box1',1)">10</div>
+
+<div class="option"
+onclick="wrongAnswer()">6</div>
+
+<div class="option"
+onclick="wrongAnswer()">5</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide2">
+
+<div class="title">
+
+Addition
+
+</div>
+
+<div class="equation">
+
+<div class="picBox">
+
+<img src="assets/2crayons.png">
+
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+
+<img src="assets/4crayons.png">
+
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box2"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="wrongAnswer()">8</div>
+
+<div class="option"
+onclick="checkAnswer(this,6,'box2',2)">6</div>
+
+<div class="option"
+onclick="wrongAnswer()">5</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide3">
+
+<div class="title">Addition</div>
+
+<div class="equation">
+
+<div class="picBox">
+<img src="assets/6pineapples.png">
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+<img src="assets/3pineapples.png">
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box3"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="wrongAnswer()">10</div>
+
+<div class="option"
+onclick="checkAnswer(this,9,'box3',3)">9</div>
+
+<div class="option"
+onclick="wrongAnswer()">5</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide4">
+
+<div class="title">Addition</div>
+
+<div class="equation">
+
+<div class="picBox">
+<img src="assets/3balloons.png">
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+<img src="assets/2balloons.png">
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box4"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="wrongAnswer()">9</div>
+
+<div class="option"
+onclick="wrongAnswer()">7</div>
+
+<div class="option"
+onclick="checkAnswer(this,5,'box4',4)">5</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide5">
+
+<div class="title">Addition</div>
+
+<div class="equation">
+
+<div class="picBox">
+<img src="assets/4birds.png">
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+<img src="assets/3birds.png">
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box5"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="checkAnswer(this,7,'box5',5)">7</div>
+
+<div class="option"
+onclick="wrongAnswer()">6</div>
+
+<div class="option"
+onclick="wrongAnswer()">5</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide6">
+
+<div class="title">Addition</div>
+
+<div class="equation">
+
+<div class="picBox">
+<img src="assets/4candies.png">
+</div>
+
+<div class="sign">+</div>
+
+<div class="picBox">
+<img src="assets/4candies2.png">
+</div>
+
+<div class="sign">=</div>
+
+<div class="answerBox" id="box6"></div>
+
+</div>
+
+<div class="options">
+
+<div class="option"
+onclick="wrongAnswer()">4</div>
+
+<div class="option"
+onclick="checkAnswer(this,8,'box6',6)">8</div>
+
+<div class="option"
+onclick="wrongAnswer()">2</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+
+<div class="slide" id="slide7">
+
+<div class="good">
+
+🎉 Good Job! 🎉
+
+</div>
+
+<button class="playAgain"
+onclick="location.reload()">
+
+PLAY AGAIN
+
+</button>
+
+</div>
+
+<script>
+
+let currentSlide = 0;
+
+const slides = document.querySelectorAll(".slide");
+
+setTimeout(() => {
+    nextSlide();
+}, 2000);
+
+function nextSlide() {
+
+    if (currentSlide < slides.length - 1) {
+
+        slides[currentSlide].classList.remove("active");
+
+        currentSlide++;
+
+        slides[currentSlide].classList.add("active");
+
+    }
+
+}
+
+function wrongAnswer() {
+
+    const cross = document.getElementById("cross");
+
+    document.getElementById("wrong").currentTime = 0;
+    document.getElementById("wrong").play();
+
+    cross.classList.add("show");
+
+    setTimeout(() => {
+        cross.classList.remove("show");
+    }, 800);
+
+}
+
+function checkAnswer(option, answer, boxId, slideNo) {
+
+    const tick = document.getElementById("tick");
+
+    document.getElementById(boxId).innerHTML = answer;
+
+    option.style.visibility = "hidden";
+
+    document.getElementById("clap").currentTime = 0;
+    document.getElementById("clap").play();
+
+    tick.classList.add("show");
+
+    setTimeout(() => {
+
+        tick.classList.remove("show");
+
+        nextSlide();
+
+        if (currentSlide == 7) {
+
+            startRain();
+
+        }
+
+    }, 1500);
+
+}
+
+function startRain() {
+
+    const colors = [
+        "#ff0000",
+        "#ff9800",
+        "#ffeb3b",
+        "#4caf50",
+        "#2196f3",
+        "#9c27b0",
+        "#e91e63"
+    ];
+
+    for (let i = 0; i < 60; i++) {
+
+        const d = document.createElement("div");
+
+        d.className = "rain";
+
+        d.innerHTML = Math.floor(Math.random() * 10);
+
+        d.style.left = Math.random() * 100 + "vw";
+
+        d.style.animationDuration =
+            (3 + Math.random() * 3) + "s";
+
+        d.style.animationDelay =
+            Math.random() * 3 + "s";
+
+        d.style.color =
+            colors[Math.floor(Math.random() * colors.length)];
+
+        document.getElementById("slide7").appendChild(d);
+
+    }
+
+}
+
+document.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener("dragstart", function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener("touchstart", function() {}, {
+    passive: true
+});
+
+</script>
+
+</body>
+</html>
