@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>Skip Counting</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:Arial,Helvetica,sans-serif;
+touch-action:none;
+}
+
+body{
+
+background:
+linear-gradient(
+135deg,
+#fff6c9,
+#ffd8ef,
+#d8f4ff,
+#fff6cc);
+
+}
+
+/*----------------------------------------------------
+SPLASH
+----------------------------------------------------*/
+
+#splashScreen{
+
+position:fixed;
+inset:0;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+background:white;
+
+z-index:9999;
+
+}
+
+#splashScreen img{
+
+width:min(65vw,320px);
+
+}
+
+/*----------------------------------------------------
+START
+----------------------------------------------------*/
+
+#startScreen{
+
+position:fixed;
+inset:0;
+
+display:none;
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+background:
+
+linear-gradient(
+135deg,
+#ffe6f4,
+#fff8d9,
+#dff7ff);
+
+}
+
+.gameTitle{
+
+font-size:clamp(40px,7vw,76px);
+
+font-weight:900;
+
+text-align:center;
+
+animation:titleFlash 1.2s infinite alternate;
+
+}
+
+@keyframes titleFlash{
+
+0%{color:#ff2d55;}
+
+25%{color:#ff8c00;}
+
+50%{color:#6a00f4;}
+
+75%{color:#0096c7;}
+
+100%{color:#2a9d8f;}
+
+}
+
+#tapStartBtn{
+
+margin-top:45px;
+
+padding:18px 42px;
+
+border:none;
+
+border-radius:22px;
+
+background:#ff4d6d;
+
+color:white;
+
+font-size:clamp(24px,3vw,34px);
+
+font-weight:bold;
+
+cursor:pointer;
+
+animation:tapMove 1s infinite;
+
+box-shadow:
+0 0 12px #ff4d6d,
+0 0 24px #ff4d6d;
+
+}
+
+@keyframes tapMove{
+
+0%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-10px);
+}
+
+100%{
+transform:translateY(0);
+}
+
+}
+
+#tapStartBtn:active{
+
+transform:scale(.95);
+
+}
+
+/*----------------------------------------------------
+GAME
+----------------------------------------------------*/
+
+#gameContainer{
+display:none;
+width:100%;
+height:100%;
+padding:10px;
+
+display:flex;
+flex-direction:column;
+}
+
+/*----------------------------------------------------
+TOP
+----------------------------------------------------*/
+
+.topArea{
+height:auto;
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-bottom:10px;
+}
+
+#roundTitle{
+
+text-align:center;
+
+font-size:clamp(34px,5vw,60px);
+
+font-weight:900;
+
+background:
+
+linear-gradient(
+90deg,
+#ff006e,
+#ff8500,
+#2dc653,
+#0096c7,
+#8338ec);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+}
+
+.questionRow{
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+gap:12px;
+
+}
+
+#questionBox{
+
+flex:1;
+
+max-width:900px;
+
+padding:14px;
+
+background:#8e24aa;
+
+border-radius:16px;
+
+color:white;
+
+font-size:clamp(16px,2vw,24px);
+
+font-weight:bold;
+
+text-align:center;
+
+}
+
+#speakBtn{
+
+border:none;
+
+background:#ffca3a;
+
+padding:12px 16px;
+
+border-radius:14px;
+
+font-size:20px;
+
+cursor:pointer;
+
+}
+
+/*----------------------------------------------------
+BOARD
+----------------------------------------------------*/
+
+#boardArea{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+#board{
+
+width:min(96%,1100px);
+
+height:240px;
+
+background:white;
+
+border:8px solid #ff5ea8;
+
+border-radius:35px;
+
+padding:22px;
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+}
+
+.slot{
+
+height:150px;
+
+border:5px dashed #ff5ea8;
+
+border-radius:22px;
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+font-size:clamp(38px,5vw,72px);
+
+font-weight:900;
+
+background:#fff8fd;
+
+transition:.25s;
+
+}
+
+.slot.filled{
+
+background:#e8ffe8;
+
+border-color:#2eb82e;
+
+color:#111;
+
+}
+
+/*----------------------------------------------------
+OPTIONS
+----------------------------------------------------*/
+
+#optionsArea{
+height:auto;
+padding:10px 0;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+#optionsContainer{
+
+width:min(96%,1200px);
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+justify-items:center;
+
+gap:18px;
+
+}
+
+.option{
+
+width:170px;
+
+height:170px;
+
+position:relative;
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+user-select:none;
+
+touch-action:none;
+
+cursor:pointer;
+
+}
+
+.option img{
+
+width:145px;
+
+height:145px;
+
+pointer-events:none;
+
+}
+
+.optionNumber{
+
+position:absolute;
+
+inset:0;
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+font-size:clamp(36px,5vw,62px);
+
+font-weight:900;
+
+color:#6a00f4;
+
+text-shadow:
+
+1px 1px white,
+
+2px 2px white;
+
+pointer-events:none;
+
+}
+.correctGlow{
+
+animation:correctGlow 1s infinite;
+
+}
+
+@keyframes correctGlow{
+
+0%{
+
+filter:drop-shadow(0 0 6px #00ff00);
+
+}
+
+50%{
+
+filter:drop-shadow(0 0 18px #00ff00);
+
+}
+
+100%{
+
+filter:drop-shadow(0 0 6px #00ff00);
+
+}
+
+}
+
+.shake{
+
+animation:shake .3s;
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+
+25%{transform:translateX(-8px);}
+
+50%{transform:translateX(8px);}
+
+75%{transform:translateX(-8px);}
+
+100%{transform:translateX(0);}
+
+}
+
+/*---------------------------------------
+GOOD JOB
+---------------------------------------*/
+
+#goodJobScreen{
+
+position:fixed;
+
+left:50%;
+
+bottom:35px;
+
+transform:translateX(-50%);
+
+display:none;
+
+padding:18px 36px;
+
+background:#fff4b5;
+
+border:6px solid #ffb703;
+
+border-radius:24px;
+
+font-size:clamp(22px,3vw,42px);
+
+font-weight:900;
+
+z-index:5000;
+
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+/*---------------------------------------
+CONFETTI
+---------------------------------------*/
+
+#confettiContainer{
+
+position:fixed;
+
+inset:0;
+
+pointer-events:none;
+
+overflow:hidden;
+
+z-index:9999;
+
+}
+
+.confetti{
+
+position:absolute;
+
+width:14px;
+
+height:14px;
+
+border-radius:3px;
+
+animation:fall linear forwards;
+
+}
+
+@keyframes fall{
+
+from{
+
+transform:
+
+translateY(-50px)
+
+rotate(0deg);
+
+}
+
+to{
+
+transform:
+
+translateY(110vh)
+
+rotate(720deg);
+
+}
+
+}
+
+/*---------------------------------------
+FINAL
+---------------------------------------*/
+
+#finalScreen{
+
+position:fixed;
+
+inset:0;
+
+display:none;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+gap:30px;
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#fff8cf,
+
+#ffdced,
+
+#dff7ff);
+
+z-index:6000;
+
+}
+
+#finalText{
+
+font-size:clamp(42px,7vw,90px);
+
+font-weight:900;
+
+text-align:center;
+
+animation:titleFlash 1s infinite alternate;
+
+}
+
+#playAgainBtn{
+
+padding:18px 42px;
+
+border:none;
+
+border-radius:22px;
+
+background:#ffb703;
+
+font-size:clamp(22px,3vw,32px);
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+/*---------------------------------------
+MOBILE
+---------------------------------------*/
+
+@media(max-width:768px){
+
+.topArea{
+
+height:24%;
+
+}
+
+#roundTitle{
+
+font-size:28px;
+
+}
+
+#questionBox{
+
+font-size:16px;
+
+padding:10px;
+
+}
+
+#boardArea{
+
+height:32%;
+
+}
+
+#board{
+
+height:180px;
+
+padding:12px;
+
+gap:10px;
+
+}
+
+.slot{
+
+height:110px;
+
+font-size:34px;
+
+}
+
+#optionsArea{
+
+height:44%;
+
+}
+
+#optionsContainer{
+
+grid-template-columns:repeat(2,1fr);
+
+gap:8px;
+
+}
+
+.option{
+
+width:120px;
+
+height:120px;
+
+}
+
+.option img{
+
+width:105px;
+
+height:105px;
+
+}
+
+.optionNumber{
+
+font-size:38px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+#roundTitle{
+
+font-size:24px;
+
+}
+
+#board{
+
+height:160px;
+
+}
+
+.slot{
+
+height:90px;
+
+font-size:30px;
+
+}
+
+.option{
+
+width:100px;
+
+height:100px;
+
+}
+
+.option img{
+
+width:90px;
+
+height:90px;
+
+}
+
+.optionNumber{
+
+font-size:30px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SPLASH -->
+
+<div id="splashScreen">
+
+<img src="assets/innovine-logo.png">
+
+</div>
+
+<!-- START -->
+
+<div id="startScreen">
+
+<h1 class="gameTitle">
+
+Skip Counting
+
+</h1>
+
+<button id="tapStartBtn">
+
+👆 TAP TO START
+
+</button>
+
+</div>
+
+<!-- GAME -->
+
+<div id="gameContainer">
+
+<div class="topArea">
+
+<h2 id="roundTitle"></h2>
+
+<div class="questionRow">
+
+<div id="questionBox"></div>
+
+<button id="speakBtn">
+
+🔊
+
+</button>
+
+</div>
+
+</div>
+
+<div id="boardArea">
+
+<div id="board">
+
+<div class="slot" data-index="0"></div>
+
+<div class="slot" data-index="1"></div>
+
+<div class="slot" data-index="2"></div>
+
+<div class="slot" data-index="3"></div>
+
+</div>
+
+</div>
+
+<div id="optionsArea">
+
+<div id="optionsContainer"></div>
+
+</div>
+
+</div>
+
+<div id="goodJobScreen">
+
+🌟 GOOD JOB! 🌟
+
+</div>
+
+<div id="confettiContainer"></div>
+
+<div id="finalScreen">
+
+<div id="finalText">
+
+🎉 GREAT JOB! 🎉
+
+</div>
+
+<button id="playAgainBtn">
+
+🔄 PLAY AGAIN
+
+</button>
+
+</div>
+
+<audio id="clapSound" src="assets/clap.mp3"></audio>
+
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<script>   
+ /*==================================================
+ROUND DATA
+==================================================*/
+
+const rounds=[
+{
+title:"Skip Counting by 2",
+question:"Skip count by 2. Drag and drop the given numbers in proper sequence.",
+sequence:[2,4,6,8],
+options:[8,6,2,4],
+shape:"assets/flower.png"
+},
+{
+title:"Skip Counting by 5",
+question:"Skip count by 5. Drag and drop the given numbers in proper sequence.",
+sequence:[5,10,15,20],
+options:[20,10,5,15],
+shape:"assets/circle.png"
+},
+{
+title:"Skip Counting by 10",
+question:"Skip count by 10. Drag and drop the given numbers in proper sequence.",
+sequence:[10,20,30,40],
+options:[20,40,30,10],
+shape:"assets/star.png"
+},
+{
+title:"Skip Counting by 2",
+question:"Skip count by 2. Drag and drop the given numbers in proper sequence.",
+sequence:[12,14,16,18],
+options:[18,12,16,14],
+shape:"assets/purple.png"
+},
+{
+title:"Skip Counting by 5",
+question:"Skip count by 5. Drag and drop the given numbers in proper sequence.",
+sequence:[35,40,45,50],
+options:[45,35,50,40],
+shape:"assets/flower.png"
+},
+{
+title:"Skip Counting by 10",
+question:"Skip count by 10. Drag and drop the given numbers in proper sequence.",
+sequence:[70,80,90,100],
+options:[90,70,100,80],
+shape:"assets/pink.png"
+}
+];
+
+/*==================================================
+ELEMENTS
+==================================================*/
+
+const splashScreen=document.getElementById("splashScreen");
+const startScreen=document.getElementById("startScreen");
+const gameContainer=document.getElementById("gameContainer");
+
+const roundTitle=document.getElementById("roundTitle");
+const questionBox=document.getElementById("questionBox");
+const speakBtn=document.getElementById("speakBtn");
+
+const board=document.getElementById("board");
+const slots=document.querySelectorAll(".slot");
+
+const optionsContainer=document.getElementById("optionsContainer");
+
+const tapStartBtn=document.getElementById("tapStartBtn");
+
+const goodJobScreen=document.getElementById("goodJobScreen");
+
+const finalScreen=document.getElementById("finalScreen");
+const playAgainBtn=document.getElementById("playAgainBtn");
+
+const clapSound=document.getElementById("clapSound");
+const wrongSound=document.getElementById("wrongSound");
+
+const confettiContainer=document.getElementById("confettiContainer");
+
+/*==================================================
+VARIABLES
+==================================================*/
+
+let currentRound=0;
+let nextSlot=0;
+let wrongAttempts=0;
+
+let draggedOption=null;
+let dragClone=null;
+
+/*==================================================
+SPLASH
+==================================================*/
+
+setTimeout(()=>{
+
+splashScreen.style.display="none";
+startScreen.style.display="flex";
+
+},5000);
+
+/*==================================================
+START BUTTON
+==================================================*/
+
+tapStartBtn.onclick=()=>{
+
+startScreen.style.display="none";
+gameContainer.style.display="flex";
+
+loadRound();
+
+};
+
+/*==================================================
+SPEECH
+==================================================*/
+
+function speak(text){
+
+speechSynthesis.cancel();
+
+const msg=new SpeechSynthesisUtterance(text);
+
+msg.rate=.9;
+msg.pitch=1;
+
+speechSynthesis.speak(msg);
+
+}
+
+speakBtn.onclick=()=>{
+
+speak(questionBox.textContent);
+
+};
+
+/*==================================================
+LOAD ROUND
+==================================================*/
+
+function loadRound(){
+
+nextSlot=0;
+wrongAttempts=0;
+
+slots.forEach(slot=>{
+
+slot.textContent="";
+slot.classList.remove("filled");
+
+});
+
+const round=rounds[currentRound];
+
+roundTitle.textContent=round.title;
+questionBox.textContent=round.question;
+
+optionsContainer.innerHTML="";
+
+round.options.forEach(number=>{
+
+const option=document.createElement("div");
+
+option.className="option";
+option.dataset.value=number;
+
+option.innerHTML=`
+<img src="${round.shape}">
+<div class="optionNumber">${number}</div>
+`;
+
+enableDrag(option);
+
+optionsContainer.appendChild(option);
+
+});
+
+setTimeout(()=>{
+
+speak(round.question);
+
+},500);
+
+}
+/*==================================================
+DRAG SYSTEM
+==================================================*/
+
+function enableDrag(option){
+
+/* ---------- DESKTOP ---------- */
+
+option.draggable=true;
+
+option.addEventListener("dragstart",e=>{
+
+draggedOption=option;
+
+e.dataTransfer.setDragImage(option,70,70);
+
+});
+
+option.addEventListener("dragend",()=>{
+
+draggedOption=null;
+
+});
+
+/* ---------- MOBILE ---------- */
+
+option.addEventListener("touchstart",touchStart,{passive:false});
+
+}
+
+function touchStart(e){
+
+e.preventDefault();
+
+draggedOption=e.currentTarget;
+
+dragClone=draggedOption.cloneNode(true);
+
+dragClone.style.position="fixed";
+dragClone.style.pointerEvents="none";
+dragClone.style.width=draggedOption.offsetWidth+"px";
+dragClone.style.height=draggedOption.offsetHeight+"px";
+dragClone.style.opacity=".85";
+dragClone.style.zIndex="99999";
+
+document.body.appendChild(dragClone);
+
+moveClone(e.touches[0]);
+
+document.addEventListener("touchmove",touchMove,{passive:false});
+document.addEventListener("touchend",touchEnd);
+
+}
+
+function touchMove(e){
+
+e.preventDefault();
+
+moveClone(e.touches[0]);
+
+}
+
+function moveClone(touch){
+
+dragClone.style.left=
+(touch.clientX-dragClone.offsetWidth/2)+"px";
+
+dragClone.style.top=
+(touch.clientY-dragClone.offsetHeight/2)+"px";
+
+}
+
+function touchEnd(e){
+
+document.removeEventListener("touchmove",touchMove);
+document.removeEventListener("touchend",touchEnd);
+
+if(dragClone){
+
+dragClone.remove();
+
+dragClone=null;
+
+}
+
+const touch=e.changedTouches[0];
+
+const target=document.elementFromPoint(
+touch.clientX,
+touch.clientY
+);
+
+if(target){
+
+const slot=target.closest(".slot");
+
+if(slot){
+
+handleDrop(draggedOption);
+
+}
+
+}
+
+draggedOption=null;
+
+}
+
+/*==================================================
+DROP TARGETS
+==================================================*/
+
+slots.forEach(slot=>{
+
+slot.addEventListener("dragover",e=>{
+
+e.preventDefault();
+
+});
+
+slot.addEventListener("drop",e=>{
+
+e.preventDefault();
+
+if(draggedOption){
+
+handleDrop(draggedOption);
+
+}
+
+});
+
+});
+
+/*==================================================
+HANDLE DROP
+==================================================*/
+
+function handleDrop(option){
+
+const value=parseInt(option.dataset.value);
+
+const correct=
+rounds[currentRound].sequence[nextSlot];
+
+if(value===correct){
+
+slots[nextSlot].textContent=value;
+
+slots[nextSlot].classList.add("filled");
+
+option.style.visibility="hidden";
+
+nextSlot++;
+
+wrongAttempts=0;
+
+if(nextSlot===4){
+
+roundComplete();
+
+}
+
+}else{
+
+wrongAttempts++;
+
+wrongSound.currentTime=0;
+wrongSound.play();
+
+option.classList.add("shake");
+
+setTimeout(()=>{
+
+option.classList.remove("shake");
+
+},300);
+
+if(wrongAttempts>=2){
+
+showHint();
+
+}
+
+}
+
+}
+
+/*==================================================
+HINT
+==================================================*/
+
+function showHint(){
+
+wrongAttempts=0;
+
+const answer=
+rounds[currentRound].sequence[nextSlot];
+
+document.querySelectorAll(".option").forEach(opt=>{
+
+if(parseInt(opt.dataset.value)===answer){
+
+opt.classList.add("correctGlow");
+
+setTimeout(()=>{
+
+opt.classList.remove("correctGlow");
+
+},2500);
+
+}
+
+});
+
+}
+
+/*==================================================
+ROUND COMPLETE
+==================================================*/
+
+function roundComplete(){
+
+clapSound.currentTime=0;
+clapSound.play();
+
+goodJobScreen.style.display="flex";
+
+setTimeout(()=>{
+
+goodJobScreen.style.display="none";
+
+currentRound++;
+
+if(currentRound>=rounds.length){
+
+finishGame();
+
+}else{
+
+loadRound();
+
+}
+
+},2000);
+
+}
+
+/*==================================================
+CONFETTI
+==================================================*/
+
+function createConfetti(){
+
+confettiContainer.innerHTML="";
+
+const colors=[
+
+"#ff595e",
+"#ffca3a",
+"#8ac926",
+"#1982c4",
+"#6a4c93",
+"#ff85a1"
+
+];
+
+for(let i=0;i<250;i++){
+
+const c=document.createElement("div");
+
+c.className="confetti";
+
+c.style.left=Math.random()*100+"vw";
+
+c.style.background=
+colors[Math.floor(Math.random()*colors.length)];
+
+c.style.animationDuration=
+(3+Math.random()*3)+"s";
+
+confettiContainer.appendChild(c);
+
+}
+
+}
+
+/*==================================================
+FINISH GAME
+==================================================*/
+
+function finishGame(){
+
+createConfetti();
+
+clapSound.currentTime=0;
+clapSound.play();
+
+finalScreen.style.display="flex";
+
+speak("Great Job. You completed all the rounds.");
+
+}
+
+/*==================================================
+PLAY AGAIN
+==================================================*/
+
+playAgainBtn.onclick=()=>{
+
+speechSynthesis.cancel();
+
+confettiContainer.innerHTML="";
+
+finalScreen.style.display="none";
+
+currentRound=0;
+
+gameContainer.style.display="none";
+
+splashScreen.style.display="flex";
+
+setTimeout(()=>{
+
+splashScreen.style.display="none";
+
+startScreen.style.display="flex";
+
+},5000);
+
+};
+</script>
+</body>
+</html>
