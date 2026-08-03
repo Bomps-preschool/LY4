@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>School Puzzle</title>
+<style>
+.rainbowTitle{
+font-size:clamp(40px,7vw,80px);
+font-weight:bold;
+background:linear-gradient(
+90deg,
+#ff595e,
+#ffca3a,
+#8ac926,
+#1982c4,
+#6a4c93
+);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:titleBounce 1.5s infinite;
+}
+
+@keyframes titleBounce{
+50%{
+transform:scale(1.08);
+}
+}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:
+linear-gradient(
+135deg,
+#FFE082 0%,
+#FFD1DC 25%,
+#C8E6C9 50%,
+#BBDEFB 75%,
+#FFF9C4 100%
+);
+text-align:center;
+overflow:hidden;
+}
+#logo,#title,#game,#finish{display:none}
+.screen{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#logo img{max-width:220px;width:45%}
+#schoolWrap{
+position:relative;
+display:inline-block;
+max-width:90vw;
+}
+
+#school{
+max-width:100%;
+max-height:82vh;
+display:block;
+margin:auto;
+}
+
+@media(max-width:768px){
+
+#school{
+max-height:72vh;
+}
+
+.bar{
+margin-top:15px;
+}
+
+.card{
+padding:2px;
+}
+
+.card img{
+width:42px;
+height:42px;
+}
+
+.questionRow h2{
+font-size:18px;
+line-height:1.2;
+}
+
+.hearBtn{
+padding:6px 10px;
+font-size:14px;
+}
+
+} 
+
+.hotspot{position:absolute;border-radius:50%}
+.selected{outline:4px solid orange}
+.found{outline:4px solid #00c853;background:rgba(0,255,0,.2)}
+.bar{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.card{border:2px solid #ccc;border-radius:10px;padding:4px;background:#fff;cursor:pointer}
+.card img{width:40px;height:40px;object-fit:contain}
+.done{opacity:.4}
+.playAgainBtn{
+padding:18px 40px;
+font-size:30px;
+font-weight:bold;
+border:none;
+border-radius:20px;
+cursor:pointer;
+color:white;
+background:
+linear-gradient(
+135deg,
+#ff6b6b,
+#ffb347,
+#4ecdc4
+);
+box-shadow:0 6px 15px rgba(0,0,0,.25);
+animation:pulseBtn 1.5s infinite;
+}
+
+@keyframes pulseBtn{
+50%{
+transform:scale(1.08);
+}
+}
+.confetti{
+position:fixed;
+width:12px;
+height:12px;
+top:-20px;
+animation:fall 4s linear forwards;
+pointer-events:none;
+z-index:999; 
+}
+
+@keyframes fall{
+to{
+transform:
+translateY(110vh)
+rotate(720deg);
+opacity:0;
+}
+}
+.questionRow{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+margin:8px 0;
+}
+
+.questionRow h2{
+margin:0;
+font-size:clamp(16px,2vw,28px);
+}
+
+.hearBtn{
+padding:8px 14px;
+font-size:16px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+background:#4FC3F7;
+color:white;
+font-weight:bold;
+box-shadow:0 2px 6px rgba(0,0,0,.2);
+}
+
+.hearBtn:hover{
+transform:scale(1.05);
+} 
+</style>
+</head>
+<body>
+
+<div id="logo" class="screen"><img src="assets/innovine-logo.png"></div>
+<div id="title" class="screen"><h1 class="rainbowTitle">School Puzzle</h1></div>
+
+<div id="game">
+<div class="questionRow">
+<h2>Tap an object below and then find and tap the same object in the picture.</h2>
+
+<button class="hearBtn" onclick="speak(instr)">
+🔊 Hear Again
+</button>
+</div>
+<div id="schoolWrap">
+<img id="school" src="assets/school.png">
+<div class="hotspot" data-id="pear" style="left:7%;top:7%;width:12%;height:14%"></div>
+<div class="hotspot" data-id="bottle" style="left:83%;top:25%;width:10%;height:14%"></div>
+<div class="hotspot" data-id="ball" style="left:10%;top:42%;width:12%;height:12%"></div>
+<div class="hotspot" data-id="schoolbag" style="left:42%;top:63%;width:14%;height:18%"></div>
+<div class="hotspot" data-id="watercan" style="left:73%;top:66%;width:15%;height:15%"></div>
+<div class="hotspot" data-id="pencil" style="left:2%;top:82%;width:12%;height:12%"></div>
+<div class="hotspot" data-id="scissors" style="left:12%;top:83%;width:14%;height:14%"></div>
+<div class="hotspot" data-id="paintbrush" style="left:66%;top:88%;width:10%;height:8%"></div>
+<div class="hotspot" data-id="crayonbox" style="left:79%;top:82%;width:16%;height:14%"></div>
+</div>
+<div class="bar" id="bar"></div>
+<audio id="correct" src="assets/correct.mp3"></audio>
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+<audio id="clap" src="assets/freesound_community-claps-44774.mp3"></audio>
+</div>
+
+<div id="finish" class="screen">
+<h1 class="rainbowTitle">🎉 Great Job! 🎉</h1>
+<button class="playAgainBtn"
+onclick="location.reload()">
+🎮 Play Again
+</button>
+</div>
+
+<script>
+const instr="Tap an object below and then find and tap the same object in the picture.";
+const objs=["ball","bottle","crayonbox","paintbrush","pear","pencil","schoolbag","scissors","watercan"];
+let selected=null, found=0;
+
+function speak(t){
+ if(!window.speechSynthesis) return;
+ speechSynthesis.cancel();
+ speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+}
+
+objs.forEach(o=>{
+ let d=document.createElement("div");
+ d.className="card";
+ d.id="card-"+o;
+ d.innerHTML=`<img src="assets/${o}.png">`;
+ d.onclick=()=>{
+   if(d.classList.contains("done")) return;
+   document.querySelectorAll(".card").forEach(c=>c.classList.remove("selected"));
+   d.classList.add("selected");
+   selected=o;
+   speak(
+"Find the " +
+o.replace("crayonbox","crayon box")
+.replace("schoolbag","school bag")
+.replace("paintbrush","paint brush")
+.replace("watercan","water can")
+);
+ };
+ document.getElementById("bar").appendChild(d);
+});
+
+document.querySelectorAll(".hotspot").forEach(h=>{
+ h.onclick=()=>{
+   if(!selected){speak("Tap an object below first"); return;}
+   if(h.dataset.id===selected){
+      h.classList.add("found");
+      document.getElementById("card-"+selected).classList.add("done");
+      correct.play(); clap.play();
+      found++;
+      selected=null;
+      document.querySelectorAll(".card").forEach(c=>c.classList.remove("selected"));
+      if(found===9){
+
+document.getElementById("game").style.display="none";
+document.getElementById("finish").style.display="flex";
+
+createConfetti();
+
+speak(
+"Fantastic! You found all the hidden objects!"
+);
+}
+   }else{
+      wrong.play();
+   }
+ };
+});
+
+document.getElementById("logo").style.display="flex";
+
+setTimeout(()=>{
+document.getElementById("logo").style.display="none";
+document.getElementById("title").style.display="flex";
+},5000);
+
+setTimeout(()=>{
+document.getElementById("title").style.display="none";
+document.getElementById("game").style.display="block";
+
+speak(
+"Tap an object below and then find and tap the same object in the picture."
+);
+
+},10000);
+
+function createConfetti(){
+
+for(let i=0;i<120;i++){
+
+const c=document.createElement("div");
+
+c.className="confetti";
+
+c.style.left=Math.random()*100+"vw";
+
+c.style.background=
+`hsl(${Math.random()*360},90%,60%)`;
+
+c.style.animationDelay = Math.random()*2 + "s";
+
+document.body.appendChild(c);
+
+setTimeout(()=>{
+c.remove();
+},5000);
+
+}
+
+}
+</script>
+</body>
+</html>
