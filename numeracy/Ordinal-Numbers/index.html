@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Pet Parade</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+body{
+font-family:Arial,sans-serif;
+height:100vh;
+overflow:hidden;
+background:url('assets/racetrack.png') center center/cover no-repeat;
+}
+
+/* LOGO */
+
+#logoScreen{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(to bottom,#ffe38a,#ffd1ea,#aee7ff);
+z-index:9999;
+}
+
+#logoScreen img{
+width:min(280px,70vw);
+animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+
+/* TITLE */
+
+#titleScreen{
+position:fixed;
+inset:0;
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:24px;
+background:linear-gradient(to bottom,#ffe38a,#ffd1ea,#aee7ff);
+text-align:center;
+padding:20px;
+}
+
+.title{
+font-size:clamp(40px,7vw,70px);
+font-weight:bold;
+color:#ff4f8b;
+text-shadow:3px 3px white;
+}
+
+.subTitle{
+font-size:clamp(22px,4vw,38px);
+font-weight:bold;
+color:#5c47ff;
+}
+
+.startBtn{
+padding:16px 34px;
+font-size:26px;
+border:none;
+border-radius:20px;
+background:#ff9c3f;
+color:white;
+font-weight:bold;
+cursor:pointer;
+box-shadow:0 5px 0 #d6761e;
+}
+
+/* GAME */
+
+#gameContainer{
+height:100vh;
+display:none;
+flex-direction:column;
+align-items:center;
+padding:6px;
+overflow:hidden;
+}
+
+.header{
+text-align:center;
+}
+
+.header h1{
+font-size:clamp(34px,6vw,58px);
+color:#ff4f8b;
+text-shadow:3px 3px white;
+}
+
+.roundText{
+font-size:clamp(16px,2vw,24px);
+font-weight:bold;
+color:#5c47ff;
+margin-top:2px;
+}
+
+/* QUESTION BOX */
+
+.questionBox{
+width:78%;
+max-width:620px;
+background:
+linear-gradient(135deg,
+#fff0a6,
+#ffd6f0,
+#c8f1ff);
+border-radius:20px;
+padding:6px 10px;
+margin-top:4px;
+text-align:center;
+box-shadow:0 4px 10px rgba(0,0,0,0.10);
+border:2px solid white;
+}
+
+.question{
+font-size:clamp(16px,1.8vw,24px);
+font-weight:bold;
+line-height:1.3;
+background:
+linear-gradient(90deg,
+#ff4f8b,
+#ff9800,
+#5c47ff,
+#00a86b);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.listenBtn{
+margin-top:8px;
+padding:8px 16px;
+font-size:16px;
+border:none;
+border-radius:14px;
+background:#58c7ff;
+color:white;
+font-weight:bold;
+}
+
+/* PARADE */
+
+.paradeArea{
+flex:1;
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+padding:0 4px;
+}
+
+.paradeRow{
+width:100%;
+max-width:1300px;
+background:#ffffffdd;
+border-radius:28px;
+padding:8px 4px;
+display:flex;
+justify-content:space-evenly;
+align-items:center;
+gap:2px;
+box-shadow:0 6px 18px rgba(0,0,0,0.12);
+}
+
+.petBox{
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+padding:3px;
+border-radius:16px;
+transition:0.2s;
+}
+
+.petBox img{
+width:82px;
+height:82px;
+object-fit:contain;
+}
+
+/* FEEDBACK */
+
+.feedback{
+height:38px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
+font-weight:bold;
+color:#24a148;
+}
+
+/* WRONG */
+
+.wiggle{
+animation:wiggle 0.35s;
+}
+
+@keyframes wiggle{
+0%{transform:translateX(0);}
+25%{transform:translateX(-5px);}
+50%{transform:translateX(5px);}
+75%{transform:translateX(-5px);}
+100%{transform:translateX(0);}
+}
+
+/* GLOW */
+
+.correctGlow{
+animation:glow 1s infinite;
+border-radius:18px;
+}
+
+@keyframes glow{
+0%{
+box-shadow:0 0 0 gold;
+}
+50%{
+box-shadow:0 0 18px gold;
+}
+100%{
+box-shadow:0 0 0 gold;
+}
+}
+
+/* END */
+
+#endScreen{
+position:fixed;
+inset:0;
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:linear-gradient(to bottom,#ffe38a,#ffd1ea,#aee7ff);
+gap:20px;
+text-align:center;
+}
+
+#endScreen h2{
+font-size:clamp(40px,7vw,70px);
+color:#ff4f8b;
+}
+
+#endScreen p{
+font-size:clamp(24px,4vw,40px);
+font-weight:bold;
+color:#5c47ff;
+}
+
+/* CONFETTI */
+
+.confetti{
+position:fixed;
+width:14px;
+height:14px;
+border-radius:50%;
+top:-20px;
+animation:fall linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(110vh) rotate(720deg);
+}
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.questionBox{
+width:92%;
+padding:5px 8px;
+}
+
+.petBox img{
+width:48px;
+height:48px;
+}
+
+.question{
+font-size:15px;
+}
+
+.listenBtn{
+font-size:14px;
+padding:7px 12px;
+}
+
+.paradeRow{
+padding:6px 2px;
+}
+
+}
+
+@media(max-width:500px){
+
+.petBox img{
+width:40px;
+height:40px;
+}
+
+.questionBox{
+width:96%;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<audio id="rightSound" src="assets/correct.mp3"></audio>
+<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+<audio id="clapSound"
+src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<!-- LOGO -->
+
+<div id="logoScreen">
+<img src="assets/innovine-logo.png">
+</div>
+
+<!-- TITLE -->
+
+<div id="titleScreen">
+
+<div class="title">Pet Parade</div>
+
+<div class="subTitle">
+Ordinal Numbers Game
+</div>
+
+<button class="startBtn"
+onclick="startGame()">
+Start Game
+</button>
+
+</div>
+
+<!-- GAME -->
+
+<div id="gameContainer">
+
+<div class="header">
+
+<h1>Pet Parade</h1>
+
+<div class="roundText"
+id="roundText"></div>
+
+</div>
+
+<div class="questionBox">
+
+<div class="question"
+id="questionText"></div>
+
+<button class="listenBtn"
+onclick="speakQuestion()">
+🔊 Hear Again
+</button>
+
+</div>
+
+<div class="paradeArea">
+
+<div class="paradeRow"
+id="paradeRow"></div>
+
+</div>
+
+<div class="feedback"
+id="feedback"></div>
+
+</div>
+
+<!-- END -->
+
+<div id="endScreen">
+
+<h2>🎉 Great Job! 🎉</h2>
+
+<p>You completed all the rounds!</p>
+
+<button class="startBtn"
+onclick="restartGame()">
+Play Again
+</button>
+
+</div>
+
+<script>
+
+/* PETS */
+
+const pets = [
+
+{ name:"Dog", image:"assets/dog.png" },
+{ name:"Cat", image:"assets/cat.png" },
+{ name:"Bunny", image:"assets/bunny.png" },
+{ name:"Turtle", image:"assets/turtle.png" },
+{ name:"Bird", image:"assets/bird.png" },
+{ name:"Hamster", image:"assets/hamster.png" },
+{ name:"Fish", image:"assets/fish.png" },
+{ name:"Guinea Pig", image:"assets/guineapig.png" },
+{ name:"Hedgehog", image:"assets/hedgehog.png" },
+{ name:"Puppy", image:"assets/puppy.png" }
+
+];
+
+const ordinals = [
+"1st","2nd","3rd","4th","5th",
+"6th","7th","8th","9th","10th"
+];
+
+/* FIXED QUESTION ORDER */
+
+const questionOrder =
+[3,4,9,6,0,5,1,8,2,7];
+
+let currentRound = 0;
+let wrongAttempts = 0;
+
+const paradeRow =
+document.getElementById("paradeRow");
+
+const questionText =
+document.getElementById("questionText");
+
+const feedback =
+document.getElementById("feedback");
+
+const roundText =
+document.getElementById("roundText");
+
+/* LOGO */
+
+window.onload = ()=>{
+
+setTimeout(()=>{
+
+document.getElementById("logoScreen")
+.style.display="none";
+
+document.getElementById("titleScreen")
+.style.display="flex";
+
+},5000);
+
+};
+
+/* START */
+
+function startGame(){
+
+document.getElementById("titleScreen")
+.style.display="none";
+
+document.getElementById("gameContainer")
+.style.display="flex";
+
+currentRound=0;
+
+loadRound();
+
+}
+
+/* LOAD ROUND */
+
+function loadRound(){
+
+wrongAttempts=0;
+
+feedback.innerHTML="";
+
+paradeRow.innerHTML="";
+
+const correctPosition =
+questionOrder[currentRound];
+
+roundText.innerHTML =
+`Round ${currentRound+1} / 10`;
+
+questionText.innerHTML =
+`Who is in the ${ordinals[correctPosition]} place?`;
+
+speakQuestion();
+
+/* SHOW PETS */
+
+pets.forEach((pet,index)=>{
+
+const petBox =
+document.createElement("div");
+
+petBox.classList.add("petBox");
+
+petBox.innerHTML =
+`<img src="${pet.image}">`;
+
+petBox.addEventListener("click",()=>{
+
+checkAnswer(index,petBox);
+
+});
+
+paradeRow.appendChild(petBox);
+
+});
+
+}
+
+/* CHECK ANSWER */
+
+function checkAnswer(index,box){
+
+const correctPosition =
+questionOrder[currentRound];
+
+if(index===correctPosition){
+
+box.classList.add("correctGlow");
+
+document.getElementById("rightSound")
+.play();
+
+document.getElementById("clapSound")
+.play();
+
+feedback.innerHTML =
+"✅ Good Job!";
+
+setTimeout(()=>{
+
+currentRound++;
+
+if(currentRound>=10){
+
+endGame();
+
+}else{
+
+loadRound();
+
+}
+
+},1600);
+
+}else{
+
+wrongAttempts++;
+
+document.getElementById("wrongSound")
+.play();
+
+box.classList.add("wiggle");
+
+setTimeout(()=>{
+box.classList.remove("wiggle");
+},400);
+
+if(wrongAttempts>=2){
+
+document.querySelectorAll(".petBox")
+[correctPosition]
+.classList.add("correctGlow");
+
+}
+
+}
+
+}
+
+/* VOICE */
+
+function speakQuestion(){
+
+speechSynthesis.cancel();
+
+const correctPosition =
+questionOrder[currentRound];
+
+const speech =
+new SpeechSynthesisUtterance(
+
+`Who is in the ${ordinals[correctPosition]} place?`
+
+);
+
+speech.rate=0.9;
+speech.pitch=1;
+
+speechSynthesis.speak(speech);
+
+}
+
+/* END */
+
+function endGame(){
+
+document.getElementById("gameContainer")
+.style.display="none";
+
+document.getElementById("endScreen")
+.style.display="flex";
+
+createConfetti();
+
+}
+
+/* CONFETTI */
+
+function createConfetti(){
+
+for(let i=0;i<120;i++){
+
+const confetti =
+document.createElement("div");
+
+confetti.classList.add("confetti");
+
+confetti.style.left =
+Math.random()*100+"vw";
+
+confetti.style.background =
+["#ff4f8b","#ff9800",
+"#5c47ff","#00c2ff",
+"#78d64b"]
+[Math.floor(Math.random()*5)];
+
+confetti.style.animationDuration =
+(Math.random()*3+2)+"s";
+
+document.body.appendChild(confetti);
+
+setTimeout(()=>{
+confetti.remove();
+},5000);
+
+}
+
+}
+
+/* RESTART */
+
+function restartGame(){
+
+document.getElementById("endScreen")
+.style.display="none";
+
+document.getElementById("gameContainer")
+.style.display="flex";
+
+currentRound=0;
+
+loadRound();
+
+}
+
+</script>
+
+</body>
+</html>
