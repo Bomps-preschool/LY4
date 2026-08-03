@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>State of Water</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:'Baloo 2',cursive;
+
+background:
+radial-gradient(circle at top,#FFF9C4 0%,transparent 35%),
+radial-gradient(circle at bottom right,#BBDEFB 0%,transparent 35%),
+linear-gradient(135deg,#FFF8E1,#E1F5FE,#E8F5E9);
+
+}
+
+body{
+
+display:flex;
+
+justify-content:center;
+
+align-items:flex-start;
+
+}
+
+#game{
+
+width:100vw;
+height:100vh;
+
+display:flex;
+
+justify-content:flex-start;
+
+align-items:flex-start;
+
+position:relative;
+
+overflow:hidden;
+
+}
+/*------------------------------------------------*/
+
+.screen{
+
+position:absolute;
+inset:0;
+
+display:flex;
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+}
+
+/*---------------- Logo ----------------*/
+
+#logoScreen{
+
+background:white;
+z-index:50;
+
+}
+
+#logo{
+
+width:min(70vw,340px);
+
+animation:logoPop 1s ease infinite alternate;
+
+}
+
+@keyframes logoPop{
+
+from{
+
+transform:scale(.96);
+
+}
+
+to{
+
+transform:scale(1.04);
+
+}
+
+}
+
+/*--------------- Title Screen ----------------*/
+
+#titleScreen{
+
+display:none;
+
+background:
+
+linear-gradient(135deg,
+#FFF8E1,
+#E1F5FE,
+#E8F5E9);
+
+}
+
+#gameTitle{
+
+font-size:clamp(34px,6vw,62px);
+
+font-weight:800;
+
+background:
+
+linear-gradient(90deg,
+
+#EF5350,
+#FFA726,
+#66BB6A,
+#29B6F6,
+#AB47BC);
+
+-webkit-background-clip:text;
+
+color:transparent;
+
+animation:titleFlash .8s infinite alternate;
+
+text-align:center;
+
+}
+
+@keyframes titleFlash{
+
+from{
+
+transform:scale(1);
+
+}
+
+to{
+
+transform:scale(1.05);
+
+}
+
+}
+
+#startBtn{
+
+margin-top:35px;
+
+padding:18px 45px;
+
+border:none;
+
+border-radius:50px;
+
+font-size:clamp(22px,3vw,30px);
+
+font-weight:800;
+
+background:#FF9800;
+
+color:white;
+
+cursor:pointer;
+
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+animation:pulse 1.2s infinite;
+
+}
+
+@keyframes pulse{
+
+0%{
+
+transform:scale(1);
+
+}
+
+50%{
+
+transform:scale(1.08);
+
+}
+
+100%{
+
+transform:scale(1);
+
+}
+
+}
+
+/*---------------- Game Screen ----------------*/
+
+#playScreen{
+
+display:none;
+
+padding:0 1vw 0;
+
+justify-content:flex-start;
+
+}
+
+h1{
+
+text-align:center;
+
+font-size:clamp(28px,5vw,46px);
+
+font-weight:800;
+
+margin:0; /* Add this line */
+
+background:
+
+linear-gradient(90deg,
+
+#EF5350,
+#FFA726,
+#66BB6A,
+#29B6F6,
+#AB47BC);
+
+-webkit-background-clip:text;
+
+color:transparent;
+
+}
+
+#question{
+
+flex:1;
+
+font-size:clamp(18px,2vw,24px);
+
+font-weight:700;
+
+color:#E53935;
+
+}
+
+ #questionBar{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:10px;
+
+margin:0 10px 4px;
+
+}
+
+.smallBtn{
+
+width:42px;
+
+height:42px;
+
+padding:0;
+
+border:none;
+
+border-radius:50%;
+
+background:#29B6F6;
+
+color:white;
+
+font-size:22px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+cursor:pointer;
+
+flex-shrink:0;
+
+}
+
+/*------------- Sorting Rows ------------*/
+
+/*================ Sorting Area ================*/
+
+#rows{
+
+margin-top:.3vh;
+
+display:flex;
+flex-direction:column;
+
+gap:2vh;
+
+height:58vh;
+
+width:96%;
+
+margin-left:auto;
+margin-right:auto;
+
+}
+
+.dropRow{
+
+display:flex;
+
+align-items:center;
+
+height:16vh;
+
+background:rgba(255,255,255,.55);
+
+border:3px solid #666;
+
+border-radius:28px;
+
+padding:10px 14px;
+
+box-shadow:0 5px 12px rgba(0,0,0,.15);
+
+}
+
+/*================ Left Picture =================*/
+
+.labelBox{
+
+width:170px;
+
+height:100%;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+flex-shrink:0;
+
+background:white;
+
+border-radius:20px;
+
+border:2px solid #cccccc;
+
+}
+
+.labelBox img{
+
+width:90%;
+
+height:90%;
+
+object-fit:contain;
+
+}
+
+/*================ Large Drop Area =================*/
+
+.dropZone{
+
+flex:1;
+
+height:100%;
+
+margin-left:18px;
+
+border:4px dashed #4CAF50;
+
+border-radius:22px;
+
+background:rgba(255,255,255,.8);
+
+display:flex;
+
+align-items:center;
+
+justify-content:flex-start;
+
+gap:12px;
+
+padding:10px 15px;
+
+overflow-x:auto;
+
+overflow-y:hidden;
+
+}
+
+ .dropZone .card{
+
+width:58px;
+
+height:58px;
+
+margin:0;
+
+flex-shrink:0;
+
+background:white;
+
+border-radius:12px;
+
+padding:3px;
+
+box-shadow:0 2px 6px rgba(0,0,0,.15);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+.dropZone .card img{
+
+width:100%;
+
+height:100%;
+
+object-fit:contain;
+
+}
+
+.dropZone.correct{
+
+border-color:#4CAF50;
+
+background:#E8F5E9;
+
+}
+
+/*-------------- Draggable Images ----------------*/
+
+#options{
+
+margin-top:1vh;
+
+height:20vh;
+
+display:flex;
+
+flex-wrap:wrap;
+
+justify-content:center;
+
+align-items:center;
+
+gap:12px;
+
+}
+
+.card{
+
+width:min(15vw,95px);
+
+height:min(15vw,95px);
+
+cursor:pointer;
+
+touch-action:none;
+
+transition:.25s;
+
+}
+
+.card:hover{
+
+transform:scale(1.08);
+
+}
+
+.card img{
+
+width:100%;
+height:100%;
+object-fit:contain;
+
+pointer-events:none;
+
+}
+
+/*--------------- Overlay ----------------*/
+
+#finish{
+
+position:absolute;
+inset:0;
+
+display:none;
+
+justify-content:center;
+align-items:center;
+flex-direction:column;
+
+background:linear-gradient(
+135deg,
+#FFF8E1,
+#E1F5FE,
+#E8F5E9);
+
+backdrop-filter:blur(2px);
+
+z-index:90;
+
+}
+
+#excellent{
+
+font-size:clamp(40px,7vw,72px);
+
+font-weight:800;
+
+background:linear-gradient(
+90deg,
+#FF5252,
+#FF9800,
+#FFD600,
+#4CAF50,
+#29B6F6,
+#7E57C2,
+#EC407A);
+
+-webkit-background-clip:text;
+
+color:transparent;
+
+animation:bounce .8s infinite alternate;
+
+text-shadow:3px 3px 8px rgba(0,0,0,.2);
+
+}
+
+@keyframes bounce{
+
+from{
+
+transform:translateY(0);
+
+}
+
+to{
+
+transform:translateY(-10px);
+
+}
+
+} 
+
+#playAgain{
+
+padding:18px 50px;
+
+border:none;
+
+border-radius:60px;
+
+font-size:28px;
+
+font-weight:800;
+
+background:linear-gradient(
+45deg,
+#4CAF50,
+#81C784);
+
+color:white;
+
+cursor:pointer;
+
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+transition:.3s;
+
+}
+
+#playAgain:hover{
+
+transform:scale(1.08);
+
+}
+
+canvas{
+
+position:absolute;
+
+inset:0;
+
+pointer-events:none;
+
+z-index:100;
+
+}
+
+/*-------------- Mobile ----------------*/
+
+@media(max-width:700px){
+
+#rows{
+
+height:47vh;
+
+gap:1.5vh;
+
+}
+
+.dropRow{
+
+height:15vh;
+
+padding:6px;
+
+}
+
+.labelBox{
+
+width:90px;
+
+}
+
+.dropZone{
+
+margin-left:8px;
+
+padding:6px;
+
+}
+
+.card{
+
+width:68px;
+
+height:68px;
+
+}
+
+h1{
+
+font-size:28px;
+
+margin:2px 0;
+
+}
+
+#questionBar{
+
+gap:6px;
+
+margin:2px 6px 6px;
+
+}
+
+#question{
+
+font-size:14px;
+
+line-height:1.2;
+
+text-align:left;
+
+margin:0;
+
+}
+
+.smallBtn{
+
+width:36px;
+
+height:36px;
+
+padding:0;
+
+font-size:18px;
+
+margin:0;
+
+}
+
+}
+
+/*------------- Correct Drop Highlight -------------*/
+
+.dropZone.correct{
+
+border-color:#4CAF50;
+
+background:#E8F5E9;
+
+}
+
+/*------------- Wrong Drop Flash -------------*/
+
+.shake{
+
+animation:shake .35s;
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+25%{transform:translateX(-5px);}
+50%{transform:translateX(5px);}
+75%{transform:translateX(-5px);}
+100%{transform:translateX(0);}
+
+}
+
+/*------------- Draggable while dragging -------------*/
+
+.dragging{
+
+opacity:.8;
+
+transform:scale(1.08);
+
+}
+
+/*------------- Prevent image selection -------------*/
+
+img{
+
+user-select:none;
+-webkit-user-drag:none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="game">
+
+<!-- ================= Logo Screen ================= -->
+
+<div
+id="logoScreen"
+class="screen">
+
+<img
+id="logo"
+src="assets/innovine-logo.png">
+
+</div>
+
+<!-- ================= Title Screen ================= -->
+
+<div
+id="titleScreen"
+class="screen">
+
+<h1 id="gameTitle">
+
+State of Water
+
+</h1>
+
+<button id="startBtn">
+
+Tap to Start
+
+</button>
+
+</div>
+
+<!-- ================= Game Screen ================= -->
+
+<div
+id="playScreen"
+class="screen">
+
+<h1>
+
+State of Water
+
+</h1>
+
+<div id="questionBar">
+
+<div id="question">
+
+Look at each picture below. Drag and drop it to the correct state of water.
+
+</div>
+
+<button id="speakBtn" class="smallBtn">🔊</button>
+
+</div>
+
+<!-- ================= Rows ================= -->
+
+<div id="rows">
+
+<!-- SOLID -->
+
+<div class="dropRow">
+
+<div class="labelBox">
+
+<img src="assets/solid.png">
+
+</div>
+
+<div
+class="dropZone"
+id="solidZone"
+data-state="solid">
+
+</div>
+
+</div>
+
+<!-- LIQUID -->
+
+<div class="dropRow">
+
+<div class="labelBox">
+
+<img src="assets/liquid.png">
+
+</div>
+
+<div
+class="dropZone"
+id="liquidZone"
+data-state="liquid">
+
+</div>
+
+</div>
+
+<!-- GAS -->
+
+<div class="dropRow">
+
+<div class="labelBox">
+
+<img src="assets/gas.png">
+
+</div>
+
+<div
+class="dropZone"
+id="gasZone"
+data-state="gas">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================= Option Images ================= -->
+
+<div id="options">
+
+<div
+class="card"
+draggable="true"
+data-answer="liquid">
+
+<img src="assets/waterglass.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="gas">
+
+<img src="assets/boilwater.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="solid">
+
+<img src="assets/icecube.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="solid">
+
+<img src="assets/igloo.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="gas">
+
+<img src="assets/soup.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="liquid">
+
+<img src="assets/tub.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="gas">
+
+<img src="assets/boiledwater.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="solid">
+
+<img src="assets/snowman.png">
+
+</div>
+
+<div
+class="card"
+draggable="true"
+data-answer="liquid">
+
+<img src="assets/tap.png">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================= Finish Screen ================= -->
+
+<div id="finish">
+
+<h2 id="excellent">
+
+🎉 Excellent! 🎉
+ 
+</h2>
+
+<button id="playAgain">
+
+Play Again
+
+</button>
+
+</div>
+
+<!-- ================= Confetti ================= -->
+
+<canvas id="confetti"></canvas>
+
+<!-- ================= Audio ================= -->
+
+<audio
+id="clap"
+src="assets/clap.mp3">
+
+</audio>
+
+<script>
+ //==================== Screens ====================
+
+const logoScreen=document.getElementById("logoScreen");
+const titleScreen=document.getElementById("titleScreen");
+const playScreen=document.getElementById("playScreen");
+const finish=document.getElementById("finish");
+
+const startBtn=document.getElementById("startBtn");
+const playAgain=document.getElementById("playAgain");
+
+const clap=document.getElementById("clap");
+
+const speakBtn=document.getElementById("speakBtn");
+
+const options=document.getElementById("options");
+
+const dropZones=document.querySelectorAll(".dropZone");
+
+let dragged=null;
+
+const question=
+"Look at each picture below. Drag and drop it to the correct state of water.";
+
+
+//==================== Intro ====================
+
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+titleScreen.style.display="flex";
+
+},5000);
+
+
+//==================== Voice ====================
+
+function speak(text){
+
+speechSynthesis.cancel();
+
+const msg=new SpeechSynthesisUtterance(text);
+
+msg.lang="en-IN";
+
+msg.rate=.9;
+
+msg.pitch=1;
+
+speechSynthesis.speak(msg);
+
+}
+
+speakBtn.onclick=()=>speak(question);
+
+
+//==================== Start Game ====================
+
+startBtn.onclick=()=>{
+
+titleScreen.style.display="none";
+
+playScreen.style.display="flex";
+
+speak(question);
+
+};
+
+
+//==================== Desktop Drag ====================
+
+document.querySelectorAll(".card").forEach(card=>{
+
+card.addEventListener("dragstart",()=>{
+
+dragged=card;
+
+card.classList.add("dragging");
+
+});
+
+card.addEventListener("dragend",()=>{
+
+card.classList.remove("dragging");
+
+});
+
+});
+
+dropZones.forEach(zone=>{
+
+zone.addEventListener("dragover",e=>{
+
+e.preventDefault();
+
+});
+
+zone.addEventListener("drop",e=>{
+
+e.preventDefault();
+
+dropCard(zone,dragged);
+
+});
+
+});
+
+
+//==================== Mobile Drag ====================
+
+let activeCard=null;
+
+let offsetX=0;
+let offsetY=0;
+
+document.querySelectorAll(".card").forEach(card=>{
+
+card.addEventListener("touchstart",e=>{
+
+activeCard=card;
+
+const t=e.touches[0];
+
+const r=card.getBoundingClientRect();
+
+offsetX=t.clientX-r.left;
+
+offsetY=t.clientY-r.top;
+
+card.style.position="fixed";
+
+card.style.zIndex="999";
+
+});
+
+card.addEventListener("touchmove",e=>{
+
+if(!activeCard)return;
+
+const t=e.touches[0];
+
+activeCard.style.left=(t.clientX-offsetX)+"px";
+
+activeCard.style.top=(t.clientY-offsetY)+"px";
+
+});
+
+card.addEventListener("touchend",e=>{
+
+if(!activeCard)return;
+
+const touch=e.changedTouches[0];
+
+let placed=false;
+
+dropZones.forEach(zone=>{
+
+const r=zone.getBoundingClientRect();
+
+if(
+
+touch.clientX>r.left &&
+touch.clientX<r.right &&
+touch.clientY>r.top &&
+touch.clientY<r.bottom
+
+){
+
+dropCard(zone,activeCard);
+
+placed=true;
+
+}
+
+});
+
+activeCard.style.position="";
+
+activeCard.style.left="";
+
+activeCard.style.top="";
+
+activeCard.style.zIndex="";
+
+activeCard=null;
+
+});
+
+});
+
+
+//==================== Drop Logic ====================
+
+function dropCard(zone,card){
+
+if(!card)return;
+
+if(card.dataset.answer===zone.dataset.state){
+
+zone.appendChild(card);
+
+card.draggable=false;
+
+card.style.cursor="default";
+
+zone.classList.add("correct");
+
+checkFinish();
+
+}
+
+else{
+
+zone.classList.add("shake");
+
+setTimeout(()=>{
+
+zone.classList.remove("shake");
+
+},350);
+
+new Audio("assets/wrong.mp3").play();
+
+}
+
+}
+//==================== Finish Check ====================
+
+function checkFinish(){
+
+const remaining=document.querySelectorAll("#options .card").length;
+
+if(remaining===0){
+
+setTimeout(finishGame,500);
+
+}
+
+}
+
+
+//==================== Finish Game ====================
+
+function finishGame(){
+
+speechSynthesis.cancel();
+
+clap.currentTime=0;
+clap.play();
+
+startConfetti();
+setTimeout(stopConfetti,5000);
+ 
+playScreen.style.display="none";   // Hide the game
+
+finish.style.display="flex";
+
+}
+
+
+//==================== Play Again ====================
+
+playAgain.onclick=()=>{
+
+stopConfetti();
+
+finish.style.display="none";
+
+titleScreen.style.display="none";
+
+speechSynthesis.cancel();
+
+logoScreen.style.display="flex";
+
+// Move all cards back
+
+const cards=[
+
+...document.querySelectorAll(".card")
+
+];
+
+cards.forEach(card=>{
+
+card.style.position="";
+card.style.left="";
+card.style.top="";
+card.style.zIndex=""; 
+
+card.draggable=true;
+
+card.style.cursor="pointer";
+
+options.appendChild(card);
+
+});
+
+dropZones.forEach(zone=>{
+
+zone.classList.remove("correct");
+
+});
+
+// Restart intro
+
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+
+titleScreen.style.display="flex";
+
+},5000);
+
+};
+
+
+//==================== Confetti ====================
+
+const canvas=document.getElementById("confetti");
+
+const ctx=canvas.getContext("2d");
+
+let pieces=[];
+
+let animation=null;
+
+function resizeCanvas(){
+
+canvas.width=window.innerWidth;
+
+canvas.height=window.innerHeight;
+
+}
+
+window.addEventListener("resize",resizeCanvas);
+
+resizeCanvas();
+
+function random(min,max){
+
+return Math.random()*(max-min)+min;
+
+}
+
+function startConfetti(){
+
+pieces=[];
+
+for(let i=0;i<350;i++){
+
+pieces.push({
+
+x:random(0,canvas.width),
+
+y:random(-canvas.height,0),
+
+r:random(8,16),
+
+dx:random(-2,2),
+
+dy:random(5,10),
+
+rot:random(0,360),
+
+dr:random(-5,5)
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+for(let p of pieces){
+
+ctx.save();
+
+ctx.translate(p.x,p.y);
+
+ctx.rotate(p.rot*Math.PI/180);
+
+ctx.fillStyle=
+
+"hsla("+
+
+Math.floor(random(0,360))
+
++",80%,60%,1)";
+
+ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
+
+ctx.restore();
+
+p.x+=p.dx;
+
+p.y+=p.dy;
+
+p.rot+=p.dr;
+
+if(p.y>canvas.height){
+
+p.y=-10;
+
+p.x=random(0,canvas.width);
+
+}
+
+}
+
+animation=requestAnimationFrame(animateConfetti);
+
+}
+
+function stopConfetti(){
+
+cancelAnimationFrame(animation);
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+}
+
+
+//==================== Prevent Scrolling While Dragging ====================
+
+document.addEventListener("touchmove",function(e){
+
+if(activeCard){
+
+e.preventDefault();
+
+}
+
+},{passive:false});
+
+</script>
+
+</body>
+
+</html>  
