@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>Machine in Action</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:'Baloo 2',cursive;
+background:#FFF9EE;
+}
+
+/*------------------------------------*/
+/* Background */
+/*------------------------------------*/
+
+body{
+
+background:
+radial-gradient(circle at 15% 20%,#FFE082 0%,transparent 20%),
+radial-gradient(circle at 82% 18%,#FFCCBC 0%,transparent 18%),
+radial-gradient(circle at 25% 82%,#B3E5FC 0%,transparent 18%),
+radial-gradient(circle at 78% 75%,#C8E6C9 0%,transparent 18%),
+linear-gradient(180deg,#FFF8E8,#FDFDFD);
+
+}
+
+/*------------------------------------*/
+
+.screen{
+
+position:absolute;
+left:0;
+top:0;
+width:100%;
+height:100%;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+}
+
+/*------------------------------------*/
+/* Splash */
+/*------------------------------------*/
+
+#logoScreen{
+
+background:white;
+z-index:1000;
+
+}
+
+#logoScreen img{
+
+width:min(70vw,300px);
+
+}
+
+/*------------------------------------*/
+
+#titleScreen{
+
+display:none;
+background:#FFF9F0;
+z-index:900;
+
+}
+
+/*------------------------------------*/
+
+.flashTitle{
+
+font-size:clamp(36px,6vw,62px);
+font-weight:800;
+padding:12px 28px;
+border-radius:18px;
+
+background:white;
+
+box-shadow:
+
+0 8px 20px rgba(0,0,0,.15);
+
+animation:
+
+flashTitle 1s infinite alternate;
+
+}
+
+@keyframes flashTitle{
+
+from{
+
+color:#FF7043;
+transform:scale(1);
+
+}
+
+to{
+
+color:#E91E63;
+transform:scale(1.08);
+
+}
+
+}
+
+/*------------------------------------*/
+
+#startScreen{
+
+display:none;
+padding:20px;
+
+}
+
+.startTitle{
+
+font-size:clamp(28px,5vw,52px);
+
+font-weight:800;
+
+background:linear-gradient(90deg,
+#FF7043,
+#EC407A,
+#AB47BC,
+#42A5F5,
+#66BB6A);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-align:center;
+
+}
+
+/*------------------------------------*/
+
+.startSub{
+
+margin-top:20px;
+
+font-size:clamp(18px,2.6vw,24px);
+
+color:#666;
+
+}
+
+/*------------------------------------*/
+
+#startBtn{
+
+margin-top:30px;
+
+padding:18px 42px;
+
+border:none;
+
+border-radius:60px;
+
+font-size:clamp(24px,3vw,32px);
+
+font-weight:800;
+
+background:#FF9800;
+
+color:white;
+
+cursor:pointer;
+
+box-shadow:
+
+0 8px 18px rgba(0,0,0,.22);
+
+animation:pulse 1.5s infinite;
+
+}
+
+@keyframes pulse{
+
+0%{
+
+transform:scale(1);
+
+}
+
+50%{
+
+transform:scale(1.08);
+
+}
+
+100%{
+
+transform:scale(1);
+
+}
+
+}
+
+/*------------------------------------*/
+/* Game */
+/*------------------------------------*/
+
+#game{
+
+display:none;
+
+height:100%;
+
+padding:8px;
+
+}
+
+/*------------------------------------*/
+
+.gameTitle{
+
+text-align:center;
+
+font-size:clamp(24px,4vw,44px);
+
+font-weight:800;
+
+margin-top:0px;
+
+background:linear-gradient(90deg,
+#FF7043,
+#EC407A,
+#5C6BC0);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+}
+
+/*------------------------------------*/
+
+#question{
+
+margin-top:2px;
+
+text-align:center;
+
+font-size:clamp(15px,2vw,24px);
+
+font-weight:700;
+
+color:#EF6C00;
+
+padding:0 10px;
+
+}
+
+/*------------------------------------*/
+
+.topBar{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:10px;
+
+margin-top:2px;
+
+max-width:900px;
+
+margin-left:auto;
+
+margin-right:auto;
+
+}
+
+/*------------------------------------*/
+
+#speakBtn{
+
+width:46px;
+
+height:46px;
+
+border:none;
+
+border-radius:50%;
+
+background:#42A5F5;
+
+color:white;
+
+font-size:22px;
+
+cursor:pointer;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+}
+
+/*------------------------------------*/
+/* Drop Area */
+/*------------------------------------*/
+
+#dropArea{
+
+margin-top:10px;
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:14px;
+
+justify-items:center;
+
+align-items:center;
+
+max-width:900px;
+
+margin-left:auto;
+
+margin-right:auto;
+
+}
+
+/*------------------------------------*/
+
+.dropBox{
+
+width:min(26vw,150px);
+
+height:min(26vw,150px);
+
+background:white;
+
+border:2px solid #2EAF62;
+
+border-radius:24px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:32px;
+
+font-weight:800;
+
+position:relative;
+
+transition:.25s;
+
+}
+
+/*------------------------------------*/
+
+.dropBox.correct{
+
+box-shadow:0 0 22px #66BB6A;
+
+border:4px solid #43A047;
+
+animation:pop .35s ease-out;
+
+}
+
+@keyframes pop{
+
+0%{
+
+transform:scale(.8);
+
+}
+
+60%{
+
+transform:scale(1.12);
+
+}
+
+100%{
+
+transform:scale(1);
+
+}
+
+}
+  
+/*------------------------------------*/
+
+.bottomRow{
+
+grid-column:1/4;
+
+display:flex;
+
+justify-content:center;
+
+gap:40px;
+
+width:100%;
+
+}
+
+/*------------------------------------*/
+/* Cards */
+/*------------------------------------*/
+
+#cards{
+
+margin-top:12px;
+
+display:flex;
+
+justify-content:center;
+
+gap:10px;
+
+flex-wrap:nowrap;
+
+align-items:flex-end;
+
+}
+
+/*------------------------------------*/
+
+.card{
+
+width:min(18vw,120px);
+
+cursor:pointer;
+
+touch-action:none;
+
+transition:transform .2s;
+
+position:relative;
+
+user-select:none;
+
+-webkit-user-select:none;
+
+}
+
+.card:active{
+
+transform:scale(.95);
+
+}
+
+/*------------------------------------*/
+
+.card img{
+
+width:100%;
+
+display:block;
+
+pointer-events:none;
+
+}
+
+.card.dragging{
+
+position:fixed;
+
+z-index:9999;
+
+transform:translate(-50%,-50%) scale(1.08);
+
+pointer-events:none;
+
+transition:none;
+
+}  
+
+/*------------------------------------*/
+/* Responsive */
+/*------------------------------------*/
+
+@media(max-width:700px){
+
+.dropBox{
+
+width:105px;
+height:105px;
+
+font-size:30px;
+
+}
+
+#dropArea{
+
+margin-top:16px;
+
+}
+  
+.card{
+
+width:82px;
+
+}
+
+#cards{
+
+flex-wrap:wrap;
+
+max-width:300px;
+
+margin:10px auto 0;
+
+justify-content:center;
+
+gap:12px;
+
+}
+  
+.bottomRow{
+
+gap:18px;
+
+}
+
+.gameTitle{
+
+margin-top:-12px;
+
+}
+
+#question{
+
+margin-top:0;
+
+}
+
+.topBar{
+
+margin-top:0;
+
+margin-bottom:8px;
+
+}
+  
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGO SCREEN -->
+
+<div id="logoScreen" class="screen">
+
+<img src="assets/innovine-logo.png">
+
+</div>
+
+<!-- FLASH TITLE -->
+
+<div id="titleScreen" class="screen">
+
+<div class="flashTitle">
+
+Machine in Action
+
+</div>
+
+</div>
+
+<!-- START SCREEN -->
+
+<div id="startScreen" class="screen">
+
+<div class="startTitle">
+
+Machine in Action
+
+</div>
+
+<button id="startBtn">
+
+Tap to Start
+
+</button>
+
+</div>
+
+<!-- GAME -->
+
+<div id="game" class="screen">
+
+<div class="gameTitle">
+
+Machine in Action
+
+</div>
+
+<div id="question"></div>
+
+<div class="topBar">
+
+<button id="speakBtn" aria-label="Hear Again">
+
+🔊
+
+</button>
+
+</div>
+
+<div id="dropArea">
+
+<!-- Filled by JavaScript -->
+
+</div>
+
+<div id="cards">
+
+<!-- Filled by JavaScript -->
+
+</div>
+
+</div>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<script>
+
+/****************************************************
+
+Machine in Action
+Part 1
+
+****************************************************/
+
+const logoScreen=document.getElementById("logoScreen");
+const titleScreen=document.getElementById("titleScreen");
+const startScreen=document.getElementById("startScreen");
+const game=document.getElementById("game");
+
+const question=document.getElementById("question");
+const dropArea=document.getElementById("dropArea");
+const cards=document.getElementById("cards");
+
+const clap=document.getElementById("clap");
+const wrong=document.getElementById("wrong");
+
+const speakBtn=document.getElementById("speakBtn");
+const startBtn=document.getElementById("startBtn");
+
+let currentRound=0;
+
+let rounds=[];
+
+function speak(text){
+
+speechSynthesis.cancel();
+
+const msg=new SpeechSynthesisUtterance(text);
+
+msg.rate=.9;
+
+msg.pitch=1;
+
+speechSynthesis.speak(msg);
+
+}
+
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+
+startScreen.style.display="flex";
+
+},5000);
+
+startBtn.onclick=function(){
+
+startScreen.style.display="none";
+
+game.style.display="flex";
+
+loadRound(0);
+
+};
+
+/*------------------------------------------*/
+/* ROUNDS */
+/*------------------------------------------*/
+
+rounds=[
+
+{
+
+question:"Drag and drop the pictures in the correct order to show how to make toast using a toaster.",
+
+correct:[
+
+"step1.png",
+"step2.png",
+"step3.png",
+"step4.png",
+"step5.png"
+
+],
+
+cards:[
+
+"step5.png",
+"step3.png",
+"step1.png",
+"step2.png",
+"step4.png"
+
+]
+
+},
+
+{
+
+question:"Drag and drop the pictures in the correct order to show how we wash clothes using washing machine.",
+
+correct:[
+
+"stepA1.png",
+"stepA2.png",
+"stepA3.png",
+"stepA4.png",
+"stepA5.png"
+
+],
+
+cards:[
+
+"stepA5.png",
+"stepA3.png",
+"stepA1.png",
+"stepA2.png",
+"stepA4.png"
+
+]
+
+}
+
+];
+
+/*------------------------------------------*/
+
+function loadRound(index){
+
+currentRound=index;
+
+dropArea.innerHTML="";
+
+cards.innerHTML="";
+
+question.innerHTML=rounds[index].question;
+
+speak(rounds[index].question);
+
+/* Hear Again */
+
+speakBtn.onclick=function(){
+
+speak(rounds[index].question);
+
+};
+
+/*----------------------------*/
+/* Drop Boxes */
+/*----------------------------*/
+
+for(let i=0;i<3;i++){
+
+const box=document.createElement("div");
+
+box.className="dropBox";
+
+box.dataset.answer=rounds[index].correct[i];
+
+box.dataset.filled="false";
+
+box.innerHTML=i+1;
+
+dropArea.appendChild(box);
+
+}
+
+const row=document.createElement("div");
+
+row.className="bottomRow";
+
+dropArea.appendChild(row);
+
+for(let i=3;i<5;i++){
+
+const box=document.createElement("div");
+
+box.className="dropBox";
+
+box.dataset.answer=rounds[index].correct[i];
+
+box.dataset.filled="false";
+
+box.innerHTML=i+1;
+
+row.appendChild(box);
+
+}
+
+/*----------------------------*/
+/* Cards */
+/*----------------------------*/
+
+rounds[index].cards.forEach(file=>{
+
+const card=document.createElement("div");
+
+card.className="card";
+
+card.draggable=true;
+
+card.dataset.name=file;
+
+card.innerHTML=`<img src="assets/${file}">`;
+
+cards.appendChild(card);
+
+});
+
+enableDrag();
+
+}
+
+/*------------------------------------------*/
+/* Drag & Drop */
+/*------------------------------------------*/
+
+function enableDrag(){
+
+const allCards=document.querySelectorAll(".card");
+const allBoxes=document.querySelectorAll(".dropBox");
+
+let dragging=null;
+let startParent=null;
+let startNextSibling=null;
+
+/*---------------------------*/
+/* Place Card */
+/*---------------------------*/
+
+function placeCard(box){
+
+if(!dragging)return;
+
+if(box.dataset.filled=="true"){
+
+resetCard();
+return;
+
+}
+
+if(dragging.dataset.name==box.dataset.answer){
+
+dragging.classList.remove("dragging");
+
+dragging.style.left="";
+dragging.style.top="";
+
+box.innerHTML="";
+box.appendChild(dragging);
+
+box.classList.add("correct");
+box.dataset.filled="true";
+
+dragging.draggable=false;
+
+checkRound();
+
+}
+else{
+
+wrong.currentTime=0;
+wrong.play();
+
+resetCard();
+
+}
+
+dragging=null;
+
+}
+
+/*---------------------------*/
+/* Return Card */
+/*---------------------------*/
+
+function resetCard(){
+
+if(!dragging)return;
+
+dragging.classList.remove("dragging");
+
+dragging.style.left="";
+dragging.style.top="";
+
+if(startNextSibling){
+
+startParent.insertBefore(dragging,startNextSibling);
+
+}
+else{
+
+startParent.appendChild(dragging);
+
+}
+
+dragging=null;
+
+}
+
+/*---------------------------*/
+/* Desktop Drag */
+/*---------------------------*/
+
+allCards.forEach(card=>{
+
+card.addEventListener("dragstart",()=>{
+
+dragging=card;
+
+});
+
+});
+
+allBoxes.forEach(box=>{
+
+box.addEventListener("dragover",e=>{
+
+e.preventDefault();
+
+});
+
+box.addEventListener("drop",e=>{
+
+e.preventDefault();
+
+placeCard(box);
+
+});
+
+});
+
+/*---------------------------*/
+/* Mobile Drag */
+/*---------------------------*/
+
+allCards.forEach(card=>{
+
+card.addEventListener("touchstart",function(e){
+
+if(card.parentElement.classList.contains("dropBox")) return;
+
+dragging=card;
+
+startParent=card.parentNode;
+startNextSibling=card.nextSibling;
+
+card.classList.add("dragging");
+
+moveCard(e.touches[0]);
+
+e.preventDefault();
+
+},{passive:false});
+
+});
+
+document.addEventListener("touchmove",function(e){
+
+if(!dragging)return;
+
+moveCard(e.touches[0]);
+
+e.preventDefault();
+
+},{passive:false});
+
+document.addEventListener("touchend",function(e){
+
+if(!dragging)return;
+
+const touch=e.changedTouches[0];
+
+const element=document.elementFromPoint(touch.clientX,touch.clientY);
+
+const box=element ? element.closest(".dropBox") : null;
+
+if(box){
+
+placeCard(box);
+
+}
+else{
+
+resetCard();
+
+}
+
+});
+
+function moveCard(touch){
+
+dragging.style.left=touch.clientX+"px";
+dragging.style.top=touch.clientY+"px";
+
+}
+
+}
+/*------------------------------------------*/
+
+function checkRound(){
+
+const boxes=document.querySelectorAll(".dropBox");
+
+let finished=true;
+
+boxes.forEach(box=>{
+
+if(box.dataset.filled!="true")
+
+finished=false;
+
+});
+
+if(!finished)return;
+
+clap.currentTime=0;
+clap.play();
+
+clap.onended=function(){
+
+clap.onended=null;
+
+if(currentRound<rounds.length-1){
+
+loadRound(currentRound+1);
+
+}
+else{
+
+showFinishScreen();
+
+}
+
+};
+
+}
+  
+/*------------------------------------------*/
+/* FINISH SCREEN */
+/*------------------------------------------*/
+
+function showFinishScreen(){
+
+game.style.display="none";
+
+/* Create finish screen */
+
+const finish=document.createElement("div");
+
+finish.id="finishScreen";
+
+finish.className="screen";
+
+finish.innerHTML=`
+
+<div id="confetti"></div>
+
+<h1 class="finishTitle">Excellent!</h1>
+
+<button id="playAgain">Play Again</button>
+
+`;
+
+document.body.appendChild(finish);
+
+/* Extra CSS */
+
+const style=document.createElement("style");
+
+style.innerHTML=`
+
+.finishTitle{
+
+font-size:clamp(42px,7vw,72px);
+
+font-weight:800;
+
+background:linear-gradient(90deg,#FF7043,#EC407A,#42A5F5,#66BB6A,#FFB300);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+animation:pulse 1.2s infinite;
+
+margin-bottom:30px;
+
+z-index:2;
+
+}
+
+#playAgain{
+
+padding:18px 45px;
+
+font-size:28px;
+
+border:none;
+
+border-radius:60px;
+
+background:#42A5F5;
+
+color:white;
+
+font-weight:800;
+
+cursor:pointer;
+
+box-shadow:0 8px 18px rgba(0,0,0,.2);
+
+z-index:2;
+
+}
+
+#confetti{
+
+position:absolute;
+
+left:0;
+
+top:0;
+
+width:100%;
+
+height:100%;
+
+overflow:hidden;
+
+pointer-events:none;
+
+}
+
+.confettiPiece{
+
+position:absolute;
+
+top:-30px;
+
+border-radius:50%;
+
+animation:fall linear forwards;
+
+}
+
+@keyframes fall{
+
+to{
+
+transform:translateY(110vh) rotate(720deg);
+
+}
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+/*--------------------------------*/
+/* Colourful Circles */
+/*--------------------------------*/
+
+const colours=[
+
+"#F44336",
+"#FF9800",
+"#FFEB3B",
+"#4CAF50",
+"#03A9F4",
+"#3F51B5",
+"#9C27B0",
+"#E91E63"
+
+];
+
+const confetti=document.getElementById("confetti");
+
+for(let i=0;i<180;i++){
+
+const piece=document.createElement("div");
+
+piece.className="confettiPiece";
+
+const size=8+Math.random()*12;
+
+piece.style.width=size+"px";
+
+piece.style.height=size+"px";
+
+piece.style.left=Math.random()*100+"vw";
+
+piece.style.background=colours[Math.floor(Math.random()*colours.length)];
+
+piece.style.animationDuration=(3+Math.random()*2)+"s";
+
+piece.style.animationDelay=(Math.random()*2)+"s";
+
+confetti.appendChild(piece);
+
+}
+
+/*--------------------------------*/
+/* Play Again */
+/*--------------------------------*/
+
+document.getElementById("playAgain").onclick=function(){
+
+speechSynthesis.cancel();
+
+finish.remove();
+
+restartGame();
+
+};
+
+}
+
+/*------------------------------------------*/
+/* Restart */
+/*------------------------------------------*/
+
+function restartGame(){
+
+currentRound=0;
+
+logoScreen.style.display="flex";
+
+titleScreen.style.display="none";
+
+startScreen.style.display="none";
+
+game.style.display="none";
+
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+
+startScreen.style.display="flex";
+
+},5000);
+
+}
+
+</script>
+
+</body>
+
+</html>
