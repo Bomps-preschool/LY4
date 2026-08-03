@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>R-Controlled Words</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:'Baloo 2',cursive;
+}
+
+/* ---------- Background ---------- */
+
+body{
+
+background:
+radial-gradient(circle at top left,#FFE082 0%,transparent 30%),
+radial-gradient(circle at bottom right,#B3E5FC 0%,transparent 30%),
+radial-gradient(circle at top right,#C8E6C9 0%,transparent 25%),
+linear-gradient(135deg,#FFF8E7,#E3F2FD,#FFF3E0);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+/* ---------- Common Screen ---------- */
+
+.screen{
+
+position:absolute;
+inset:0;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+}
+
+/* ---------- Splash ---------- */
+
+#logoScreen{
+
+background:white;
+z-index:30;
+
+}
+
+#logoScreen img{
+
+width:min(60vw,340px);
+
+}
+
+/* ---------- Header Screen ---------- */
+
+#titleScreen{
+
+display:none;
+
+background:linear-gradient(135deg,#FFF8E7,#E3F2FD);
+
+z-index:25;
+
+gap:35px;   
+
+}
+
+#titleFlash{
+
+font-size:clamp(34px,6vw,62px);
+
+font-weight:800;
+
+text-align:center;
+
+animation:flash 1s infinite;
+
+}
+
+@keyframes flash{
+
+0%,100%{
+
+color:#FF7043;
+
+}
+
+25%{
+
+color:#29B6F6;
+
+}
+
+50%{
+
+color:#66BB6A;
+
+}
+
+75%{
+
+color:#AB47BC;
+
+}
+
+}
+
+/* ---------- Start ---------- */
+
+
+#gameTitle{
+
+font-size:clamp(30px,5vw,48px);
+
+font-weight:800;
+
+margin-bottom:2vh;
+
+background:linear-gradient(90deg,#FF7043,#29B6F6,#66BB6A,#AB47BC);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+#startBtn{
+
+padding:18px 42px;
+
+border:none;
+
+border-radius:50px;
+
+font-size:clamp(24px,3vw,32px);
+
+font-weight:700;
+
+background:#FFB74D;
+
+color:white;
+
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+animation:pulse 1.4s infinite;
+
+cursor:pointer;
+
+}
+
+@keyframes pulse{
+
+0%,100%{
+
+transform:scale(1);
+
+}
+
+50%{
+
+transform:scale(1.08);
+
+}
+
+}
+
+/* ---------- Game ---------- */
+
+#gameScreen{
+
+display:none;
+
+padding:1vh;
+
+justify-content:flex-start;
+
+}
+
+/* title */
+
+.title{
+
+margin-top:1vh;
+
+font-size:clamp(26px,5vw,42px);
+
+font-weight:800;
+
+background:linear-gradient(90deg,#FF7043,#29B6F6,#66BB6A,#AB47BC);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+/* question */
+
+.questionRow{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+margin-top:1vh;
+
+}
+
+#question{
+
+font-size:clamp(18px,2.6vw,26px);
+
+font-weight:700;
+
+text-align:center;
+
+}
+
+#speakBtn{
+
+font-size:30px;
+
+cursor:pointer;
+
+}
+
+/* board */
+
+.board{
+
+margin-top:2vh;
+
+width:min(86vw,820px);
+
+height:min(52vh,350px);
+
+display:flex;
+
+gap:3vw;
+
+}
+
+/* image */
+
+.imageBox{
+
+flex:1;
+
+background:white;
+
+border:5px solid #42A5F5;
+
+border-radius:28px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+box-shadow:0 8px 16px rgba(0,0,0,.18);
+
+padding:0.8vh;
+   
+}
+
+#picture{
+
+max-width:98%;
+
+max-height:98%;
+
+object-fit:contain;
+
+transform:scale(1.15);
+
+}
+
+/* options */
+
+.options{
+
+flex:0.85;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-evenly;
+
+}
+
+.option{
+
+height:38%;
+
+background:white;
+
+border:5px solid #42A5F5;
+
+border-radius:28px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:clamp(24px,3.4vw,38px);
+
+font-weight:800;
+
+cursor:pointer;
+
+transition:.25s;
+
+box-shadow:0 8px 16px rgba(0,0,0,.15);
+
+user-select:none;
+
+}
+
+.option:hover{
+
+transform:scale(1.02);
+
+}
+
+.correct{
+
+background:#C8E6C9!important;
+
+border-color:#4CAF50!important;
+
+box-shadow:0 0 25px #4CAF50;
+
+}
+
+.wrong{
+
+animation:shake .35s;
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+25%{transform:translateX(-6px);}
+50%{transform:translateX(6px);}
+75%{transform:translateX(-6px);}
+100%{transform:translateX(0);}
+
+}
+
+/* Good Job */
+
+#goodJob{
+
+position:absolute;
+
+top:42%;
+
+left:50%;
+
+transform:translate(-50%,-50%);
+
+font-size:clamp(40px,6vw,70px);
+
+font-weight:800;
+
+display:none;
+
+animation:zoom .6s;
+
+text-shadow:3px 3px white;
+
+z-index:20;
+
+}
+
+@keyframes zoom{
+
+0%{
+
+transform:translate(-50%,-50%) scale(.4);
+
+opacity:0;
+
+}
+
+100%{
+
+transform:translate(-50%,-50%) scale(1);
+
+opacity:1;
+
+}
+
+}
+
+/* Finish */
+
+#finishScreen{
+
+display:none;
+
+z-index:15;
+
+background:transparent;
+
+}
+
+#awesome{
+
+font-size:clamp(48px,7vw,90px);
+
+font-weight:800;
+
+background:linear-gradient(90deg,#FF7043,#29B6F6,#66BB6A,#AB47BC);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+margin-bottom:25px;
+
+}
+
+#playAgain{
+
+padding:16px 40px;
+
+border:none;
+
+border-radius:50px;
+
+font-size:30px;
+
+font-weight:700;
+
+background:#FFB74D;
+
+color:white;
+
+cursor:pointer;
+
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+}
+
+/* Confetti */
+
+canvas{
+
+position:fixed;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+pointer-events:none;
+
+z-index:100;
+
+}
+
+/* ---------- Responsive ---------- */
+
+@media(max-width:700px){
+
+.board{
+
+width:95vw;
+
+height:68vh;
+
+display:flex;
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+/* Image box */
+
+.imageBox{
+
+flex:0 0 55%;
+
+padding:8px;
+
+}
+
+/* Image */
+
+#picture{
+
+max-width:96%;
+
+max-height:96%;
+
+object-fit:contain;
+
+}
+
+/* Word cards */
+
+.options{
+
+flex:1;
+
+display:flex;
+
+flex-direction:row;
+
+gap:10px;
+
+}
+
+/* Cards */
+
+.option{
+
+height:100%;
+
+flex:1;
+
+font-size:30px;
+
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- Splash -->
+
+<div id="logoScreen" class="screen">
+
+<img src="assets/innovine-logo.png">
+
+</div>
+
+<!-- Flashing Title -->
+
+<div id="titleScreen" class="screen">
+
+<div id="titleFlash">
+R-Controlled Words
+</div>
+
+<button id="startBtn">
+Tap to Start
+</button>
+
+</div>
+
+
+<!-- Game -->
+
+<div id="gameScreen" class="screen">
+
+<div class="title">
+R-Controlled Words
+</div>
+
+<div class="questionRow">
+
+<div id="question">
+Look at the image and tap on the correct word.
+</div>
+
+<div id="speakBtn">
+🔊
+</div>
+
+</div>
+
+<div class="board">
+
+<div class="imageBox">
+
+<img id="picture">
+
+</div>
+
+<div class="options">
+
+<div class="option" id="opt1"></div>
+
+<div class="option" id="opt2"></div>
+
+</div>
+
+</div>
+
+<div id="goodJob">
+🌈 Good Job!
+</div>
+
+</div>
+
+<!-- Finish -->
+
+<div id="finishScreen" class="screen">
+
+<div id="awesome">
+🎉 Awesome! 🎉
+</div>
+
+<button id="playAgain">
+
+▶ Play Again
+
+</button>
+
+</div>
+
+<canvas id="confetti"></canvas>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<script>
+
+let currentRound=0;
+let locked=false;
+
+/* --------------------------
+   ELEMENTS
+---------------------------*/
+
+const logoScreen=document.getElementById("logoScreen");
+const titleScreen=document.getElementById("titleScreen");
+const gameScreen=document.getElementById("gameScreen");
+
+const picture=document.getElementById("picture");
+
+const opt1=document.getElementById("opt1");
+const opt2=document.getElementById("opt2");
+
+const question=document.getElementById("question");
+const speakBtn=document.getElementById("speakBtn");
+
+const clap=document.getElementById("clap");
+const wrong=document.getElementById("wrong");
+
+const goodJob=document.getElementById("goodJob");
+const finishScreen=document.getElementById("finishScreen");
+const confettiCanvas=document.getElementById("confetti");
+const ctx=confettiCanvas.getContext("2d");
+
+/* --------------------------
+   SPLASH SEQUENCE
+---------------------------*/
+
+window.onload=()=>{
+
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+
+titleScreen.style.display="flex";
+
+},5000);
+
+};
+
+/* --------------------------
+   START
+---------------------------*/
+
+document.getElementById("startBtn").onclick=()=>{
+
+titleScreen.style.display="none";
+
+gameScreen.style.display="flex";
+
+currentRound=0;
+
+loadRound();
+
+};
+
+/* --------------------------
+   VOICE
+---------------------------*/
+
+function speakQuestion(){
+
+speechSynthesis.cancel();
+
+const msg=new SpeechSynthesisUtterance(
+question.textContent
+);
+
+msg.rate=.85;
+msg.pitch=1;
+
+speechSynthesis.speak(msg);
+
+}
+
+speakBtn.onclick=speakQuestion;
+
+/* --------------------------
+   LOAD ROUND
+---------------------------*/
+
+function loadRound(){
+
+locked=false;
+
+opt1.className="option";
+opt2.className="option";
+
+const r=rounds[currentRound];
+
+picture.src=r.img;
+
+question.textContent=r.question;
+
+opt1.textContent=r.options[0];
+opt2.textContent=r.options[1];
+
+speakQuestion();
+
+}
+
+/* --------------------------
+   OPTIONS
+---------------------------*/
+
+opt1.onclick=()=>checkAnswer(opt1);
+
+opt2.onclick=()=>checkAnswer(opt2);
+
+/* --------------------------
+   CHECK
+---------------------------*/
+
+function checkAnswer(card){
+
+if(locked)return;
+
+locked=true;
+
+const answer=card.textContent;
+
+const correct=rounds[currentRound].correct;
+
+if(answer===correct){
+
+card.classList.add("correct");
+
+goodJob.style.display="block";
+
+clap.currentTime=0;
+clap.play();
+
+setTimeout(()=>{
+
+goodJob.style.display="none";
+
+currentRound++;
+
+if(currentRound<rounds.length){
+
+loadRound();
+
+}else{
+
+showFinish();
+
+}
+
+},1200);
+
+}else{
+
+locked=false;
+
+card.classList.add("wrong");
+
+wrong.currentTime=0;
+wrong.play();
+
+setTimeout(()=>{
+
+card.classList.remove("wrong");
+
+},350);
+
+}
+
+}
+const rounds=[
+
+{
+img:"assets/arm.png",
+question:"Look at the image and tap on the correct word.",
+options:["arm","charm"],
+correct:"arm"
+},
+
+{
+img:"assets/baker.png",
+question:"Look at the image and tap on the correct word.",
+options:["computer","baker"],
+correct:"baker"
+},
+
+{
+img:"assets/burger.png",
+question:"Look at the image and tap on the correct word.",
+options:["burger","water"],
+correct:"burger"
+},
+
+{
+img:"assets/car.png",
+question:"Look at the image and tap on the correct word.",
+options:["car","barn"],
+correct:"car"
+},
+
+{
+img:"assets/far.png",
+question:"Look at the image and tap on the correct word.",
+options:["star","far"],
+correct:"far"
+},
+
+{
+img:"assets/hammer.png",
+question:"Look at the image and tap on the correct word.",
+options:["tiger","hammer"],
+correct:"hammer"
+},
+
+{
+img:"assets/farm.png",
+question:"Look at the image and tap on the correct word.",
+options:["farm","car"],
+correct:"farm"
+},
+
+{
+img:"assets/painter.png",
+question:"Look at the image and tap on the correct word.",
+options:["dancer","painter"],
+correct:"painter"
+},
+
+{
+img:"assets/shark.png",
+question:"Look at the image and tap on the correct word.",
+options:["shark","far"],
+correct:"shark"
+},
+
+{
+img:"assets/teacher.png",
+question:"Look at the image and tap on the correct word.",
+options:["burger","teacher"],
+correct:"teacher"
+},
+
+{
+img:"assets/tiger.png",
+question:"Look at the image and tap on the correct word.",
+options:["tiger","flower"],
+correct:"tiger"
+}
+
+];
+
+
+/* -------------------------
+FINISH
+-------------------------*/
+
+const pieces=[];
+let confettiAnimation=null;
+let confettiRunning=false;   
+
+function resizeCanvas(){
+
+confettiCanvas.width=window.innerWidth;
+confettiCanvas.height=window.innerHeight;
+
+}
+
+resizeCanvas();
+
+window.addEventListener("resize",resizeCanvas);
+
+function startConfetti(){
+
+pieces.length=0;
+confettiRunning=true;
+
+for(let i=0;i<180;i++){
+
+pieces.push({
+
+x:Math.random()*confettiCanvas.width,
+
+y:Math.random()*-confettiCanvas.height,
+
+r:4+Math.random()*6,
+
+d:2+Math.random()*4,
+
+tilt:Math.random()*10,
+
+c:[
+"#FF7043",
+"#29B6F6",
+"#66BB6A",
+"#FFD54F",
+"#AB47BC",
+"#EF5350"
+][Math.floor(Math.random()*6)]
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+
+pieces.forEach(p=>{
+
+ctx.fillStyle=p.c;
+
+ctx.fillRect(p.x,p.y,p.r,p.r*2);
+
+p.y+=p.d;
+
+if(p.y>confettiCanvas.height){
+
+p.y=-20;
+
+p.x=Math.random()*confettiCanvas.width;
+
+}
+
+});
+
+if(confettiRunning){
+
+confettiAnimation=requestAnimationFrame(animateConfetti);
+
+}
+
+}
+
+function showFinish(){
+
+gameScreen.style.display="none";
+
+finishScreen.style.display="flex";
+
+startConfetti();
+
+}
+
+document.getElementById("playAgain").onclick=()=>{
+
+speechSynthesis.cancel();
+
+ confettiRunning=false;
+
+cancelAnimationFrame(confettiAnimation);
+
+ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);  
+
+finishScreen.style.display="none";
+
+gameScreen.style.display="none";
+
+titleScreen.style.display="none";
+
+logoScreen.style.display="flex";
+
+currentRound=0;
+
+locked=false;
+
+opt1.className="option";
+opt2.className="option";
+   
+setTimeout(()=>{
+
+logoScreen.style.display="none";
+
+titleScreen.style.display="flex";
+
+},5000);
+
+};
+
+</script>
+
+</body>
+
+</html>
