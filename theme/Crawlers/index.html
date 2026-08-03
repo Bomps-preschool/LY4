@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crawlers Memory Game - Jr.KG</title>
+<style>
+  body {
+    margin:0;
+    font-family:'Arbutus', cursive;
+    background: url('assets/backdrop.jpg') center/cover no-repeat;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    min-height:100vh;
+    color:#333;
+  }
+  #splash, #headerScreen, #gameScreen, #endScreen {
+    width:100%;
+    height:100vh;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  #splash img {
+    width:200px;
+    height:auto;
+  }
+  h1 {
+    font-size:3em;
+    margin:10px;
+    text-align:center;
+    color:#ff6f61;
+  }
+  #questionBox {
+    margin:10px 0;
+    font-size:1.5em;
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+  #hearAgain {
+    cursor:pointer;
+    font-size:0.8em;
+    background:#ffcc5c;
+    padding:5px 10px;
+    border-radius:5px;
+  }
+  #cardsContainer {
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:10px;
+    margin-top:20px;
+    width:90%;
+    max-width:600px;
+  }
+  .card {
+    width:100%;
+    padding-top:100%;
+    position:relative;
+    background: #fff8b0; /* soft yellow */
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #ccc;
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: scale(1.05);
+  }
+  .card img {
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    width:100%; height:100%;
+    object-fit:contain;
+    display:none;
+  }
+  .card.flipped img {
+    display:block;
+  }
+  .card.correct {
+    border:3px solid #4CAF50;
+  }
+  .card.wrong {
+    animation: shake 0.5s;
+  }
+  @keyframes shake {
+    0% { transform:translateX(0);}
+    25% { transform:translateX(-10px);}
+    50% { transform:translateX(10px);}
+    75% { transform:translateX(-10px);}
+    100% { transform:translateX(0);}
+  }
+  #endScreen button {
+    padding:10px 20px;
+    font-size:1.2em;
+    cursor:pointer;
+    background:#ff6f61;
+    color:white;
+    border:none;
+    border-radius:10px;
+  }
+  canvas.confettiCanvas {
+    position:fixed;
+    top:0;
+    left:0;
+    pointer-events:none;
+    width:100%;
+    height:100%;
+    z-index:9999;
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- Header Screen -->
+<div id="headerScreen">
+  <h1>Crawlers</h1>
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <div id="questionBox">
+    Flip over cards to find the matching pairs.
+    <div id="hearAgain">Hear Again</div>
+  </div>
+  <div id="cardsContainer"></div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <h1>Good Job!</h1>
+  <canvas class="confettiCanvas"></canvas>
+  <button id="playAgainBtn">Play Again</button>
+</div>
+
+<audio id="correctAudio" src="assets/correct.mp3"></audio>
+<audio id="wrongAudio" src="assets/wrong.mp3"></audio>
+<audio id="clapAudio" src="assets/freesound_community-claps-44774.mp3"></audio>
+
+<script>
+const rounds = [
+  [
+    'ant.png','bee.png','butterfly.png','spider.png',
+    'spider.png','butterfly.png','ant.png','bee.png'
+  ],
+  [
+    'fly.png','grasshopper.png','mosquito.png','scorpion.png',
+    'scorpion.png','mosquito.png','fly.png','grasshopper.png'
+  ]
+];
+
+let currentRound = 0;
+let flippedCards = [];
+let wrongAttempts = 0;
+let lockBoard = false;
+
+const splash = document.getElementById('splash');
+const headerScreen = document.getElementById('headerScreen');
+const gameScreen = document.getElementById('gameScreen');
+const cardsContainer = document.getElementById('cardsContainer');
+const endScreen = document.getElementById('endScreen');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const hearAgain = document.getElementById('hearAgain');
+
+const correctAudio = document.getElementById('correctAudio');
+const wrongAudio = document.getElementById('wrongAudio');
+const clapAudio = document.getElementById('clapAudio');
+
+function shuffle(array){
+  return array.sort(()=>Math.random()-0.5);
+}
+
+function showSplash() {
+  splash.style.display='flex';
+  setTimeout(()=>{ splash.style.display='none'; showHeader(); }, 5000);
+}
+
+function showHeader() {
+  headerScreen.style.display='flex';
+  setTimeout(()=>{ headerScreen.style.display='none'; startRound(); }, 5000);
+}
+
+function startRound() {
+  gameScreen.style.display='flex';
+  wrongAttempts=0;
+  flippedCards=[];
+  renderCards(rounds[currentRound]);
+  playRoundAudio();
+}
+
+function renderCards(cardsArray){
+  cardsContainer.innerHTML='';
+  const shuffled = shuffle([...cardsArray]);
+  shuffled.forEach((imgName,index)=>{
+    const card = document.createElement('div');
+    card.classList.add('card');
+    const img = document.createElement('img');
+    img.src = 'assets/' + imgName;
+    card.appendChild(img);
+    card.dataset.imgName = imgName;
+    card.addEventListener('click', ()=>flipCard(card));
+    cardsContainer.appendChild(card);
+  });
+}
+
+function flipCard(card){
+
+  if(lockBoard) return;
+
+  // already matched
+  if(card.classList.contains('correct')) return;
+
+  // already flipped
+  if(card.classList.contains('flipped')) return;
+
+  card.classList.add('flipped');
+  flippedCards.push(card);
+
+  if(flippedCards.length === 2){
+    lockBoard = true;
+    checkMatch();
+  }
+}
+
+function checkMatch(){
+
+  const [card1, card2] = flippedCards;
+
+  if(card1.dataset.imgName === card2.dataset.imgName){
+
+    card1.classList.add('correct');
+    card2.classList.add('correct');
+
+    correctAudio.play();
+
+    flippedCards = [];
+    lockBoard = false;
+
+    if(document.querySelectorAll('.card.correct').length === 8){
+
+      clapAudio.play();
+
+      setTimeout(()=>{
+
+        currentRound++;
+
+        if(currentRound < rounds.length){
+          startRound();
+        }else{
+          showEndScreen();
+        }
+
+      },1000);
+    }
+
+  }else{
+
+    wrongAttempts++;
+    wrongAudio.play();
+
+    card1.classList.add('wrong');
+    card2.classList.add('wrong');
+
+    setTimeout(()=>{
+
+      card1.classList.remove('flipped','wrong');
+      card2.classList.remove('flipped','wrong');
+
+      flippedCards = [];
+
+
+      lockBoard = false;
+
+    },800);
+  }
+}
+
+function showEndScreen(){
+  gameScreen.style.display='none';
+  endScreen.style.display='flex';
+  launchConfetti();
+}
+
+playAgainBtn.addEventListener('click', ()=>{
+  currentRound=0;
+  endScreen.style.display='none';
+  showSplash();
+});
+
+function playRoundAudio(){
+  const utterance = new SpeechSynthesisUtterance("Flip over cards to find the matching pairs.");
+  speechSynthesis.speak(utterance);
+}
+hearAgain.addEventListener('click', playRoundAudio);
+
+// Confetti
+function launchConfetti(){
+  const canvas = document.querySelector('.confettiCanvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const confetti = [];
+  for(let i=0;i<150;i++){
+    confetti.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+4,
+      d:Math.random()*150+50,
+      color:`hsl(${Math.random()*360},70%,50%)`,
+      tilt:Math.random()*10-10
+    });
+  }
+  let angle = 0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach(c=>{
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r/2);
+      ctx.stroke();
+    });
+    update();
+  }
+  function update(){
+    angle += 0.01;
+    confetti.forEach(c=>{
+      c.y += Math.cos(angle + c.d) +1 + c.r/2;
+      c.x += Math.sin(angle);
+      if(c.y>canvas.height){ c.y=-10; c.x=Math.random()*canvas.width; }
+    });
+  }
+  const interval = setInterval(draw,20);
+ setTimeout(()=>{
+  clearInterval(interval);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+},5000);
+}
+
+showSplash();
+</script>
+
+</body>
+</html>
