@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>3D Shape - Cylinder</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:'Baloo 2',cursive;
+
+}
+
+/* ---------------- BACKGROUND ---------------- */
+
+body{
+
+background:
+radial-gradient(circle at 15% 20%,#FFF6B7 0%,transparent 15%),
+radial-gradient(circle at 85% 15%,#FFD6E8 0%,transparent 18%),
+radial-gradient(circle at 20% 80%,#D4F8C4 0%,transparent 18%),
+radial-gradient(circle at 80% 75%,#CDEBFF 0%,transparent 18%),
+linear-gradient(180deg,#A9E7FF,#FDF7CF);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+/* floating decorations */
+
+body::before{
+
+content:"";
+
+position:fixed;
+inset:0;
+
+background-image:
+
+radial-gradient(#ffffff 2px,transparent 2px),
+radial-gradient(#FFD54F 3px,transparent 3px),
+radial-gradient(#81D4FA 3px,transparent 3px),
+radial-gradient(#F48FB1 3px,transparent 3px);
+
+background-size:
+120px 120px,
+180px 180px,
+220px 220px,
+170px 170px;
+
+opacity:.35;
+
+pointer-events:none;
+
+}
+
+/* ---------------- SCREENS ---------------- */
+
+.screen{
+
+position:absolute;
+inset:0;
+
+display:none;
+
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+padding:2vh;
+
+}
+
+.show{
+
+display:flex;
+
+}
+
+/* ---------------- LOGO ---------------- */
+
+#logo{
+
+width:min(70vw,340px);
+
+animation:pop 1.2s infinite alternate;
+
+}
+
+/* ---------------- TITLE ---------------- */
+
+#titleScreen h1{
+
+font-size:clamp(34px,6vw,62px);
+
+font-weight:800;
+
+text-align:center;
+
+animation:flash 1s infinite;
+
+background:linear-gradient(90deg,#ff5f6d,#ff9800,#43a047,#2196f3,#9c27b0);
+
+background-size:500%;
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+/* ---------------- START BUTTON ---------------- */
+
+#startBtn{
+
+margin-top:5vh;
+
+padding:18px 40px;
+
+border:none;
+
+border-radius:60px;
+
+font-size:clamp(22px,3vw,32px);
+
+font-weight:700;
+
+background:#FF9800;
+
+color:white;
+
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+cursor:pointer;
+
+animation:pulse 1.5s infinite;
+
+}
+
+#startBtn:active{
+
+transform:scale(.96);
+
+}
+
+/* ---------------- GAME ---------------- */
+
+#game{
+
+justify-content:flex-start;
+
+padding:2vh;
+
+}
+
+/* Title */
+
+#gameTitle{
+
+font-size:clamp(26px,4vw,42px);
+
+font-weight:800;
+
+text-align:center;
+
+background:linear-gradient(90deg,#ff5f6d,#ff9800,#43a047,#2196f3,#8e24aa);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+/* Question */
+
+#questionWrap{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:12px;
+
+margin-top:1vh;
+
+}
+
+#question{
+
+font-size:clamp(18px,2.8vw,30px);
+
+font-weight:700;
+
+text-align:center;
+
+color:#2E4053;
+
+}
+
+/* Speaker */
+
+#speaker{
+
+width:52px;
+
+height:52px;
+
+border-radius:50%;
+
+border:none;
+
+background:white;
+
+font-size:28px;
+
+cursor:pointer;
+
+box-shadow:0 5px 12px rgba(0,0,0,.25);
+
+}
+
+/* Shape */
+
+#shape{
+
+margin-top:1vh;
+
+width:min(34vw,190px);
+
+height:min(24vh,170px);
+
+object-fit:contain;
+
+border-radius:18px;
+
+background:white;
+
+padding:8px;
+
+box-shadow:0 6px 16px rgba(0,0,0,.18);
+
+}
+
+/* Options */
+
+#options{
+
+margin-top:2vh;
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:2vw;
+
+width:min(95vw,900px);
+
+}
+
+/* Cards */
+
+.card{
+
+background:white;
+
+border-radius:20px;
+
+padding:10px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+border:5px solid #ffffff;
+
+box-shadow:0 6px 14px rgba(0,0,0,.15);
+
+transition:.25s;
+
+cursor:pointer;
+
+height:min(28vh,230px);
+
+}
+
+.card img{
+
+max-width:95%;
+
+max-height:95%;
+
+object-fit:contain;
+
+}
+
+.card.correct{
+
+border-color:#43A047;
+
+box-shadow:
+
+0 0 0 5px #C8E6C9,
+
+0 0 25px #66BB6A;
+
+}
+
+.card.shake{
+
+animation:shake .4s;
+
+}
+
+/* Good Job */
+
+#goodJob{
+
+margin-top:1.5vh;
+
+font-size:clamp(28px,5vw,50px);
+
+font-weight:800;
+
+display:none;
+
+background:linear-gradient(90deg,#ff5722,#ff9800,#43a047,#2196f3,#9c27b0);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+/* Finish */
+
+#finish h1{
+
+font-size:clamp(40px,7vw,70px);
+
+font-weight:800;
+
+background:linear-gradient(90deg,#ff5722,#ff9800,#43a047,#2196f3,#8e24aa);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+margin-bottom:4vh;
+
+}
+
+#playAgain{
+
+padding:18px 42px;
+
+font-size:28px;
+
+border:none;
+
+border-radius:60px;
+
+background:#FF9800;
+
+color:white;
+
+font-weight:700;
+
+cursor:pointer;
+
+animation:pulse 1.5s infinite;
+
+}
+
+/* Confetti */
+
+canvas{
+
+position:fixed;
+
+inset:0;
+
+pointer-events:none;
+
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+
+@keyframes pulse{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+
+}
+
+@keyframes flash{
+
+0%,100%{opacity:1;}
+
+50%{opacity:.3;}
+
+}
+
+@keyframes pop{
+
+from{transform:scale(.96);}
+
+to{transform:scale(1.05);}
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+20%{transform:translateX(-6px);}
+40%{transform:translateX(6px);}
+60%{transform:translateX(-6px);}
+80%{transform:translateX(6px);}
+100%{transform:translateX(0);}
+
+}
+
+/* ---------------- MOBILE ---------------- */
+
+@media(max-width:700px){
+
+#shape{
+
+width:42vw;
+
+height:20vh;
+
+}
+
+.card{
+
+height:21vh;
+
+padding:6px;
+
+}
+
+#speaker{
+
+width:46px;
+
+height:46px;
+
+font-size:24px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- Logo -->
+
+<div id="logoScreen" class="screen show">
+
+<img id="logo" src="assets/innovine-logo.png">
+
+</div>
+
+<!-- Title -->
+
+<div id="titleScreen" class="screen">
+
+<h1>3D Shape - Cylinder</h1>
+
+<button id="startBtn">
+
+Tap to Start
+
+</button>
+
+</div>
+
+<!-- Game -->
+
+<div id="game" class="screen">
+
+<div id="gameTitle">
+
+3D Shape - Cylinder
+
+</div>
+
+<div id="questionWrap">
+
+<div id="question">
+
+Look at the shape and tap on the objects that match that shape.
+
+</div>
+
+<button id="speaker">
+
+🔊
+
+</button>
+
+</div>
+
+<img id="shape" src="assets/cylinder.jpg">
+
+<div id="options">
+
+</div>
+
+<div id="goodJob">
+
+🌟 Good Job! 🌟
+
+</div>
+
+</div>
+
+<!-- Finish -->
+
+<div id="finish" class="screen">
+
+<h1>
+
+🎉 Awesome! 🎉
+
+</h1>
+
+<button id="playAgain">
+
+Play Again
+
+</button>
+
+</div>
+
+<canvas id="confetti"></canvas>
+
+<audio id="clap" src="assets/clap.mp3"></audio>
+
+<audio id="wrong" src="assets/wrong.mp3"></audio>
+
+<script>
+
+/*--------------------------------------------------
+3D SHAPE - CYLINDER
+PART 2
+---------------------------------------------------*/
+
+const logoScreen=document.getElementById("logoScreen");
+const titleScreen=document.getElementById("titleScreen");
+const game=document.getElementById("game");
+const finish=document.getElementById("finish");
+
+const question=document.getElementById("question");
+const options=document.getElementById("options");
+const speaker=document.getElementById("speaker");
+const goodJob=document.getElementById("goodJob");
+
+const clap=document.getElementById("clap");
+const wrong=document.getElementById("wrong");
+
+const playAgain=document.getElementById("playAgain");
+
+/*-----------------------------
+Rounds
+------------------------------*/
+
+const rounds=[
+
+{
+
+question:"Look at the shape and tap on the objects that match that shape.",
+
+shape:"assets/cylinder.jpg",
+
+options:[
+
+{img:"assets/battery.png",correct:true},
+
+{img:"assets/ball.png",correct:false},
+
+{img:"assets/bottle.png",correct:true}
+
+]
+
+},
+
+{
+
+question:"Look at the shape and tap on the objects that match that shape.",
+
+shape:"assets/cylinder.jpg",
+
+options:[
+
+{img:"assets/button.png",correct:false},
+
+{img:"assets/camera.png",correct:false},
+
+{img:"assets/candle.png",correct:true}
+
+]
+
+},
+
+{
+
+question:"Look at the shape and tap on the objects that match that shape.",
+
+shape:"assets/cylinder.jpg",
+
+options:[
+
+{img:"assets/cone.png",correct:false},
+
+{img:"assets/drum.png",correct:true},
+
+{img:"assets/cube.png",correct:false}
+
+]
+
+},
+
+{
+
+question:"Look at the shape and tap on the objects that match that shape.",
+
+shape:"assets/cylinder.jpg",
+
+options:[
+
+{img:"assets/pencil.png",correct:true},
+
+{img:"assets/gift.png",correct:false},
+
+{img:"assets/soda.png",correct:true}
+
+]
+
+},
+
+{
+
+question:"Look at the shape and tap on the objects that match that shape.",
+
+shape:"assets/cylinder.jpg",
+
+options:[
+
+{img:"assets/spary.png",correct:true},
+
+{img:"assets/globe.png",correct:false},
+
+{img:"assets/tissue.png",correct:true}
+
+]
+
+}
+
+];
+
+let currentRound=0;
+let selectedCorrect=0;
+let totalCorrect=0;
+let speaking=false;
+
+// Load voices for Android/iPhone
+speechSynthesis.getVoices();
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => {
+        speechSynthesis.getVoices();
+    };
+}
+    
+/*-----------------------------
+Speech
+------------------------------*/
+function speakQuestion(){
+
+    speechSynthesis.cancel();
+
+    const msg = new SpeechSynthesisUtterance(
+        rounds[currentRound].question
+    );
+
+    msg.lang = "en-US";
+    msg.rate = 0.9;
+    msg.pitch = 1;
+    msg.volume = 1;
+
+    // wait until voices are loaded
+    const voices = speechSynthesis.getVoices();
+
+    if (voices.length > 0) {
+        msg.voice = voices[0];
+    }
+
+    setTimeout(() => {
+        speechSynthesis.speak(msg);
+    }, 100);
+
+}
+speaker.onclick = () => {
+
+    speechSynthesis.cancel();
+
+    setTimeout(() => {
+        speakQuestion();
+    }, 100);
+
+};
+    
+/*-----------------------------
+Start Screen Flow
+------------------------------*/
+
+setTimeout(()=>{
+
+logoScreen.classList.remove("show");
+titleScreen.classList.add("show");
+
+},5000);
+
+/*-----------------------------
+Start Game
+------------------------------*/
+
+ document.getElementById("startBtn").onclick = () => {
+
+speechSynthesis.cancel();
+
+currentRound = 0;
+
+loadRound();
+
+titleScreen.classList.remove("show");
+game.classList.add("show");
+
+requestAnimationFrame(() => {
+    setTimeout(() => {
+        speakQuestion();
+    }, 500);
+});
+
+}; 
+
+/*-----------------------------
+Load Round
+------------------------------*/
+
+function loadRound(){
+
+goodJob.style.display="none";
+
+selectedCorrect=0;
+
+options.innerHTML="";
+
+const round=rounds[currentRound];
+
+question.innerHTML=round.question;
+
+document.getElementById("shape").src=round.shape;
+
+totalCorrect=round.options.filter(o=>o.correct).length;
+
+round.options.forEach(item=>{
+
+const card=document.createElement("div");
+
+card.className="card";
+
+const image=document.createElement("img");
+
+image.src=item.img;
+
+card.appendChild(image);
+
+card.onclick=()=>selectCard(card,item);
+
+options.appendChild(card);
+
+});
+
+}
+
+/*-----------------------------
+Selection
+------------------------------*/
+
+function selectCard(card,item){
+
+if(card.classList.contains("correct")) return;
+
+if(item.correct){
+
+card.classList.add("correct");
+
+selectedCorrect++;
+
+if(selectedCorrect===totalCorrect){
+
+roundComplete();
+
+}
+
+}
+
+else{
+
+wrong.currentTime=0;
+wrong.play();
+
+card.classList.add("shake");
+
+setTimeout(()=>{
+
+card.classList.remove("shake");
+
+},400);
+
+}
+
+}
+
+/*-----------------------------
+Round Complete
+------------------------------*/
+
+function roundComplete(){
+
+goodJob.style.display="block";
+
+clap.currentTime=0;
+clap.play();
+
+setTimeout(()=>{
+
+goodJob.style.display="none";
+
+currentRound++;
+
+if(currentRound<rounds.length){
+
+loadRound();
+
+setTimeout(() => {
+
+    speechSynthesis.cancel();
+
+    requestAnimationFrame(() => {
+        speakQuestion();
+    });
+
+},500);
+
+}
+
+    else{
+
+        game.classList.remove("show");
+
+        finish.classList.add("show");
+
+        startConfetti();
+
+    }
+
+},1400);
+
+}
+
+/*-------------------------------------------------
+CONFETTI
+-------------------------------------------------*/
+
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+
+let pieces=[];
+let confettiAnimation=null;
+let confettiRunning=false;
+
+function resizeCanvas(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+}
+
+resizeCanvas();
+
+window.addEventListener("resize",resizeCanvas);
+
+function startConfetti(){
+
+pieces=[];
+
+confettiRunning=true;
+
+for(let i=0;i<180;i++){
+
+pieces.push({
+
+x:Math.random()*canvas.width,
+
+y:Math.random()*canvas.height-canvas.height,
+
+r:Math.random()*8+4,
+
+dx:(Math.random()-0.5)*2,
+
+dy:Math.random()*3+2,
+
+color:[
+"#F44336",
+"#FF9800",
+"#FFD54F",
+"#4CAF50",
+"#29B6F6",
+"#AB47BC",
+"#EC407A"
+][Math.floor(Math.random()*7)]
+
+});
+
+}
+
+animateConfetti();
+
+}
+
+function animateConfetti(){
+
+if(!confettiRunning){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+return;
+
+}
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+pieces.forEach(p=>{
+
+ctx.fillStyle=p.color;
+
+ctx.fillRect(p.x,p.y,p.r,p.r);
+
+p.x+=p.dx;
+
+p.y+=p.dy;
+
+if(p.y>canvas.height){
+
+p.y=-20;
+
+}
+
+});
+
+confettiAnimation=requestAnimationFrame(animateConfetti);
+
+}
+
+/*-------------------------------------------------
+PLAY AGAIN
+-------------------------------------------------*/
+
+playAgain.onclick=()=>{
+
+speechSynthesis.cancel();
+
+confettiRunning=false;
+
+cancelAnimationFrame(confettiAnimation);
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+finish.classList.remove("show");
+
+currentRound=0;
+
+logoScreen.classList.add("show");
+
+setTimeout(()=>{
+
+logoScreen.classList.remove("show");
+
+titleScreen.classList.add("show");
+
+},5000);
+
+};
+
+</script>
+
+</body>
+
+</html>           
