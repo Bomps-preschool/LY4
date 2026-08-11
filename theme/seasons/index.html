@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Seasons Crossword &middot; LY4 &middot; Game 28</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+#game-screen{display:none;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;max-width:860px;height:100%;padding:10px 14px 76px;overflow-y:auto;overflow-x:hidden}
+
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:8px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-shrink:0}
+.progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+.instruction{text-align:center;font-size:clamp(0.85em,2.8vw,1.05em);color:#333;font-weight:800;margin-bottom:6px;padding:0 6px;line-height:1.4;flex-shrink:0}
+
+/* Q-card */
+.q-card{background:white;border-radius:24px;padding:14px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;flex:1;justify-content:center}
+
+/* Crossword grid */
+.cw-wrap{display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cw-grid{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(9,1fr);gap:2px;width:min(224px,66vw);aspect-ratio:7/9}
+.cw-cell{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,3.2vw,14px);font-weight:900;font-family:inherit;background:transparent;border-radius:3px;position:relative;line-height:1}
+.cw-cell.active{background:white;border:2px solid #ccc}
+.cw-cell.highlighted{background:#ede7f6 !important;border-color:#6c5ce7 !important;border-width:2.5px !important}
+.cw-cell.hint-cell{background:#fff8e1 !important;border-color:#FFD700 !important;border-width:2.5px !important;animation:pulseHint 1s ease-in-out infinite}
+.cw-cell.done-cell{border-color:#ddd}
+.cw-cell .clue-num{position:absolute;top:1px;left:2px;font-size:clamp(5px,1.4vw,7px);font-weight:800;color:#6c5ce7;line-height:1;pointer-events:none}
+@keyframes letterPop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+
+/* Image top */
+.q-img-box{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;width:100%}
+.q-clue-label{font-size:clamp(0.78em,2.6vw,1em);font-weight:800;color:#6a0dad;text-align:center;white-space:nowrap}
+.q-img-wrap{width:min(180px,48vw);height:min(140px,38vw);border-radius:16px;overflow:hidden;border:3px solid #6c5ce7;background:#f0f4f8;display:flex;align-items:center;justify-content:center}
+.q-img-wrap img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s}
+.q-img-wrap img.loaded{opacity:1}
+
+/* Tiles pool */
+.tiles-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;width:100%;padding:4px 0}
+.letter-tile{width:clamp(42px,11vw,52px);height:clamp(42px,11vw,52px);background:linear-gradient(135deg,#6c5ce7,#a29bfe);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(1em,3.8vw,1.35em);font-weight:900;color:white;cursor:grab;box-shadow:0 4px 12px rgba(108,92,231,0.4);touch-action:none;flex-shrink:0;transition:opacity 0.2s,transform 0.12s;-webkit-user-drag:none}
+.letter-tile:active{transform:scale(1.1)}
+.letter-tile.tile-ghost{opacity:0.25;pointer-events:none}
+.letter-tile.tile-placed{display:none}
+
+/* Floating drag clone */
+.drag-clone{position:fixed;z-index:9000;pointer-events:none;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;box-shadow:0 8px 24px rgba(108,92,231,0.5);transform:scale(1.12);font-family:'Nunito',Arial,sans-serif}
+
+/* Bottom */
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);touch-action:manipulation;min-height:44px}
+
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:13px 28px;border-radius:50px;font-size:1.35em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;touch-action:manipulation;min-height:44px}
+
+@keyframes pulseHint{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.7)}50%{box-shadow:0 0 0 8px rgba(255,215,0,0)}}
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+
+@media(max-width:768px){.hdr-title{display:none}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 72px}
+  .hdr{padding:8px 12px;margin-bottom:5px}
+  .q-card{padding:10px;gap:8px}
+  .btn-restart{padding:10px 22px;font-size:0.92em}
+}
+@media(max-height:680px){
+  .cw-grid{width:min(196px,58vw)}
+  .q-img-wrap{width:min(140px,38vw);height:min(108px,28vw)}
+  .q-card{gap:6px}
+  .instruction{margin-bottom:3px}
+  .letter-tile{width:38px;height:38px;font-size:0.9em}
+}
+@media(max-height:640px){
+  .cw-grid{width:min(182px,54vw)}
+  .q-img-wrap{width:min(120px,34vw);height:min(92px,24vw)}
+  .q-card{gap:4px;padding:8px}
+  .instruction{margin-bottom:2px;font-size:clamp(0.78em,2.5vw,0.92em)}
+  .letter-tile{width:34px;height:34px;font-size:0.82em}
+  .tiles-pool{gap:5px}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">&#11088; <span id="score-val">0</span> / 5</div>
+    <div class="hdr-title">Seasons Crossword &middot; LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">&#128266;</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 5</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction" id="instruction-txt">Drag the letters to fill the crossword!</div>
+
+  <div class="q-card">
+    <div class="q-img-box">
+      <div class="q-clue-label" id="clue-label">Clue 1 of 5 &#8595;</div>
+      <div class="q-img-wrap">
+        <img id="q-img" src="" alt="season clue">
+      </div>
+    </div>
+    <div class="cw-wrap">
+      <div class="cw-grid" id="cw-grid"></div>
+    </div>
+    <div class="tiles-pool" id="tiles-pool"></div>
+  </div>
+
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">&#128260; &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">&#127942;</div>
+  <div class="end-title">Amazing! You did it!</div>
+  <div class="end-sub">You completed the seasons crossword!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 5</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">&#9654; &nbsp;Play Again</button>
+</div>
+
+<script>
+/*
+  Crossword layout (9 rows × 7 cols, 0-indexed):
+       c0  c1  c2  c3  c4  c5  c6
+  r0    .   .   .   .   W   .   .
+  r1    .   .   R   A   I   N   Y
+  r2    .   .   .   .   N   S   .
+  r3    .   A   .   .   T   P   .
+  r4    S   U   M   M   E   R   .
+  r5    .   T   .   .   R   I   .
+  r6    .   U   .   .   .   N   .
+  r7    .   M   .   .   .   G   .
+  r8    .   N   .   .   .   .   .
+  Crossings: WINTER×RAINY=I(1,4) · SUMMER×WINTER=E(4,4)
+             SUMMER×SPRING=R(4,5) · SUMMER×AUTUMN=U(4,1)
+*/
+const WORDS = [
+  { season:'WINTER', dir:'v', startRow:0, startCol:4, img:'Assets/winter1.png',  confetti:['#E3F2FD','#90CAF9','#42A5F5','#ffffff','#BBDEFB'] },
+  { season:'RAINY',  dir:'h', startRow:1, startCol:2, img:'Assets/rainy1.png',   confetti:['#546E7A','#90A4AE','#B0BEC5','#4FC3F7','#80DEEA'] },
+  { season:'SPRING', dir:'v', startRow:2, startCol:5, img:'Assets/spring1.png',  confetti:['#A5D6A7','#F48FB1','#CE93D8','#80CBC4','#FFCC80'] },
+  { season:'AUTUMN', dir:'v', startRow:3, startCol:1, img:'Assets/autumn.png',   confetti:['#FF8F00','#FFB300','#FF6D00','#E65100','#FFCC02'] },
+  { season:'SUMMER', dir:'h', startRow:4, startCol:0, img:'Assets/summer1.png',  confetti:['#FFD700','#FF8F00','#FFCC02','#FFA000','#FF6D00'] },
+];
+const ROWS=9, COLS=7;
+
+/* Cell map */
+const CELL_MAP={};
+WORDS.forEach((w,wi)=>{
+  for(let i=0;i<w.season.length;i++){
+    const r=w.dir==='v'?w.startRow+i:w.startRow;
+    const c=w.dir==='h'?w.startCol+i:w.startCol;
+    const key=`${r},${c}`;
+    if(!CELL_MAP[key])CELL_MAP[key]={letter:w.season[i],wordIndices:[]};
+    CELL_MAP[key].wordIndices.push(wi);
+  }
+});
+
+WORDS.forEach(w=>{const img=new Image();img.src=w.img;});
+
+let curQ=0,score=0,muted=false,wrongDrops=0;
+const doneWords=new Set();
+let dragTile=null,dragClone=null,dragLetter=null;
+
+const sndWrong=new Audio('Assets/wrong.mp3');
+const sndClaps=new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;window.speechSynthesis?.cancel();s.currentTime=0;s.play().catch(()=>{})}
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window)||muted)return;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    window.speechSynthesis.resume();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.7;u.pitch=1.0;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000)}
+
+/* ── Grid ── */
+function buildGrid(){
+  const grid=document.getElementById('cw-grid');
+  grid.innerHTML='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const cell=document.createElement('div');
+      cell.className='cw-cell';
+      cell.id=`cell-${r}-${c}`;
+      if(CELL_MAP[`${r},${c}`])cell.classList.add('active');
+      grid.appendChild(cell);
+    }
+  }
+  addClueNumbers();
+}
+
+function addClueNumbers(){
+  WORDS.forEach((w,wi)=>{
+    const cell=document.getElementById(`cell-${w.startRow}-${w.startCol}`);
+    if(cell&&!cell.querySelector('.clue-num')){
+      const num=document.createElement('span');
+      num.className='clue-num';
+      num.textContent=wi+1;
+      cell.appendChild(num);
+    }
+  });
+}
+
+function getCells(wordIdx){
+  const w=WORDS[wordIdx];
+  return Array.from({length:w.season.length},(_,i)=>{
+    const r=w.dir==='v'?w.startRow+i:w.startRow;
+    const c=w.dir==='h'?w.startCol+i:w.startCol;
+    return document.getElementById(`cell-${r}-${c}`);
+  });
+}
+
+function highlightWord(wordIdx){
+  document.querySelectorAll('.cw-cell.highlighted').forEach(c=>{c.classList.remove('highlighted');delete c.dataset.expected;});
+  const w=WORDS[wordIdx];
+  getCells(wordIdx).forEach((cell,i)=>{
+    if(cell&&!cell.classList.contains('done-cell')){
+      cell.classList.add('highlighted');
+      cell.dataset.expected=w.season[i];
+    }
+  });
+}
+
+function placeLetterInCell(cell,letter){
+  cell.classList.remove('highlighted','hint-cell');
+  delete cell.dataset.expected;
+  cell.classList.add('done-cell');
+  const span=document.createElement('span');
+  span.textContent=letter;
+  span.style.cssText='color:#4CAF50;display:inline-block;animation:letterPop 0.3s ease both';
+  cell.innerHTML='';
+  cell.appendChild(span);
+  addClueNumbers();
+}
+
+function checkWordComplete(){
+  if(getCells(curQ).every(c=>c&&c.classList.contains('done-cell')))registerWordCorrect();
+}
+
+function registerWordCorrect(){
+  score++;
+  document.getElementById('score-val').textContent=score;
+  window.speechSynthesis?.cancel();
+  playClaps();
+  showToast('&#11088; Correct!','#4CAF50');
+  spawnSeasonConfetti(WORDS[curQ].confetti);
+  doneWords.add(curQ);
+  setTimeout(()=>{curQ++;loadQuestion();},3200);
+}
+
+/* ── Tiles ── */
+function buildTiles(){
+  const pool=document.getElementById('tiles-pool');
+  pool.innerHTML='';
+  const w=WORDS[curQ];
+  const cells=getCells(curQ);
+  const letters=[];
+  cells.forEach((cell,i)=>{
+    if(cell&&!cell.classList.contains('done-cell'))letters.push(w.season[i]);
+  });
+  shuffle(letters);
+  letters.forEach(letter=>{
+    const tile=document.createElement('div');
+    tile.className='letter-tile';
+    tile.textContent=letter;
+    tile.dataset.letter=letter;
+    tile.addEventListener('touchstart',e=>startDrag(tile,e),{passive:false});
+    tile.addEventListener('mousedown', e=>startDrag(tile,e));
+    pool.appendChild(tile);
+  });
+}
+
+/* ── Drag & Drop ── */
+function getPos(e){
+  if(e.changedTouches&&e.changedTouches.length)return{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+  if(e.touches&&e.touches.length)return{x:e.touches[0].clientX,y:e.touches[0].clientY};
+  return{x:e.clientX,y:e.clientY};
+}
+
+function startDrag(tile,e){
+  e.preventDefault();
+  if(dragClone)return;
+  dragTile=tile;
+  dragLetter=tile.dataset.letter;
+  tile.classList.add('tile-ghost');
+  const rect=tile.getBoundingClientRect();
+  dragClone=document.createElement('div');
+  dragClone.className='drag-clone';
+  dragClone.textContent=dragLetter;
+  dragClone.style.width=rect.width+'px';
+  dragClone.style.height=rect.height+'px';
+  dragClone.style.fontSize=getComputedStyle(tile).fontSize;
+  dragClone.style.left=rect.left+'px';
+  dragClone.style.top=rect.top+'px';
+  document.body.appendChild(dragClone);
+  document.addEventListener('touchmove',moveDrag,{passive:false});
+  document.addEventListener('touchend',endDrag,{passive:false});
+  document.addEventListener('mousemove',moveDrag);
+  document.addEventListener('mouseup',endDrag);
+}
+
+function moveDrag(e){
+  if(!dragClone)return;
+  e.preventDefault();
+  const pos=getPos(e);
+  dragClone.style.left=(pos.x-dragClone.offsetWidth/2)+'px';
+  dragClone.style.top=(pos.y-dragClone.offsetHeight/2)+'px';
+}
+
+function endDrag(e){
+  e.preventDefault();
+  document.removeEventListener('touchmove',moveDrag);
+  document.removeEventListener('touchend',endDrag);
+  document.removeEventListener('mousemove',moveDrag);
+  document.removeEventListener('mouseup',endDrag);
+  if(!dragClone||!dragTile)return;
+
+  const pos=getPos(e);
+  dragClone.style.visibility='hidden';
+  const el=document.elementFromPoint(pos.x,pos.y);
+  dragClone.style.visibility='visible';
+
+  const targetCell=el?.closest('.cw-cell.highlighted');
+
+  if(targetCell&&!targetCell.classList.contains('done-cell')){
+    if(targetCell.dataset.expected===dragLetter){
+      /* ✅ Correct */
+      placeLetterInCell(targetCell,dragLetter);
+      dragTile.classList.add('tile-placed');
+      dragClone.remove();dragClone=null;dragTile=null;dragLetter=null;
+      checkWordComplete();
+      return;
+    } else {
+      /* ❌ Wrong cell */
+      handleWrongDrop();
+      return;
+    }
+  }
+  /* Dropped outside — silently return */
+  animateTileBack();
+}
+
+function animateTileBack(){
+  if(!dragClone||!dragTile){cleanupDrag();return;}
+  const rect=dragTile.getBoundingClientRect();
+  const tx=rect.left+rect.width/2-dragClone.offsetWidth/2;
+  const ty=rect.top+rect.height/2-dragClone.offsetHeight/2;
+  dragClone.style.transition='left 0.22s ease,top 0.22s ease,transform 0.22s ease';
+  dragClone.style.left=tx+'px';
+  dragClone.style.top=ty+'px';
+  dragClone.style.transform='scale(1)';
+  const cl=dragClone,tl=dragTile;
+  dragClone=null;dragTile=null;dragLetter=null;
+  setTimeout(()=>{cl.remove();tl.classList.remove('tile-ghost');},240);
+}
+
+function cleanupDrag(){
+  dragClone?.remove();dragClone=null;
+  dragTile?.classList.remove('tile-ghost');dragTile=null;dragLetter=null;
+}
+
+function handleWrongDrop(){
+  wrongDrops++;
+  play(sndWrong);
+  if(wrongDrops===1){
+    showToast('&#10060; Try again!','#f44336');
+    /* Hint: pulse the correct cell for this letter */
+    const w=WORDS[curQ];
+    const cells=getCells(curQ);
+    for(let i=0;i<w.season.length;i++){
+      if(cells[i]&&w.season[i]===dragLetter&&!cells[i].classList.contains('done-cell')){
+        cells[i].classList.add('hint-cell');
+        setTimeout(()=>cells[i]?.classList.remove('hint-cell'),2000);
+        break;
+      }
+    }
+    animateTileBack();
+  } else {
+    showToast('&#10060; Wrong!','#f44336');
+    const revealLetter=dragLetter, revealTile=dragTile;
+    animateTileBack();
+    setTimeout(()=>autoRevealLetter(revealLetter,revealTile),350);
+  }
+}
+
+function autoRevealLetter(letter,tile){
+  const w=WORDS[curQ];
+  const cells=getCells(curQ);
+  for(let i=0;i<w.season.length;i++){
+    if(cells[i]&&!cells[i].classList.contains('done-cell')&&w.season[i]===letter){
+      const cell=cells[i];
+      cell.classList.remove('highlighted','hint-cell');
+      delete cell.dataset.expected;
+      cell.classList.add('done-cell');
+      const span=document.createElement('span');
+      span.textContent=letter;
+      span.style.cssText='color:#FF9800;display:inline-block;animation:letterPop 0.3s ease both';
+      cell.innerHTML='';
+      cell.appendChild(span);
+      break;
+    }
+  }
+  addClueNumbers();
+  if(tile) tile.classList.add('tile-placed');
+  showToast(`&#128161; ${letter} goes here!`,'#FF9800');
+  wrongDrops=0;
+  highlightWord(curQ);
+  checkWordComplete();
+}
+
+/* ── Load question ── */
+function loadQuestion(){
+  if(curQ>=WORDS.length){showEnd();return;}
+  wrongDrops=0;
+  const w=WORDS[curQ];
+
+  document.getElementById('q-num').textContent=curQ+1;
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('prog-bar').style.width=(curQ/WORDS.length*100)+'%';
+
+  const dirLabel=w.dir==='h'?' &#8594;':' &#8595;';
+  document.getElementById('clue-label').innerHTML=`Clue ${curQ+1} of 5${dirLabel}`;
+
+  const img=document.getElementById('q-img');
+  img.classList.remove('loaded');
+  img.onload=()=>img.classList.add('loaded');
+  img.onerror=()=>{};
+  img.src=w.img;
+  if(img.complete&&img.naturalWidth>0)img.classList.add('loaded');
+
+  speak('Which season does this picture show? Drag the letters!');
+
+  highlightWord(curQ);
+
+  /* Skip if crossing cells already filled this word */
+  if(getCells(curQ).every(c=>c&&c.classList.contains('done-cell'))){
+    doneWords.add(curQ);
+    setTimeout(()=>{curQ++;loadQuestion();},500);
+    return;
+  }
+
+  buildTiles();
+}
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;doneWords.clear();
+  buildGrid();loadQuestion();
+}
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  cleanupDrag();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;wrongDrops=0;doneWords.clear();
+  buildGrid();loadQuestion();
+}
+
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.innerHTML=msg;el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+
+function spawnSeasonConfetti(colors){
+  for(let i=0;i<70;i++) setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){
+  const s=document.createElement('style');s.id='cf-style';
+  s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';
+  document.head.appendChild(s);
+}
+
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').innerHTML=muted?'&#128263;':'&#128266;';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else speak('Drag the letters to fill in the crossword!');
+}
+
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').innerHTML=score>=5?'&#11088;&#11088;&#11088;':score>=3?'&#11088;&#11088;':'&#11088;';
+  window.speechSynthesis?.cancel();
+  playClaps();
+  spawnSeasonConfetti(['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC']);
+  setTimeout(()=>spawnSeasonConfetti(['#FFD700','#4FC3F7','#A5D6A7','#F48FB1']),800);
+}
+</script>
+</body>
+</html>
