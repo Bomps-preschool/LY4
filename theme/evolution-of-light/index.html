@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Evolution of Light · LY4</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #e8f5e9 50%, #e3f2fd 100%);
+      height: 100vh; height: 100dvh;
+      display: flex; align-items: stretch; justify-content: center;
+      overflow: hidden; user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── INTRO ── */
+    #intro-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #4a148c, #7b1fa2, #ab47bc);
+      display: flex; align-items: center; justify-content: center;
+      border: 5px solid #FFD700; z-index: 200; cursor: pointer;
+    }
+    #intro-logo { width: 220px; height: auto; filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5)); animation: logoBounce 2s ease-in-out infinite; -webkit-user-drag: none; opacity: 0; transition: opacity 0.3s; }
+    #intro-logo.loaded { opacity: 1; }
+    @keyframes logoBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+    /* ── GAME SCREEN ── */
+    #game-screen {
+      display: none; flex-direction: column;
+      width: 100%; max-width: 860px;
+      height: 100%; padding: 10px 10px 70px;
+      overflow-y: auto;
+    }
+
+    .hdr { display:flex; align-items:center; justify-content:space-between; background:white; border-radius:18px; padding:8px 18px; margin-bottom:8px; box-shadow:0 4px 14px rgba(0,0,0,0.1); flex-shrink:0; }
+    .hdr-score { font-size:1.1em; font-weight:bold; color:#4CAF50; min-width:80px; }
+    .hdr-title { font-size:clamp(0.75em,2.5vw,1em); color:#6a0dad; font-weight:bold; text-align:center; }
+    .mute-btn { width:38px; height:38px; border:2px solid #ddd; border-radius:50%; background:white; font-size:1.1em; cursor:pointer; display:flex; align-items:center; justify-content:center; touch-action: manipulation; min-height: 44px; min-width: 44px; }
+
+    .progress-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-shrink:0; }
+    .progress-label { font-size:0.9em; color:#777; white-space:nowrap; }
+    .progress-bar-wrap { flex:1; height:10px; background:#e0e0e0; border-radius:5px; overflow:hidden; }
+    .progress-bar-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,#FF9800,#FFD700); transition:width 0.5s ease; }
+
+    .instruction { text-align:center; font-size:clamp(0.9em,3vw,1.1em); color:#333; font-weight:800; margin-bottom:8px; padding:0 4px; flex-shrink:0; line-height:1.4; }
+
+    /* ── DRAW CARD ── */
+    #draw-card {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    #draw-canvas {
+      position: absolute; inset: 0;
+      z-index: 10; touch-action: none; cursor: crosshair;
+    }
+
+    /* ── LIGHT NODES ── */
+    .light-node {
+      position: absolute; z-index: 5;
+      pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      transform: translate(-50%, -50%);
+    }
+
+    /* SOURCE node — bigger */
+    .light-node.source-node { width: 130px; }
+    .light-node.source-node img {
+      width: 100px; height: 100px;
+      object-fit: contain; background: #fff8e1;
+      border-radius: 20px; padding: 8px;
+      border: 4px solid #FF9800;
+      box-shadow: 0 4px 16px rgba(255,152,0,0.35);
+      display: block;
+      -webkit-user-drag: none;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .light-node.source-node img.loaded { opacity: 1; }
+    .light-node.source-node .node-label { font-size: 0.82em; font-weight: 800; color: #E65100; }
+
+    /* "FROM HERE" indicator on source */
+    .light-node.source-node::before {
+      content: '✏️ Draw from here';
+      position: absolute; bottom: -22px;
+      font-size: 0.6em; font-weight: 800; color: #FF9800;
+      white-space: nowrap;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* OPTION nodes */
+    .light-node.option-node { width: 110px; }
+    .light-node.option-node img {
+      width: 86px; height: 86px;
+      object-fit: contain; background: #f9f9f9;
+      border-radius: 18px; padding: 7px;
+      border: 3px solid #e0e0e0;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+      display: block;
+      -webkit-user-drag: none;
+      opacity: 0;
+    }
+    .light-node.option-node img.loaded { opacity: 1; }
+    .light-node.option-node .node-label { font-size: 0.72em; font-weight: 800; color: #555; }
+
+    /* States */
+    .light-node.correct-node img {
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 5px rgba(76,175,80,0.3);
+    }
+    .light-node.auto-node img {
+      border-color: #FF9800;
+      box-shadow: 0 0 0 5px rgba(255,152,0,0.3);
+    }
+    .light-node.hint-node img {
+      border-color: #FF9800;
+      animation: hintPulse 0.7s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%,100% { box-shadow: 0 0 10px 4px rgba(255,152,0,0.9), 0 0 30px 8px rgba(255,152,0,0.5); }
+      50%      { box-shadow: 0 0 22px 10px rgba(255,200,0,1), 0 0 50px 18px rgba(255,152,0,0.7); }
+    }
+    .light-node.wrong-node img {
+      border-color: #f44336;
+      animation: shake 0.35s ease;
+    }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+
+    /* ── TIMELINE STRIP (bottom of card) ── */
+    #timeline-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      z-index: 6; pointer-events: none;
+      padding: 6px 12px 8px;
+      background: linear-gradient(to top, rgba(255,255,255,1) 70%, transparent);
+    }
+    .tl-label { font-size: 0.6em; color: #aaa; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+    #timeline-strip {
+      display: flex; align-items: center; gap: 0;
+      min-height: 48px; justify-content: center; flex-wrap: nowrap;
+    }
+    .tl-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      animation: slideIn 0.4s ease; flex-shrink: 0;
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .tl-item img { width: 36px; height: 36px; object-fit: contain; pointer-events: none; -webkit-user-drag: none; }
+    .tl-num { font-size: 0.58em; font-weight: 800; color: #4CAF50; }
+    .tl-item.tl-auto .tl-num { color: #FF9800; }
+    .tl-arrow { font-size: 1.1em; color: #ccc; margin: 0 2px; padding-bottom: 14px; flex-shrink: 0; }
+
+    /* ── PATH NODES (Q6 full-path round) ── */
+    .light-node.path-node { width: 100px; }
+    .light-node.path-node img {
+      width: 76px; height: 76px;
+      object-fit: contain; background: #f9f9f9;
+      border-radius: 16px; padding: 6px;
+      border: 3px solid #e0e0e0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s; display: block;
+      -webkit-user-drag: none;
+      opacity: 0;
+    }
+    .light-node.path-node img.loaded { opacity: 1; }
+    .light-node.path-node .node-label { font-size: 0.7em; font-weight: 800; color: #555; text-align: center; }
+    .light-node.path-start img {
+      border-color: #2196F3;
+      animation: startPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes startPulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(33,150,243,0.6); }
+      50%      { box-shadow: 0 0 0 12px rgba(33,150,243,0); }
+    }
+    .light-node.path-connected img { border-color: #4CAF50; box-shadow: 0 0 0 4px rgba(76,175,80,0.3); }
+    .light-node.path-auto img      { border-color: #FF9800; box-shadow: 0 0 0 4px rgba(255,152,0,0.3); }
+    .light-node.path-hint img      { border-color: #FF9800; animation: hintPulse 0.7s ease-in-out infinite; }
+    .path-start-label {
+      position: absolute; z-index: 6; pointer-events: none;
+      font-size: 0.62em; font-weight: 800; color: #2196F3;
+      white-space: nowrap; animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── BOTTOM ── */
+    .btn-restart {
+      position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg,#FF9800,#F57C00); color: white;
+      border: none; border-radius: 50px; padding: 13px 34px;
+      font-size: 1em; font-family: inherit; font-weight: 800; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,152,0,0.4); z-index: 50; white-space: nowrap;
+      touch-action: manipulation; min-height: 44px;
+    }
+
+    #toast { position:fixed; top:18%; left:50%; transform:translateX(-50%) scale(0); color:white; padding:12px 26px; border-radius:50px; font-size:1.4em; font-weight:800; box-shadow:0 6px 24px rgba(0,0,0,0.25); z-index:100; transition:transform 0.2s,opacity 0.2s; opacity:0; pointer-events:none; white-space:nowrap; }
+    #toast.show { transform:translateX(-50%) scale(1); opacity:1; }
+
+    .confetti { position:fixed; top:-10px; pointer-events:none; z-index:9998; border-radius:2px; }
+    @keyframes cfFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
+    /* ── END SCREEN ── */
+    #end-screen { display:none; position:fixed; inset:0; background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc); flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:200; padding:30px; }
+    .end-trophy { font-size:4.5em; animation:trophySpin 1.5s ease-out; }
+    @keyframes trophySpin { from{transform:rotate(-20deg) scale(0)} 60%{transform:rotate(10deg) scale(1.1)} to{transform:rotate(0deg) scale(1)} }
+    .end-title  { color:#FFD700; font-size:clamp(1.5em,5vw,2.2em); font-weight:bold; text-shadow:0 3px 10px rgba(0,0,0,0.3); text-align:center; }
+    .end-sub    { color:rgba(255,255,255,0.9); font-size:1.1em; text-align:center; }
+    .end-score-box { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:16px 40px; color:white; font-size:1.8em; font-weight:bold; }
+    .end-stars  { font-size:2.2em; letter-spacing:4px; }
+    .btn-play-again { background:#FFD700; color:#333; border:none; border-radius:50px; padding:14px 36px; font-size:1.1em; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(255,215,0,0.5); touch-action: manipulation; min-height: 44px; }
+
+    @media (max-width: 768px) {
+      #game-screen { padding: 10px 10px 76px; }
+      .hdr-title { display: none; }
+    }
+    @media (max-width: 480px) {
+      .instruction { font-size: clamp(0.8em, 3.5vw, 1em); }
+      .hdr-score { font-size: 1em; }
+      .progress-label { font-size: 0.8em; }
+      .btn-restart { font-size: 0.9em; padding: 12px 26px; }
+      .light-node.source-node img { width: 80px; height: 80px; }
+      .light-node.option-node img { width: 70px; height: 70px; }
+      .light-node.path-node img   { width: 60px; height: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onload="this.classList.add('loaded')" style="-webkit-user-drag:none;">
+</div>
+
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">⭐ <span id="score-val">0</span> / 6</div>
+    <div class="hdr-title">Evolution of Light</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 6</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction" id="instruction-txt">Draw an arrow to show what came next in the evolution of light!</div>
+
+  <div id="draw-card">
+    <canvas id="draw-canvas"></canvas>
+    <div id="timeline-wrap">
+      <div class="tl-label">EVOLUTION TIMELINE</div>
+      <div id="timeline-strip"></div>
+    </div>
+  </div>
+
+  <button class="btn-restart" onclick="restartGame()">🔄 &nbsp;Restart</button>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">🏆</div>
+  <div class="end-title">You have done a great job!</div>
+  <div class="end-sub">You traced the full Evolution of Light!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 6</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">▶ &nbsp;Play Again</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   LIGHT SOURCES — index = evolution order
+   ══════════════════════════════════════ */
+const LIGHTS = [
+  { id: 0, label: 'Fire Torch',  img: 'Assets/fire torch.png'  },
+  { id: 1, label: 'Oil Lamp',    img: 'Assets/oil lamp.png'    },
+  { id: 2, label: 'Candle',      img: 'Assets/candle.png'      },
+  { id: 3, label: 'Tube Light',  img: 'Assets/tubelight.png'   },
+  { id: 4, label: 'LED Bulb',    img: 'Assets/led bulb.png'    },
+  { id: 5, label: 'Solar Light', img: 'Assets/solar light.png' },
+];
+
+/* 5 questions — each asks "what came after X?"
+   from: source light id
+   correct: correct next light id
+   wrong: two distractor ids                        */
+const QUESTIONS = [
+  { from: 0, correct: 1, wrong: [3, 5] },   // Fire Torch → Oil Lamp
+  { from: 1, correct: 2, wrong: [4, 0] },   // Oil Lamp   → Candle
+  { from: 2, correct: 3, wrong: [5, 1] },   // Candle     → Tube Light
+  { from: 3, correct: 4, wrong: [0, 2] },   // Tube Light → LED Bulb
+  { from: 4, correct: 5, wrong: [1, 3] },   // LED Bulb   → Solar Light
+];
+
+/* Q6 full-path positions — all 6 items scattered */
+const PATH_POSITIONS = [
+  { left: '20%', top: '16%' },  // 0 Fire Torch
+  { left: '78%', top: '16%' },  // 1 Oil Lamp
+  { left: '49%', top: '40%' },  // 2 Candle
+  { left: '20%', top: '67%' },  // 3 Tube Light
+  { left: '49%', top: '75%' },  // 4 LED Bulb
+  { left: '78%', top: '67%' },  // 5 Solar Light
+];
+
+/* Option positions on card (% — centered via transform) */
+const OPT_POSITIONS = [
+  { left: '20%', top: '28%' },   // top-left
+  { left: '78%', top: '28%' },   // top-right
+  { left: '50%', top: '72%' },   // bottom-center
+];
+const SRC_POSITION = { left: '50%', top: '46%' };
+
+/* Preload */
+LIGHTS.forEach(l => { new Image().src = l.img; });
+
+/* ══════════════════════════════════════
+   STATE
+   ══════════════════════════════════════ */
+let curQ         = 0;
+let score        = 0;
+let muted        = false;
+let isDrawing    = false;
+let liveX = 0, liveY = 0;
+let wrongAttempts  = 0;
+let wrongCooldown  = false;
+let locked         = false;
+let answered       = false;
+
+/* Timeline state */
+const tlItems = []; // ids placed in timeline so far
+
+/* Q6 path state */
+let pathConnected    = [];   // ids in path so far
+let pathArrows       = [];   // { from, to, color } completed arrows
+let pathWrong        = 0;    // wrong attempts for current next node
+let pathWrongCooldown = false;
+
+/* ══════════════════════════════════════
+   CANVAS
+   ══════════════════════════════════════ */
+const canvas = document.getElementById('draw-canvas');
+const ctx    = canvas.getContext('2d');
+const SNAP_R = 60;
+
+function resizeCanvas() {
+  const card = document.getElementById('draw-card');
+  canvas.width  = card.offsetWidth;
+  canvas.height = card.offsetHeight;
+  redrawCanvas();
+}
+window.addEventListener('resize', resizeCanvas);
+
+function getCanvasPt(e) {
+  const r  = canvas.getBoundingClientRect();
+  const pt = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+  return { x: pt.clientX - r.left, y: pt.clientY - r.top };
+}
+
+function getCenter(selector) {
+  const card = document.getElementById('draw-card');
+  const node = document.querySelector(selector);
+  if (!node) return { x: 0, y: 0 };
+  const cr = card.getBoundingClientRect();
+  const nr = node.getBoundingClientRect();
+  return { x: nr.left + nr.width / 2 - cr.left, y: nr.top + nr.height / 2 - cr.top };
+}
+
+function dist(a, b) { return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2); }
+
+/* ── DRAWING ── */
+function drawArrow(from, to, color) {
+  const angle   = Math.atan2(to.y - from.y, to.x - from.x);
+  const headLen = 18;
+  const shorten = 42;
+  const tx = to.x   - shorten * Math.cos(angle);
+  const ty = to.y   - shorten * Math.sin(angle);
+  const fx = from.x + shorten * Math.cos(angle);
+  const fy = from.y + shorten * Math.sin(angle);
+
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color;
+  ctx.lineWidth = 4; ctx.lineCap = 'round';
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(tx, ty);
+  ctx.lineTo(tx - headLen * Math.cos(angle - Math.PI/6), ty - headLen * Math.sin(angle - Math.PI/6));
+  ctx.lineTo(tx - headLen * Math.cos(angle + Math.PI/6), ty - headLen * Math.sin(angle + Math.PI/6));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function drawLiveLine(from, to) {
+  ctx.save();
+  ctx.globalAlpha = 0.5; ctx.strokeStyle = '#FF9800';
+  ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.setLineDash([10, 6]);
+  ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+}
+
+let completedArrow = null; // { from, to, color } — shown persistently for Q1-Q5
+
+function redrawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (curQ === 5) {
+    /* Q6 — draw all completed path arrows + live line */
+    pathArrows.forEach(a => drawArrow(a.from, a.to, a.color));
+    if (isDrawing && pathConnected.length > 0) {
+      drawLiveLine(getCenter(`.path-node[data-id="${pathConnected[pathConnected.length - 1]}"]`), { x: liveX, y: liveY });
+    }
+  } else {
+    if (completedArrow) {
+      drawArrow(completedArrow.from, completedArrow.to, completedArrow.color);
+    } else if (isDrawing) {
+      drawLiveLine(getCenter('.source-node'), { x: liveX, y: liveY });
+    }
+  }
+}
+
+/* ══════════════════════════════════════
+   POINTER EVENTS
+   ══════════════════════════════════════ */
+canvas.addEventListener('pointerdown', e => {
+  if (locked) return;
+  e.preventDefault();
+  const pt = getCanvasPt(e);
+
+  if (curQ === 5) {
+    /* Q6 — start/resume path drawing */
+    const startId = pathConnected.length === 0 ? 0 : pathConnected[pathConnected.length - 1];
+    if (dist(pt, getCenter(`.path-node[data-id="${startId}"]`)) < SNAP_R * 1.6) {
+      if (pathConnected.length === 0) {
+        pathConnected = [0];
+        markPathNode(0, 'path-connected');
+      }
+      isDrawing = true;
+      liveX = pt.x; liveY = pt.y;
+      canvas.setPointerCapture(e.pointerId);
+      redrawCanvas();
+    }
+  } else {
+    if (answered) return;
+    const src = getCenter('.source-node');
+    if (dist(pt, src) < SNAP_R * 1.5) {
+      isDrawing = true;
+      liveX = pt.x; liveY = pt.y;
+      canvas.setPointerCapture(e.pointerId);
+      redrawCanvas();
+    }
+  }
+});
+
+canvas.addEventListener('pointermove', e => {
+  if (!isDrawing || locked) return;
+  e.preventDefault();
+  const pt = getCanvasPt(e);
+  liveX = pt.x; liveY = pt.y;
+  if (curQ === 5) checkPathSnap(pt);
+  else if (!answered) checkSnap(pt);
+  redrawCanvas();
+});
+
+canvas.addEventListener('pointerup', () => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  redrawCanvas();
+});
+canvas.addEventListener('pointercancel', () => { isDrawing = false; redrawCanvas(); });
+
+/* ══════════════════════════════════════
+   SNAP CHECK
+   ══════════════════════════════════════ */
+function checkSnap(pt) {
+  const q = QUESTIONS[curQ];
+
+  /* Check correct option */
+  const correctNode = document.querySelector('.option-node.opt-correct');
+  if (correctNode && dist(pt, getCenter('.opt-correct')) < SNAP_R) {
+    handleResult(true);
+    return;
+  }
+
+  /* Check wrong options — debounced */
+  if (wrongCooldown) return;
+  document.querySelectorAll('.option-node:not(.opt-correct)').forEach(node => {
+    if (dist(pt, getCenter(`[data-id="${node.dataset.id}"]`)) < SNAP_R) {
+      wrongCooldown = true;
+      setTimeout(() => { wrongCooldown = false; }, 1500);
+      wrongAttempts++;
+      play(sndWrong);
+      node.classList.add('wrong-node');
+      setTimeout(() => node.classList.remove('wrong-node'), 500);
+
+      if (wrongAttempts === 1) {
+        showToast('❌ Try again!', '#f44336');
+        document.querySelectorAll('.option-node').forEach(n => n.classList.remove('hint-node'));
+        correctNode && correctNode.classList.add('hint-node');
+      } else {
+        showToast('💡 Let me show you!', '#FF9800');
+        isDrawing = false;
+        locked = true;
+        setTimeout(() => handleResult(false), 700);
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════
+   Q6 PATH SNAP & CONNECTION
+   ══════════════════════════════════════ */
+function checkPathSnap(pt) {
+  const nextId = pathConnected[pathConnected.length - 1] + 1;
+  if (nextId >= LIGHTS.length) return;
+
+  /* Correct next node */
+  if (dist(pt, getCenter(`.path-node[data-id="${nextId}"]`)) < SNAP_R) {
+    pathWrong = 0;
+    pathWrongCooldown = false;
+    connectPathNode(nextId, 'self');
+    return;
+  }
+
+  /* Wrong nodes — debounced */
+  if (pathWrongCooldown) return;
+  for (let i = 0; i < LIGHTS.length; i++) {
+    if (i <= pathConnected[pathConnected.length - 1]) continue;
+    if (i === nextId) continue;
+    if (dist(pt, getCenter(`.path-node[data-id="${i}"]`)) < SNAP_R) {
+      pathWrongCooldown = true;
+      setTimeout(() => { pathWrongCooldown = false; }, 1400);
+      pathWrong++;
+      play(sndWrong);
+      flashPathNode(i);
+      if (pathWrong === 1) {
+        showToast('❌ Try again!', '#f44336');
+        showPathHint(nextId);
+      } else {
+        showToast('💡 Let me help!', '#FF9800');
+        isDrawing = false;
+        locked = true;
+        setTimeout(() => { connectPathNode(nextId, 'auto'); locked = false; }, 700);
+      }
+      break;
+    }
+  }
+}
+
+function connectPathNode(id, type) {
+  const fromId = pathConnected[pathConnected.length - 1];
+  pathConnected.push(id);
+  pathArrows.push({
+    from:  getCenter(`.path-node[data-id="${fromId}"]`),
+    to:    getCenter(`.path-node[data-id="${id}"]`),
+    color: type === 'auto' ? '#FF9800' : '#4CAF50'
+  });
+  clearPathHint();
+  markPathNode(id, type === 'auto' ? 'path-auto' : 'path-connected');
+  if (type === 'self') showToast('⭐ Connected!', '#4CAF50');
+  pathWrong = 0;
+  redrawCanvas();
+
+  if (pathConnected.length === LIGHTS.length) {
+    /* Full path complete */
+    isDrawing = false; locked = true;
+    const allSelf = pathArrows.every(a => a.color === '#4CAF50');
+    if (allSelf) { score++; document.getElementById('score-val').textContent = score; }
+    window.speechSynthesis?.cancel();
+    playClaps(); spawnConfetti(); setTimeout(spawnConfetti, 600);
+    setTimeout(showEnd, 3200);
+  }
+}
+
+function markPathNode(id, cls) {
+  const node = document.querySelector(`.path-node[data-id="${id}"]`);
+  if (!node) return;
+  node.classList.remove('path-start', 'path-hint');
+  node.classList.add(cls);
+}
+function flashPathNode(id) {
+  const node = document.querySelector(`.path-node[data-id="${id}"]`);
+  if (!node) return;
+  node.classList.add('wrong-node');
+  setTimeout(() => node.classList.remove('wrong-node'), 450);
+}
+function showPathHint(id) {
+  clearPathHint();
+  const node = document.querySelector(`.path-node[data-id="${id}"]`);
+  if (node) node.classList.add('path-hint');
+}
+function clearPathHint() {
+  document.querySelectorAll('.path-hint').forEach(n => n.classList.remove('path-hint'));
+}
+
+/* ══════════════════════════════════════
+   HANDLE RESULT
+   ══════════════════════════════════════ */
+function handleResult(selfDone) {
+  if (answered) return;
+  answered = true;
+  isDrawing = false;
+  locked = true;
+  wrongCooldown = false;
+
+  const q       = QUESTIONS[curQ];
+  const srcPt   = getCenter('.source-node');
+  const tgtPt   = getCenter('.opt-correct');
+  const color   = selfDone ? '#4CAF50' : '#FF9800';
+
+  completedArrow = { from: srcPt, to: tgtPt, color };
+  redrawCanvas();
+
+  /* Mark correct option */
+  const correctNode = document.querySelector('.opt-correct');
+  correctNode && correctNode.classList.add(selfDone ? 'correct-node' : 'auto-node');
+  document.querySelectorAll('.option-node').forEach(n => n.classList.remove('hint-node'));
+
+  if (selfDone) {
+    score++;
+    document.getElementById('score-val').textContent = score;
+    showToast('⭐ Correct!', '#4CAF50');
+    spawnConfetti();
+  } else {
+    showToast('✅ This one!', '#FF9800');
+  }
+
+  /* Add to timeline — source first time, then target */
+  addToTimeline(q.from, false);
+  addToTimeline(q.correct, !selfDone);
+
+  window.speechSynthesis?.cancel();
+  if (selfDone) playClaps();
+
+  setTimeout(() => { curQ++; loadQuestion(); }, 3200);
+}
+
+/* ══════════════════════════════════════
+   TIMELINE
+   ══════════════════════════════════════ */
+function addToTimeline(id, isAuto) {
+  /* Don't add duplicate — only add the "from" of Q1, then targets only */
+  if (tlItems.includes(id)) return;
+  tlItems.push(id);
+
+  const strip = document.getElementById('timeline-strip');
+  if (strip.children.length > 0) {
+    const arrow = document.createElement('div');
+    arrow.className = 'tl-arrow'; arrow.textContent = '→';
+    strip.appendChild(arrow);
+  }
+  const item = document.createElement('div');
+  item.className = 'tl-item' + (isAuto ? ' tl-auto' : '');
+  item.innerHTML = `<img src="${LIGHTS[id].img}" alt="${LIGHTS[id].label}" style="-webkit-user-drag:none;"><div class="tl-num">${tlItems.length}</div>`;
+  strip.appendChild(item);
+}
+
+/* ══════════════════════════════════════
+   LOAD QUESTION
+   ══════════════════════════════════════ */
+function loadQuestion() {
+  if (curQ >= 6) { showEnd(); return; }
+
+  answered = false; isDrawing = false;
+  wrongAttempts = 0; wrongCooldown = false; locked = false;
+  completedArrow = null;
+
+  document.getElementById('q-num').textContent    = curQ + 1;
+  document.getElementById('prog-bar').style.width = (curQ / 6 * 100) + '%';
+
+  const card = document.getElementById('draw-card');
+  card.querySelectorAll('.light-node, .path-start-label').forEach(el => el.remove());
+
+  if (curQ === 5) {
+    /* ── Q6: full evolution path ── */
+    pathConnected = []; pathArrows = [];
+    pathWrong = 0; pathWrongCooldown = false;
+
+    const instrEl = document.getElementById('instruction-txt');
+    instrEl.textContent = 'Now draw ALL the arrows to show the full Evolution of Light!';
+    speak(instrEl.textContent);
+
+    LIGHTS.forEach((l, i) => {
+      const node = document.createElement('div');
+      node.className  = 'light-node path-node';
+      node.dataset.id = i;
+      node.style.left = PATH_POSITIONS[i].left;
+      node.style.top  = PATH_POSITIONS[i].top;
+      if (i === 0) node.classList.add('path-start');
+      node.innerHTML = `<img src="${l.img}" alt="${l.label}" onload="this.classList.add('loaded')" style="-webkit-user-drag:none;"><div class="node-label">${l.label}</div>`;
+      card.appendChild(node);
+    });
+
+    /* "Start here" label */
+    const lbl = document.createElement('div');
+    lbl.className = 'path-start-label';
+    lbl.textContent = '👆 Start here';
+    lbl.style.left = 'calc(' + PATH_POSITIONS[0].left + ' - 8px)';
+    lbl.style.top  = 'calc(' + PATH_POSITIONS[0].top  + ' + 48px)';
+    card.appendChild(lbl);
+
+    setTimeout(() => { resizeCanvas(); }, 60);
+
+  } else {
+    /* ── Q1-Q5: single arrow question ── */
+    const q = QUESTIONS[curQ];
+
+    const src = document.createElement('div');
+    src.className  = 'light-node source-node';
+    src.style.left = SRC_POSITION.left;
+    src.style.top  = SRC_POSITION.top;
+    src.innerHTML  = `<img src="${LIGHTS[q.from].img}" alt="${LIGHTS[q.from].label}" onload="this.classList.add('loaded')" style="-webkit-user-drag:none;"><div class="node-label">${LIGHTS[q.from].label}</div>`;
+    card.appendChild(src);
+
+    const allOpts   = shuffle([q.correct, ...q.wrong]);
+    const positions = shuffle([...OPT_POSITIONS]);
+    allOpts.forEach((id, i) => {
+      const node = document.createElement('div');
+      node.className  = 'light-node option-node';
+      node.dataset.id = id;
+      node.style.left = positions[i].left;
+      node.style.top  = positions[i].top;
+      if (id === q.correct) node.classList.add('opt-correct');
+      node.innerHTML = `<img src="${LIGHTS[id].img}" alt="${LIGHTS[id].label}" onload="this.classList.add('loaded')" style="-webkit-user-drag:none;"><div class="node-label">${LIGHTS[id].label}</div>`;
+      card.appendChild(node);
+    });
+
+    setTimeout(() => { resizeCanvas(); }, 60);
+    speak(document.getElementById('instruction-txt').textContent);
+  }
+}
+
+/* ══════════════════════════════════════
+   GAME CONTROL
+   ══════════════════════════════════════ */
+function startGame() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'flex';
+  curQ = 0; score = 0; tlItems.length = 0;
+  document.getElementById('score-val').textContent  = 0;
+  document.getElementById('timeline-strip').innerHTML = '';
+  loadQuestion();
+}
+
+function restartGame() {
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display  = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+  curQ = 0; score = 0; tlItems.length = 0;
+  pathConnected = []; pathArrows = [];
+  document.getElementById('score-val').textContent  = 0;
+  document.getElementById('timeline-strip').innerHTML = '';
+  loadQuestion();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('end-screen').style.display  = 'flex';
+  document.getElementById('final-score').textContent   = score;
+  document.getElementById('end-stars').textContent     = score >= 6 ? '⭐⭐⭐' : score >= 4 ? '⭐⭐' : '⭐';
+  window.speechSynthesis?.cancel();
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti, 800);
+}
+
+/* ══════════════════════════════════════
+   AUDIO / SPEECH
+   ══════════════════════════════════════ */
+const sndWrong = new Audio('Assets/wrong.mp3');
+const sndClaps = new Audio('Assets/free_claps.mp3');
+
+function unlockAudio() {
+  [sndWrong, sndClaps].forEach(s => { s.play().catch(()=>{}); s.pause(); s.currentTime = 0; });
+  document.removeEventListener('pointerdown', unlockAudio);
+}
+document.addEventListener('pointerdown', unlockAudio);
+
+function play(s) { if (muted) return; s.currentTime = 0; s.play().catch(()=>{}); }
+function playClaps() {
+  if (muted) return;
+  sndClaps.currentTime = 0; sndClaps.play().catch(()=>{});
+  setTimeout(() => { sndClaps.pause(); sndClaps.currentTime = 0; }, 3000);
+}
+function speak(text) {
+  sndClaps.pause(); sndClaps.currentTime = 0;
+  if (!('speechSynthesis' in window) || muted) return;
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    if (muted) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.7; u.pitch = 1.0;
+    const vs = window.speechSynthesis.getVoices();
+    const v  = vs.find(v => v.lang.startsWith('en') && !v.name.includes('Google'))
+            || vs.find(v => v.lang.startsWith('en')) || vs[0];
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  }, 150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
+
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('mute-btn').textContent = muted ? '🔇' : '🔊';
+  if (muted) { window.speechSynthesis?.cancel(); sndClaps.pause(); }
+  else speak(document.getElementById('instruction-txt').textContent);
+}
+
+/* ══════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let toastTimer;
+function showToast(msg, bg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = bg;
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+const CC = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF922B','#cc5de8','#ff6b81'];
+function spawnConfetti() {
+  for (let i = 0; i < 70; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      const sz = 6 + Math.random() * 9;
+      el.style.cssText = `left:${Math.random()*100}vw;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i * 22);
+  }
+}
+</script>
+</body>
+</html>
