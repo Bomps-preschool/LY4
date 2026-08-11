@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Yes and No &middot; LY4 &middot; Game 42</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:stretch;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+/* ── INTRO ── */
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite;-webkit-user-drag:none;opacity:0;transition:opacity 0.3s}
+#intro-logo.loaded{opacity:1}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ── GAME SCREEN ── */
+#game-screen{display:none;flex-direction:column;width:100%;max-width:600px;height:100%;padding:14px 14px 76px;overflow:hidden}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.2em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.75em,2.5vw,1em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:44px;height:44px;min-height:44px;min-width:44px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+
+/* ── PROGRESS ── */
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-shrink:0}
+.progress-label{font-size:0.9em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+/* ── QUESTION TEXT ── */
+.question-txt{text-align:center;font-size:clamp(1.1em,4vw,1.5em);color:#333;font-weight:800;margin-bottom:10px;padding:0 8px;line-height:1.3;flex-shrink:0;letter-spacing:0.02em}
+
+/* ── Q CARD ── */
+.q-card{background:white;border-radius:24px;padding:20px 18px 22px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;gap:18px;flex:1;min-height:0;justify-content:center}
+
+/* ── IMAGE ── */
+.img-wrap{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.img-wrap img{max-width:88%;max-height:clamp(140px,42vh,340px);object-fit:contain;border-radius:16px;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.14));opacity:0;transition:opacity 0.3s;-webkit-user-drag:none}
+.img-wrap img.loaded{opacity:1}
+
+/* ── YES / NO BUTTONS ── */
+.yn-row{display:flex;gap:clamp(24px,7vw,56px);justify-content:center;flex-shrink:0}
+.yn-btn{width:clamp(84px,21vw,114px);height:clamp(84px,21vw,114px);border-radius:50%;border:5px solid transparent;font-size:clamp(1.35em,5vw,1.9em);font-weight:800;font-family:inherit;cursor:pointer;color:white;display:flex;align-items:center;justify-content:center;touch-action:manipulation;min-height:44px;transition:transform 0.12s,border-color 0.2s,box-shadow 0.2s;text-transform:lowercase;letter-spacing:0.03em}
+.yn-btn:active{transform:scale(0.91)}
+.yn-btn.yes-btn{background:linear-gradient(135deg,#66BB6A,#2E7D32);box-shadow:0 5px 16px rgba(46,125,50,0.4)}
+.yn-btn.no-btn {background:linear-gradient(135deg,#EF5350,#b71c1c);box-shadow:0 5px 16px rgba(183,28,28,0.4)}
+
+/* ── BUTTON STATES ── */
+.yn-btn.wrong  {border-color:#FF1744!important;border-width:5px!important;animation:shakeWrong 0.4s ease}
+.yn-btn.hint   {border-color:#FFD700!important;border-width:5px!important;box-shadow:0 0 0 0 rgba(255,215,0,0.7)!important;animation:pulseHint 0.9s ease-in-out infinite}
+.yn-btn.correct{border-color:#4CAF50!important;border-width:5px!important;box-shadow:0 0 0 8px rgba(76,175,80,0.45),0 0 28px rgba(76,175,80,0.5)!important;animation:popCorrect 0.35s ease both}
+
+@keyframes shakeWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+@keyframes pulseHint{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.75)}50%{box-shadow:0 0 0 16px rgba(255,215,0,0)}}
+@keyframes popCorrect{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* ── RESTART ── */
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 32px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);min-height:44px;touch-action:manipulation}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:14px 30px;border-radius:50px;font-size:1.5em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+/* ── END SCREEN ── */
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 45px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;min-height:44px;touch-action:manipulation}
+
+@media(max-width:768px){.hdr-title{display:none}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 68px}
+  .hdr{padding:8px 14px;margin-bottom:8px}
+  .q-card{padding:14px 12px 18px;gap:14px}
+  .question-txt{font-size:clamp(1em,3.8vw,1.3em);margin-bottom:6px}
+  .hdr-title{display:none}
+}
+@media(max-height:700px){
+  .q-card{gap:12px;padding:14px 14px 16px}
+  .yn-btn{width:clamp(72px,16vh,104px);height:clamp(72px,16vh,104px)}
+  .question-txt{margin-bottom:5px}
+  .img-wrap img{max-height:clamp(120px,36vh,260px)}
+}
+@media(max-height:620px){
+  .q-card{gap:8px;padding:10px 12px 12px}
+  .yn-btn{width:clamp(60px,13vh,84px);height:clamp(60px,13vh,84px);font-size:1.1em}
+  .question-txt{font-size:clamp(0.95em,3.5vw,1.2em);margin-bottom:3px}
+  .img-wrap img{max-height:clamp(100px,30vh,200px)}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine"
+    onerror="this.style.display='none'"
+    onload="this.classList.add('loaded')">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">&#11088; <span id="score-val">0</span> / 10</div>
+    <div class="hdr-title">Yes and No &middot; LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">&#128266;</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 10</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="question-txt" id="question-txt"></div>
+  <div class="q-card" id="q-card">
+    <div class="img-wrap"><img id="q-img" src="" alt=""></div>
+    <div class="yn-row">
+      <button class="yn-btn yes-btn" id="btn-yes" onclick="selectAnswer('yes')">yes</button>
+      <button class="yn-btn no-btn"  id="btn-no"  onclick="selectAnswer('no')">no</button>
+    </div>
+  </div>
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">&#128260; &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">&#127942;</div>
+  <div class="end-title">You have done a great job!</div>
+  <div class="end-sub">You can answer Yes and No questions!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 10</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">&#9654; &nbsp;Play Again</button>
+</div>
+
+<script>
+const QUESTIONS = [
+  { q:'Is this a cat?',       img:'Assets/cat.png',      answer:'yes' },
+  { q:'Is this a banana?',    img:'Assets/banana.png',   answer:'yes' },
+  { q:'Is this a fish?',      img:'Assets/fish.png',     answer:'yes' },
+  { q:'Is this an elephant?', img:'Assets/elephant.png', answer:'yes' },
+  { q:'Is this a van?',       img:'Assets/van.png',      answer:'yes' },
+  { q:'Is this a duck?',      img:'Assets/dog.png',      answer:'no'  },
+  { q:'Is this a monkey?',    img:'Assets/pig.png',      answer:'no'  },
+  { q:'Is this a cow?',       img:'Assets/duck.png',     answer:'no'  },
+  { q:'Is this a bee?',       img:'Assets/ant.png',      answer:'no'  },
+  { q:'Is this a tree?',      img:'Assets/flower.png',   answer:'no'  },
+];
+
+/* Shuffle questions so YES/NO are mixed */
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+shuffle(QUESTIONS);
+
+/* Preload all images */
+QUESTIONS.forEach(q=>{ const i=new Image(); i.src=q.img; });
+
+let curQ=0, score=0, attempts=0, answered=false, muted=false;
+
+/* ── Audio ── */
+const sndWrong=new Audio('Assets/wrong.mp3');
+const sndClaps=new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;window.speechSynthesis?.cancel();s.currentTime=0;s.play().catch(()=>{})}
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window)||muted)return;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.68;u.pitch=1.0;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000)}
+
+/* ── Load question ── */
+function loadQuestion(){
+  if(curQ>=QUESTIONS.length){showEnd();return;}
+  answered=false; attempts=0;
+  clearBtnStates();
+
+  const q=QUESTIONS[curQ];
+  document.getElementById('q-num').textContent=curQ+1;
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('prog-bar').style.width=(curQ/QUESTIONS.length*100)+'%';
+  document.getElementById('question-txt').textContent=q.q.toUpperCase();
+  speak(q.q);
+
+  const img=document.getElementById('q-img');
+  img.classList.remove('loaded');
+  img.alt=q.q;
+  img.onload=()=>img.classList.add('loaded');
+  img.onerror=()=>{};
+  img.src=q.img;
+  if(img.complete&&img.naturalWidth>0)img.classList.add('loaded');
+}
+
+/* ── Answer ── */
+function selectAnswer(value){
+  if(answered)return;
+  const correct=QUESTIONS[curQ].answer;
+  if(value===correct) registerCorrect(value);
+  else                registerWrong(value,correct);
+}
+
+function getBtn(v){return document.getElementById(v==='yes'?'btn-yes':'btn-no');}
+
+function clearBtnStates(){
+  document.getElementById('btn-yes').classList.remove('wrong','hint','correct');
+  document.getElementById('btn-no').classList.remove('wrong','hint','correct');
+}
+
+function registerCorrect(value){
+  answered=true;
+  clearBtnStates();
+  getBtn(value).classList.add('correct');
+  score++;
+  document.getElementById('score-val').textContent=score;
+  window.speechSynthesis?.cancel();
+  playClaps();
+  showToast('⭐ Correct!','#4CAF50');
+  spawnConfetti();
+  setTimeout(()=>{curQ++;loadQuestion();},3200);
+}
+
+function registerWrong(value,correct){
+  if(answered)return;
+  attempts++;
+  const wrongBtn=getBtn(value);
+  const correctBtn=getBtn(correct);
+
+  wrongBtn.classList.add('wrong');
+  play(sndWrong);
+
+  if(attempts===1){
+    showToast('❌ Try again!','#f44336');
+    setTimeout(()=>{
+      wrongBtn.classList.remove('wrong');
+      if(!answered) correctBtn.classList.add('hint');
+    },900);
+  } else {
+    answered=true;
+    showToast('❌ Wrong!','#f44336');
+    setTimeout(()=>{
+      clearBtnStates();
+      correctBtn.classList.add('correct');
+      showToast('💡 Correct answer!','#FF9800');
+      setTimeout(()=>{curQ++;loadQuestion();},3000);
+    },1000);
+  }
+}
+
+/* ── Navigation ── */
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0; score=0;
+  loadQuestion();
+}
+
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0; score=0; attempts=0; answered=false;
+  loadQuestion();
+}
+
+/* ── Toast ── */
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+
+/* ── Mute ── */
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').innerHTML=muted?'&#128263;':'&#128266;';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else if(curQ<QUESTIONS.length) speak(QUESTIONS[curQ].q);
+}
+
+/* ── End ── */
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').innerHTML=score>=9?'&#11088;&#11088;&#11088;':score>=6?'&#11088;&#11088;':'&#11088;';
+  window.speechSynthesis?.cancel();
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti,800);
+}
+
+/* ── Confetti ── */
+const CC=['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC','#e91e63'];
+function spawnConfetti(){
+  for(let i=0;i<70;i++) setTimeout(()=>{
+    const el=document.createElement('div'); el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){
+  const s=document.createElement('style');s.id='cf-style';
+  s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';
+  document.head.appendChild(s);
+}
+</script>
+</body>
+</html>
