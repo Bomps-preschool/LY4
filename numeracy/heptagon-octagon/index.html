@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Heptagon &amp; Octagon · LY4 · Game 12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:stretch;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+#game-screen{display:none;flex-direction:column;width:100%;max-width:860px;height:100%;padding:12px 14px 76px;overflow-y:auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-shrink:0}
+.progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+.instruction{text-align:center;font-size:clamp(0.92em,3vw,1.15em);color:#333;font-weight:800;margin-bottom:8px;padding:0 6px;line-height:1.4;flex-shrink:0}
+.act-card{background:white;border-radius:24px;padding:18px 14px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;flex-shrink:0}
+.shape-badge{color:white;font-size:1.3em;font-weight:800;padding:8px 28px;border-radius:50px;letter-spacing:0.05em}
+.trace-wrap{position:relative;width:min(280px,80vw);height:min(280px,80vw);flex-shrink:0}
+.trace-wrap svg{position:absolute;top:0;left:0;width:100%;height:100%}
+.trace-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.illus-wrap{width:100%;display:flex;justify-content:center}
+.id-choices{display:flex;gap:10px;width:100%;justify-content:center}
+.id-btn{flex:1;min-width:0;max-width:150px;padding:14px 6px;border:4px solid transparent;border-radius:18px;font-size:clamp(0.8em,2.6vw,1.05em);font-weight:800;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 14px rgba(0,0,0,0.2);transition:transform 0.1s,border-color 0.2s;word-break:break-word;text-align:center}
+.id-btn:active{transform:scale(0.93)}
+.id-btn.c0{background:linear-gradient(135deg,#6A1B9A,#AB47BC)}
+.id-btn.c1{background:linear-gradient(135deg,#1565C0,#42A5F5)}
+.id-btn.c2{background:linear-gradient(135deg,#2E7D32,#66BB6A)}
+.id-btn.correct{border-color:#4CAF50;box-shadow:0 0 0 5px #4CAF5040;animation:popCorrect 0.35s ease}
+.id-btn.wrong{border-color:#f44336;animation:shakeWrong 0.4s ease}
+.id-btn.hint{border-color:#FFD700;animation:pulseHint 1s ease-in-out infinite}
+.draw-canvas-wrap{position:relative;width:min(280px,80vw);height:min(280px,80vw);border-radius:14px;border:2px solid #e0e0e0;overflow:hidden;background:white}
+.draw-guide{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#draw-canvas{position:absolute;top:0;left:0;display:block;touch-action:none;cursor:crosshair;width:100%;height:100%}
+.palette{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.swatch{width:38px;height:38px;border-radius:50%;cursor:pointer;border:4px solid transparent;transition:transform 0.1s,border-color 0.1s;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.swatch.active{border-color:#333;transform:scale(1.2)}
+.tool-row{display:flex;gap:8px;align-items:center}
+.btn-eraser{padding:8px 16px;border:3px solid #bbb;border-radius:20px;background:white;font-size:0.85em;font-family:inherit;font-weight:700;cursor:pointer;color:#555}
+.btn-eraser.active{border-color:#f44336;color:#f44336}
+.sort-zones{display:flex;gap:10px;width:100%}
+.sort-zone-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.sort-zone-label{font-size:0.82em;font-weight:800;color:#6a0dad}
+.drop-zone{width:100%;min-height:120px;border:3px dashed #bbb;border-radius:16px;display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;gap:6px;padding:8px;background:#fafafa;transition:border-color 0.2s,background 0.2s}
+.drop-zone.over{border-color:#7b1fa2;background:#f3e5f5}
+.drop-zone.hint{border-color:#FFD700;animation:pulseHint 1s ease-in-out 3}
+.sort-tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 0;width:100%}
+.sort-item{width:68px;height:68px;cursor:grab;display:flex;align-items:center;justify-content:center;border-radius:12px;background:white;box-shadow:0 3px 10px rgba(0,0,0,0.15);touch-action:none;flex-shrink:0}
+.sort-item.correct-placed{box-shadow:0 0 0 3px #4CAF50;cursor:default}
+.sort-item.wrong-drop{animation:shakeWrong 0.4s ease}
+#sort-ghost{position:fixed;pointer-events:none;z-index:1000;width:68px;height:68px;display:none;align-items:center;justify-content:center;opacity:0.82;transform:translate(-50%,-50%)}
+.btn-next{background:linear-gradient(135deg,#4CAF50,#2E7D32);color:white;border:none;padding:13px 34px;border-radius:40px;font-size:1.05em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(76,175,80,0.4);transition:transform 0.1s,opacity 0.2s}
+.btn-next:active{transform:scale(0.95)}
+.btn-next:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4)}
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:13px 28px;border-radius:50px;font-size:1.35em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px}
+@keyframes popCorrect{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes shakeWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pulseHint{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.6)}50%{box-shadow:0 0 0 14px rgba(255,215,0,0)}}
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 72px}
+  .hdr{padding:8px 12px;margin-bottom:8px}
+  .act-card{padding:12px 8px;gap:10px}
+  .shape-badge{font-size:1.1em;padding:6px 18px}
+  .id-btn{padding:10px 3px;max-width:110px}
+  .sort-item{width:58px;height:58px}
+  #sort-ghost{width:58px;height:58px}
+  .sort-tray{gap:7px}
+  .drop-zone{min-height:100px;padding:6px;gap:4px}
+  .btn-next{padding:11px 24px;font-size:0.95em}
+  .btn-restart{padding:10px 22px;font-size:0.92em}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">&#11088; <span id="score-val">0</span> / 7</div>
+    <div class="hdr-title">Heptagon &amp; Octagon &middot; LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">&#128266;</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Step <span id="step-num">1</span> / 7</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction" id="instruction-txt"></div>
+  <div class="act-card" id="act-area"></div>
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">&#128260; &nbsp;Restart</button>
+  </div>
+</div>
+<div id="end-screen">
+  <div class="end-trophy">&#127942;</div>
+  <div class="end-title">Fantastic Work!</div>
+  <div class="end-sub">You learned Heptagon &amp; Octagon!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 7</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">&#9654; &nbsp;Play Again</button>
+</div>
+<div id="sort-ghost"></div>
+
+<script>
+function polyPts(n,cx,cy,r,d0=-90){
+  const p=[];
+  for(let i=0;i<n;i++){const a=(d0+360*i/n)*Math.PI/180;p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1));}
+  return p.join(' ');
+}
+
+const SHAPES=[
+  {sides:7,label:'Heptagon',color:'#6A1B9A',light:'#EDE7F6'},
+  {sides:8,label:'Octagon', color:'#B71C1C',light:'#FFEBEE'},
+];
+const DRAW_COLORS=['#E53935','#1565C0','#2E7D32','#F57F17','#6A1B9A','#FFD700'];
+const SORT_ITEMS_DEF=[
+  {sides:7,color:'#6A1B9A'},{sides:7,color:'#1565C0'},{sides:7,color:'#00695C'},
+  {sides:8,color:'#B71C1C'},{sides:8,color:'#E65100'},{sides:8,color:'#2E7D32'},
+];
+const SCREENS=[
+  {type:'trace',    shape:SHAPES[0],instr:'Trace the Heptagon! Tap 2 through 7, then back to 1 to close.'},
+  {type:'identify', shape:SHAPES[0],instr:'What shape is this medal? Tap the correct answer!',
+   answer:'Heptagon',choices:['Heptagon','Octagon','Hexagon']},
+  {type:'draw',     shape:SHAPES[0],instr:'Draw and colour your own Heptagon!'},
+  {type:'trace',    shape:SHAPES[1],instr:'Trace the Octagon! Tap 2 through 8, then back to 1 to close.'},
+  {type:'identify', shape:SHAPES[1],instr:'What shape is this stop sign? Tap the correct answer!',
+   answer:'Octagon',choices:['Hexagon','Heptagon','Octagon']},
+  {type:'draw',     shape:SHAPES[1],instr:'Draw and colour your own Octagon!'},
+  {type:'sort',     instr:'Sort the shapes! Drag each one into the correct group.'},
+];
+
+let curScreen=0,score=0,idAttempts=0,idAnswered=false,muted=false;
+let sortPlaced=0;
+let drawColor='#E53935',isErasing=false;
+let _traceVerts=[],_traceNextIdx=1,_traceSides=0,_traceColor='',_traceLocked=false;
+let _sortAttempts=new Map();
+
+const sndWrong=new Audio('assets/wrong.mp3');
+const sndClaps=new Audio('assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{})}
+function speak(text){
+  if(!('speechSynthesis' in window)||muted)return;
+  sndClaps.pause(); sndClaps.currentTime=0;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=0.7;u.pitch=1.0;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+/* ── SVG Illustrations ── */
+function medalSVG(){
+  return `<svg viewBox="0 0 360 300" style="max-width:230px;width:100%">
+    <rect width="360" height="300" rx="20" fill="#FFFDE7"/>
+    <rect x="162" y="28" width="36" height="50" rx="4" fill="#EF9A9A"/>
+    <polygon points="${polyPts(7,180,170,108)}" fill="#FFD700" stroke="#F9A825" stroke-width="4"/>
+    <polygon points="${polyPts(7,180,170,90)}" fill="none" stroke="#F57F17" stroke-width="2.5"/>
+    <circle cx="180" cy="170" r="62" fill="#FFB300" stroke="#E65100" stroke-width="3"/>
+    <text x="180" y="158" text-anchor="middle" font-family="Nunito,Arial" font-size="30" font-weight="bold" fill="#B71C1C">7</text>
+    <text x="180" y="188" text-anchor="middle" font-family="Nunito,Arial" font-size="15" fill="#B71C1C">sides</text>
+    <text x="180" y="208" text-anchor="middle" font-family="Nunito,Arial" font-size="12" fill="#5D4037">HEPTAGON</text>
+    <circle cx="162" cy="28" r="7" fill="#E57373"/>
+    <circle cx="198" cy="28" r="7" fill="#E57373"/>
+  </svg>`;
+}
+
+function stopSignSVG(){
+  return `<svg viewBox="0 0 360 300" style="max-width:230px;width:100%">
+    <rect width="360" height="300" rx="20" fill="#E8F5E9"/>
+    <rect x="172" y="248" width="16" height="46" rx="4" fill="#9E9E9E"/>
+    <rect x="158" y="286" width="44" height="10" rx="4" fill="#757575"/>
+    <polygon points="${polyPts(8,180,143,112)}" fill="#D32F2F" stroke="white" stroke-width="8"/>
+    <polygon points="${polyPts(8,180,143,100)}" fill="none" stroke="white" stroke-width="3"/>
+    <text x="180" y="152" text-anchor="middle" font-family="Arial Black,Arial" font-size="36" font-weight="bold" fill="white" letter-spacing="1">STOP</text>
+  </svg>`;
+}
+
+/* ── Screens ── */
+function loadScreen(){
+  if(curScreen>=SCREENS.length){showEnd();return;}
+  const s=SCREENS[curScreen];
+  idAttempts=0;idAnswered=false;
+  document.getElementById('step-num').textContent=curScreen+1;
+  document.getElementById('prog-bar').style.width=((curScreen/SCREENS.length)*100)+'%';
+  document.getElementById('instruction-txt').textContent=s.instr;
+  speak(s.instr);
+  if(s.type==='trace')renderTrace(s);
+  else if(s.type==='identify')renderIdentify(s);
+  else if(s.type==='draw')renderDraw(s);
+  else if(s.type==='sort')renderSort();
+}
+
+function renderTrace(s){
+  const sz=280,vsz=320,cx=vsz/2,cy=vsz/2,r=112;
+  const sides=s.shape.sides,color=s.shape.color;
+  const pts=polyPts(sides,cx,cy,r);
+  const verts=[];
+  let labelGroups='';
+  for(let i=0;i<sides;i++){
+    const a=(-90+360*i/sides)*Math.PI/180;
+    verts.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});
+    const lx=(cx+(r+22)*Math.cos(a)).toFixed(1);
+    const ly=(cy+(r+22)*Math.sin(a)).toFixed(1);
+    labelGroups+=`<g id="vtx-g-${i}" onclick="tapVertex(${i})" style="cursor:pointer;user-select:none">
+      <circle id="vtx-c-${i}" cx="${lx}" cy="${ly}" r="15" fill="${i<=1?color:'#ccc'}"/>
+      <text x="${lx}" y="${(parseFloat(ly)+5).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="bold" fill="white" style="pointer-events:none">${i+1}</text>
+    </g>`;
+  }
+  _traceVerts=verts;_traceNextIdx=1;_traceSides=sides;_traceColor=color;_traceLocked=false;
+  document.getElementById('act-area').innerHTML=`
+    <div class="shape-badge" style="background:${color}">${s.shape.label} &mdash; ${sides} sides</div>
+    <div class="trace-wrap">
+      <svg id="trace-svg" viewBox="0 0 ${vsz} ${vsz}" style="width:100%;height:100%;position:absolute;top:0;left:0">
+        <polygon points="${pts}" fill="${s.shape.light}" stroke="${color}" stroke-width="3" stroke-dasharray="10,6" opacity="0.45"/>
+        <g id="trace-lines"></g>
+        ${labelGroups}
+      </svg>
+    </div>
+    <button class="btn-next" id="trace-next-btn" disabled onclick="finishStep()">I traced it! &#9654;</button>`;
+}
+
+function renderIdentify(s){
+  const illusFn=s.shape.sides===7?medalSVG:stopSignSVG;
+  const shuffled=[...s.choices];
+  for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
+  const btns=shuffled.map((c,i)=>`<button class="id-btn c${i}" data-choice="${c}" onclick="selectID('${c}')">${c}</button>`).join('');
+  document.getElementById('act-area').innerHTML=`
+    <div class="illus-wrap">${illusFn()}</div>
+    <div class="id-choices" id="id-choices">${btns}</div>`;
+}
+
+function selectID(choice){
+  if(idAnswered)return;
+  const s=SCREENS[curScreen];
+  const correct=s.answer;
+  const correctBtn=document.querySelector(`#id-choices [data-choice="${correct}"]`);
+  const chosenBtn=document.querySelector(`#id-choices [data-choice="${choice}"]`);
+  if(choice===correct){
+    idAnswered=true;clearIDBtns();chosenBtn.classList.add('correct');
+    score++;document.getElementById('score-val').textContent=score;
+    window.speechSynthesis?.cancel();
+    sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000);
+    showToast('&#11088; Correct!','#4CAF50');spawnConfetti();
+    setTimeout(()=>nextScreen(),3200);
+  } else {
+    idAttempts++;chosenBtn.classList.add('wrong');play(sndWrong);
+    if(idAttempts===1){
+      showToast('&#10060; Try again!','#f44336');
+      setTimeout(()=>{chosenBtn.classList.remove('wrong');if(!idAnswered)correctBtn.classList.add('hint');},900);
+    } else {
+      idAnswered=true;showToast('&#10060; Wrong!','#f44336');
+      setTimeout(()=>{clearIDBtns();correctBtn.classList.add('correct');showToast('&#128161; Correct answer!','#FF9800');setTimeout(()=>nextScreen(),3000);},1000);
+    }
+  }
+}
+function clearIDBtns(){document.querySelectorAll('.id-btn').forEach(b=>b.classList.remove('correct','wrong','hint'));}
+
+function renderDraw(s){
+  const sz=280,cx=140,cy=140,r=108;
+  const swatches=DRAW_COLORS.map((c,i)=>`<div class="swatch${i===0?' active':''}" style="background:${c}" data-color="${c}" onclick="setDrawColor('${c}')"></div>`).join('');
+  document.getElementById('act-area').innerHTML=`
+    <div class="shape-badge" style="background:${s.shape.color}">${s.shape.label}</div>
+    <div class="draw-canvas-wrap">
+      <canvas id="draw-canvas" width="${sz}" height="${sz}"></canvas>
+      <svg class="draw-guide" viewBox="0 0 ${sz} ${sz}">
+        <polygon points="${polyPts(s.shape.sides,cx,cy,r)}" fill="none" stroke="#BDBDBD" stroke-width="4" stroke-dasharray="9,5"/>
+      </svg>
+    </div>
+    <div class="palette">${swatches}</div>
+    <div class="tool-row">
+      <button class="btn-eraser" id="eraser-btn" onclick="toggleEraser()">&#9003; Eraser</button>
+      <button class="btn-next" id="draw-next-btn" disabled onclick="finishStep()">Done! &#9654;</button>
+    </div>`;
+  drawColor=DRAW_COLORS[0];isErasing=false;
+  initDrawCanvas(document.getElementById('draw-canvas'),s.shape.sides,cx,cy,r,sz);
+}
+
+function setDrawColor(c){
+  drawColor=c;isErasing=false;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`.swatch[data-color="${c}"]`).classList.add('active');
+  document.getElementById('eraser-btn').classList.remove('active');
+}
+function toggleEraser(){
+  isErasing=!isErasing;
+  document.getElementById('eraser-btn').classList.toggle('active',isErasing);
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+}
+
+function renderSort(){
+  sortPlaced=0; _sortAttempts=new Map();
+  const items=[...SORT_ITEMS_DEF];
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}
+  const trayHTML=items.map(it=>`
+    <div class="sort-item" data-sides="${it.sides}" style="touch-action:none">
+      <svg width="50" height="50" viewBox="-1 -1 2 2">
+        <polygon points="${polyPts(it.sides,0,0,0.82)}" fill="${it.color}" stroke="white" stroke-width="0.08"/>
+      </svg>
+    </div>`).join('');
+  const zones=SHAPES.map(sh=>`
+    <div class="sort-zone-wrap">
+      <div class="sort-zone-label">${sh.label}</div>
+      <div class="drop-zone" data-sides="${sh.sides}" id="zone-${sh.sides}"></div>
+    </div>`).join('');
+  document.getElementById('act-area').innerHTML=`
+    <div class="sort-zones">${zones}</div>
+    <div class="sort-tray" id="sort-tray">${trayHTML}</div>`;
+  document.querySelectorAll('.sort-item').forEach(el=>{
+    el.addEventListener('pointerdown',e=>startSortDrag(e,el));
+  });
+}
+
+/* ── Canvas ── */
+/* ── Trace: tap-to-connect ── */
+function tapVertex(idx){
+  if(_traceLocked||idx!==_traceNextIdx)return;
+  _traceLocked=true; setTimeout(()=>{_traceLocked=false;},350);
+  const v=_traceVerts,c=_traceColor,n=_traceSides;
+  document.getElementById('vtx-c-'+idx).setAttribute('fill','#4CAF50');
+  if(idx===0){
+    // Closing tap: draw last side back to vertex 0
+    _addTraceLine(v[n-1],v[0],c);
+    showToast('&#11088; Well done!','#4CAF50');
+    const btn=document.getElementById('trace-next-btn');
+    if(btn)btn.disabled=false;
+  } else {
+    _addTraceLine(v[idx-1],v[idx],c);
+    _traceNextIdx++;
+    if(_traceNextIdx>=n){
+      // All numbered vertices done — wait for closing tap on vertex 0
+      _traceNextIdx=0;
+      document.getElementById('vtx-c-0').setAttribute('fill',c);
+    } else {
+      document.getElementById('vtx-c-'+_traceNextIdx).setAttribute('fill',c);
+    }
+  }
+}
+function _addTraceLine(from,to,color){
+  const g=document.getElementById('trace-lines');
+  if(!g)return;
+  const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1',from.x.toFixed(1));l.setAttribute('y1',from.y.toFixed(1));
+  l.setAttribute('x2',to.x.toFixed(1));l.setAttribute('y2',to.y.toFixed(1));
+  l.setAttribute('stroke',color);l.setAttribute('stroke-width','5');l.setAttribute('stroke-linecap','round');
+  g.appendChild(l);
+}
+
+function initDrawCanvas(canvas,sides,cx,cy,r,sz){
+  const ctx=canvas.getContext('2d');
+  let drawing=false;
+  canvas.addEventListener('pointerdown',e=>{
+    e.preventDefault();drawing=true;canvas.setPointerCapture(e.pointerId);
+    const p=canvasXY(canvas,e);
+    ctx.globalCompositeOperation='source-over';
+    ctx.strokeStyle=isErasing?'white':drawColor;ctx.lineWidth=isErasing?28:16;
+    ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(p.x,p.y);
+  },{passive:false});
+  canvas.addEventListener('pointermove',e=>{
+    if(!drawing)return;e.preventDefault();
+    ctx.globalCompositeOperation='source-over';
+    ctx.strokeStyle=isErasing?'white':drawColor;ctx.lineWidth=isErasing?28:16;
+    const p=canvasXY(canvas,e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);
+    const btn=document.getElementById('draw-next-btn');if(btn&&!isErasing)btn.disabled=false;
+  },{passive:false});
+  canvas.addEventListener('pointerup',()=>{drawing=false;});
+  canvas.addEventListener('pointercancel',()=>{drawing=false;});
+}
+
+function canvasXY(canvas,e){
+  const r=canvas.getBoundingClientRect();
+  return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};
+}
+
+/* ── Sort Drag ── */
+let _dragEl=null,_dragSides=0;
+const ghost=document.getElementById('sort-ghost');
+
+function startSortDrag(e,el){
+  if(el.classList.contains('correct-placed'))return;
+  e.preventDefault();
+  _dragEl=el;_dragSides=parseInt(el.dataset.sides);
+  ghost.innerHTML=el.innerHTML;ghost.style.display='flex';
+  moveGhost(e.clientX,e.clientY);
+  el.setPointerCapture(e.pointerId);
+  el.addEventListener('pointermove',onSortMove);
+  el.addEventListener('pointerup',onSortDrop);
+  el.addEventListener('pointercancel',onSortCancel);
+}
+function onSortMove(e){e.preventDefault();moveGhost(e.clientX,e.clientY);highlightZone(e.clientX,e.clientY);}
+function onSortDrop(e){
+  e.preventDefault();
+  const el=_dragEl; _dragEl=null;
+  cleanSortListeners(el);
+  ghost.style.display='none';clearZoneHighlights();
+  if(!el)return;
+  const zone=getZoneAt(e.clientX,e.clientY);
+  if(zone&&parseInt(zone.dataset.sides)===parseInt(el.dataset.sides)){
+    zone.appendChild(el);el.classList.add('correct-placed');el.style.cursor='default';
+    sortPlaced++;showToast('&#11088; Correct!','#4CAF50');
+    if(sortPlaced===6){score++;document.getElementById('score-val').textContent=score;window.speechSynthesis?.cancel();play(sndClaps);spawnConfetti();setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;nextScreen();},3000);}
+  } else if(zone){
+    el.classList.add('wrong-drop');play(sndWrong);showToast('&#10060; Try again!','#f44336');
+    setTimeout(()=>el.classList.remove('wrong-drop'),500);
+    const attempts=(_sortAttempts.get(el)||0)+1;
+    _sortAttempts.set(el,attempts);
+    if(attempts===1){
+      setTimeout(()=>{
+        const cz=document.getElementById('zone-'+el.dataset.sides);
+        if(cz){cz.classList.add('hint');setTimeout(()=>cz.classList.remove('hint'),2100);}
+      },700);
+    } else {
+      setTimeout(()=>{
+        const cz=document.getElementById('zone-'+el.dataset.sides);
+        if(cz){
+          cz.appendChild(el);el.classList.add('correct-placed');el.style.cursor='default';
+          sortPlaced++;showToast('&#128161; Correct zone!','#FF9800');
+          if(sortPlaced===6){score++;document.getElementById('score-val').textContent=score;window.speechSynthesis?.cancel();play(sndClaps);spawnConfetti();setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;nextScreen();},3000);}
+        }
+      },800);
+    }
+  }
+}
+function onSortCancel(){ghost.style.display='none';clearZoneHighlights();cleanSortListeners(_dragEl);_dragEl=null;}
+function cleanSortListeners(el){if(!el)return;el.removeEventListener('pointermove',onSortMove);el.removeEventListener('pointerup',onSortDrop);el.removeEventListener('pointercancel',onSortCancel);}
+function moveGhost(x,y){ghost.style.left=x+'px';ghost.style.top=y+'px';}
+function getZoneAt(x,y){for(const z of document.querySelectorAll('.drop-zone')){const r=z.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return z;}return null;}
+function highlightZone(x,y){clearZoneHighlights();const z=getZoneAt(x,y);if(z)z.classList.add('over');}
+function clearZoneHighlights(){document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));}
+
+/* ── Navigation ── */
+function nextScreen(){curScreen++;loadScreen();}
+function finishStep(){
+  score++;document.getElementById('score-val').textContent=score;
+  showToast('&#11088; Correct!','#4CAF50');
+  window.speechSynthesis?.cancel();
+  play(sndClaps);spawnConfetti();
+  setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;nextScreen();},3000);
+}
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curScreen=0;score=0;sortPlaced=0;
+  document.getElementById('score-val').textContent=0;
+  loadScreen();
+}
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curScreen=0;score=0;sortPlaced=0;
+  document.getElementById('score-val').textContent=0;
+  loadScreen();
+}
+
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');el.innerHTML=msg;el.style.background=bg;
+  el.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+const CC=['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC','#26C6DA'];
+function spawnConfetti(){
+  for(let i=0;i<60;i++) setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){const s=document.createElement('style');s.id='cf-style';s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';document.head.appendChild(s);}
+
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').innerHTML=muted?'&#128263;':'&#128266;';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else speak(document.getElementById('instruction-txt').textContent);
+}
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').innerHTML=score>=6?'&#11088;&#11088;&#11088;':score>=4?'&#11088;&#11088;':'&#11088;';
+  window.speechSynthesis?.cancel();
+  sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000);
+  spawnConfetti();setTimeout(spawnConfetti,800);
+}
+</script>
+</body>
+</html>
