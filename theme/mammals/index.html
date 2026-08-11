@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mammals - LY4</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(#dff6ff,#ffffff);
+    overflow:hidden;
+}
+
+/* Splash Screen */
+
+#splash{
+    position:fixed;
+    inset:0;
+    background:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+#splash img{
+    width:260px;
+    margin-bottom:30px;
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+
+#startBtn{
+    padding:18px 45px;
+    font-size:28px;
+    border:none;
+    border-radius:50px;
+    background:#ff5fa2;
+    color:white;
+    cursor:pointer;
+}
+
+/* Game */
+
+#game{
+    display:none;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Header */
+
+header{
+    background:#ff5fa2;
+    color:white;
+    text-align:center;
+    padding:18px;
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+
+header h1{
+    font-size:42px;
+}
+
+#progressOuter{
+    width:70%;
+    height:18px;
+    background:white;
+    margin:15px auto;
+    border-radius:30px;
+    overflow:hidden;
+}
+
+#progress{
+    width:0%;
+    height:100%;
+    background:#4caf50;
+    transition:.4s;
+}
+
+/* Question */
+
+#questionContainer{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* Worksheet Card */
+
+#worksheet{
+    width:92%;
+    max-width:1300px;
+    border-radius:30px;
+    padding:35px;
+    box-shadow:0 8px 25px rgba(0,0,0,.15);
+    transition:.5s;
+}
+
+#instruction{
+    font-size:34px;
+    text-align:center;
+    font-weight:bold;
+    color:#333;
+    margin-bottom:35px;
+}
+
+/* Animal Row */
+
+#cards{
+    display:flex;
+    justify-content:space-evenly;
+    align-items:flex-start;
+    gap:20px;
+}
+
+/* Animal Card */
+
+.card{
+
+    width:220px;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:15px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    border:5px solid transparent;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.12);
+
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.card img{
+
+    width:160px;
+    height:160px;
+    object-fit:contain;
+
+}
+
+.name{
+
+    margin-top:12px;
+    font-size:24px;
+    font-weight:bold;
+    color:#444;
+
+}
+
+.correct{
+
+    border-color:#4caf50;
+
+    animation:pop .6s;
+
+}
+
+.wrong{
+
+    border-color:#f44336;
+
+    animation:shake .5s;
+
+}
+
+@keyframes pop{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.12);}
+100%{transform:scale(1);}
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(0);}
+25%{transform:translateX(-8px);}
+50%{transform:translateX(8px);}
+75%{transform:translateX(-8px);}
+100%{transform:translateX(0);}
+
+}
+
+/* Message */
+
+#message{
+
+    height:45px;
+    text-align:center;
+    margin-top:25px;
+    font-size:30px;
+    color:#ff4081;
+    font-weight:bold;
+
+}
+
+/* Finish Screen */
+
+#finish{
+
+    position:fixed;
+    inset:0;
+    background:white;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+}
+
+#finish h2{
+
+    font-size:70px;
+    color:#ff5fa2;
+
+}
+
+#finish p{
+
+    font-size:32px;
+    margin:20px;
+
+}
+
+#playAgain{
+
+    padding:18px 50px;
+    font-size:28px;
+    border:none;
+    border-radius:40px;
+    background:#4caf50;
+    color:white;
+    cursor:pointer;
+
+}
+
+/* Responsive */
+
+@media(max-width:1000px){
+
+#cards{
+
+flex-wrap:wrap;
+
+}
+
+.card{
+
+width:180px;
+
+}
+
+.card img{
+
+width:120px;
+height:120px;
+
+}
+
+.name{
+
+font-size:20px;
+
+}
+
+#instruction{
+
+font-size:24px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- Splash -->
+
+<div id="splash">
+
+<img src="Assets/innovinelogo.png" alt="Innovine">
+
+<button id="startBtn">
+Start Game
+</button>
+
+</div>
+
+<!-- Game -->
+
+<div id="game">
+
+<header>
+
+<h1>🐾 Mammals 🐾</h1>
+
+<div id="progressOuter">
+<div id="progress"></div>
+</div>
+
+</header>
+
+<div id="questionContainer">
+
+<div id="worksheet">
+
+<div id="instruction">
+Look at the animals. Tap the animal that is NOT a mammal.
+</div>
+
+<div id="cards"></div>
+
+<div id="message"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Finish -->
+
+<div id="finish">
+
+<h2>🎉 Fantastic! 🎉</h2>
+
+<p>You know your mammals!</p>
+
+<button id="playAgain">Play Again</button>
+
+</div>
+
+<audio id="correctSound" src="Assets/correct.mp3"></audio>
+<audio id="wrongSound" src="Assets/wrong.mp3"></audio>
+<audio id="clapSound" src="Assets/free_claps.mp3"></audio>
+
+<script>
+//=====================
+// GAME DATA
+//=====================
+
+const questions = [
+
+{
+    colour:"#FFD8E8",
+    answer:"Snake",
+    feedback:"Excellent! A snake is not a mammal.",
+    animals:[
+        {name:"Dog",image:"Assets/dog.png"},
+        {name:"Cat",image:"Assets/cat.png"},
+        {name:"Mouse",image:"Assets/mouse.png"},
+        {name:"Snake",image:"Assets/snake.png"}
+    ]
+},
+
+{
+    colour:"#FFF4B5",
+    answer:"Frog",
+    feedback:"Wonderful! A frog is not a mammal.",
+    animals:[
+        {name:"Elephant",image:"Assets/elephant.png"},
+        {name:"Frog",image:"Assets/frog.jpg"},
+        {name:"Zebra",image:"Assets/zebra.png"},
+        {name:"Lion",image:"Assets/lion.jpg"}
+    ]
+},
+
+{
+    colour:"#FFE2C4",
+    answer:"Spider",
+    feedback:"Great job! A spider is not a mammal.",
+    animals:[
+        {name:"Whale",image:"Assets/whale.png"},
+        {name:"Seal",image:"Assets/seal.jpg"},
+        {name:"Spider",image:"Assets/spider.jpg"},
+        {name:"Dolphin",image:"Assets/dolphin.png"}
+    ]
+},
+
+{
+    colour:"#D8F0FF",
+    answer:"Parrot",
+    feedback:"Amazing! A parrot is not a mammal.",
+    animals:[
+        {name:"Parrot",image:"Assets/parrot.png"},
+        {name:"Fox",image:"Assets/fox.png"},
+        {name:"Squirrel",image:"Assets/squirrel.png"},
+        {name:"Monkey",image:"Assets/monkey.png"}
+    ]
+}
+
+];
+
+//=====================
+// VARIABLES
+//=====================
+
+let currentQuestion=0;
+
+const cards=document.getElementById("cards");
+const worksheet=document.getElementById("worksheet");
+const instruction=document.getElementById("instruction");
+const message=document.getElementById("message");
+const progress=document.getElementById("progress");
+
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const clapSound=document.getElementById("clapSound");
+
+//=====================
+// WEB SPEECH
+//=====================
+
+let voices=[];
+
+speechSynthesis.onvoiceschanged=function(){
+
+voices=speechSynthesis.getVoices();
+
+};
+
+function speak(text){
+
+speechSynthesis.cancel();
+
+const speech=new SpeechSynthesisUtterance(text);
+
+speech.lang="en-GB";
+speech.rate=.85;
+speech.pitch=1.15;
+speech.volume=1;
+
+const english=voices.find(v=>v.lang.startsWith("en"));
+
+if(english){
+
+speech.voice=english;
+
+}
+
+speechSynthesis.speak(speech);
+
+}
+
+//=====================
+// LOAD QUESTION
+//=====================
+
+function loadQuestion(){
+
+cards.innerHTML="";
+message.innerHTML="";
+
+const q=questions[currentQuestion];
+
+worksheet.style.background=q.colour;
+
+progress.style.width=((currentQuestion)/questions.length)*100+"%";
+
+instruction.innerHTML=
+"Look at the animals. Tap the animal that is NOT a mammal.";
+
+setTimeout(()=>{
+
+speak("Look at the animals. Tap the animal that is not a mammal.");
+
+},400);
+
+// Shuffle the cards every round
+
+let animals=[...q.animals];
+
+animals.sort(()=>Math.random()-0.5);
+
+animals.forEach(animal=>{
+
+const card=document.createElement("div");
+
+card.className="card";
+
+card.innerHTML=`
+
+<img src="${animal.image}" alt="${animal.name}">
+
+<div class="name">${animal.name}</div>
+
+`;
+
+card.onclick=function(){
+
+checkAnswer(card,animal.name);
+
+};
+
+cards.appendChild(card);
+
+});
+
+}
+
+//=====================
+// CHECK ANSWER
+//=====================
+
+function checkAnswer(card,name){
+
+document.querySelectorAll(".card").forEach(c=>{
+
+c.style.pointerEvents="none";
+
+});
+
+const q=questions[currentQuestion];
+
+if(name===q.answer){
+
+card.classList.add("correct");
+
+correctSound.play();
+
+message.innerHTML="⭐ Excellent! ⭐";
+
+speak(q.feedback);
+
+setTimeout(()=>{
+
+currentQuestion++;
+
+if(currentQuestion<questions.length){
+
+loadQuestion();
+
+}
+else{
+
+finishGame();
+
+}
+
+},1800);
+
+}
+
+else{
+
+card.classList.add("wrong");
+
+wrongSound.play();
+
+message.innerHTML="Try Again";
+
+speak("That's not correct. Try again.");
+
+setTimeout(()=>{
+
+card.classList.remove("wrong");
+
+document.querySelectorAll(".card").forEach(c=>{
+
+c.style.pointerEvents="auto";
+
+});
+
+},900);
+
+}
+}
+//=====================
+// START GAME
+//=====================
+
+document.getElementById("startBtn").addEventListener("click",function(){
+
+document.getElementById("splash").style.display="none";
+document.getElementById("game").style.display="flex";
+
+speak("Welcome! Let's learn about mammals.");
+
+setTimeout(loadQuestion,1500);
+
+});
+
+//=====================
+// FINISH GAME
+//=====================
+
+function finishGame(){
+
+progress.style.width="100%";
+
+document.getElementById("game").style.display="none";
+document.getElementById("finish").style.display="flex";
+
+clapSound.play();
+
+speak("Fantastic! You found all the animals that are not mammals. Well done!");
+
+createConfetti();
+
+}
+
+//=====================
+// CONFETTI
+//=====================
+
+function createConfetti(){
+
+const colours=[
+"#FF4081",
+"#FFEB3B",
+"#4CAF50",
+"#03A9F4",
+"#FF9800",
+"#9C27B0"
+];
+
+for(let i=0;i<200;i++){
+
+const confetti=document.createElement("div");
+
+confetti.style.position="fixed";
+confetti.style.width="10px";
+confetti.style.height="10px";
+confetti.style.left=Math.random()*100+"vw";
+confetti.style.top="-20px";
+confetti.style.background=colours[Math.floor(Math.random()*colours.length)];
+confetti.style.opacity="0.9";
+confetti.style.borderRadius="50%";
+confetti.style.pointerEvents="none";
+confetti.style.zIndex="9999";
+
+document.body.appendChild(confetti);
+
+const duration=3000+Math.random()*3000;
+const xMove=(Math.random()*200)-100;
+
+confetti.animate([
+
+{
+transform:"translate(0,0) rotate(0deg)"
+},
+
+{
+transform:`translate(${xMove}px,110vh) rotate(720deg)`
+}
+
+],{
+
+duration:duration,
+easing:"linear"
+
+});
+
+setTimeout(()=>{
+
+confetti.remove();
+
+},duration);
+
+}
+
+}
+
+//=====================
+// PLAY AGAIN
+//=====================
+
+document.getElementById("playAgain").addEventListener("click",function(){
+
+currentQuestion=0;
+
+document.getElementById("finish").style.display="none";
+document.getElementById("game").style.display="flex";
+
+loadQuestion();
+
+});
+
+//=====================
+// PRELOAD VOICES
+//=====================
+
+window.speechSynthesis.onvoiceschanged=function(){
+
+voices=window.speechSynthesis.getVoices();
+
+};
+
+//=====================
+// CLOSE SCRIPT
+//=====================
+
+</script>
+
+</body>
+</html>
