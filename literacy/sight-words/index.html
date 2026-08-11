@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>This That These Those &middot; LY4 &middot; Game 30</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+#game-screen{display:none;flex-direction:column;width:100%;max-width:860px;height:100%;padding:12px 14px 76px;overflow-y:auto}
+
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-shrink:0}
+.progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+.instruction{text-align:center;font-size:clamp(0.9em,2.8vw,1.05em);color:#555;font-weight:800;margin-bottom:8px;flex-shrink:0}
+
+/* Q-card */
+.q-card{background:white;border-radius:24px;padding:18px 16px 22px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;width:100%;flex:1;min-height:0;overflow:hidden}
+
+/* Image */
+.img-wrap{display:flex;align-items:center;justify-content:center;width:100%}
+.q-img{width:auto;height:min(260px,42vh);max-width:80%;object-fit:contain;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+
+/* Sentence with tappable words */
+.sentence-area{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+.word-row{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:center;gap:4px 0;font-size:clamp(1.3em,4.5vw,1.8em);font-weight:800;color:#333;line-height:1.8;text-align:center}
+.tap-word{
+  display:inline-block;
+  cursor:pointer;
+  padding:2px 5px;
+  border-bottom:4px solid #bbb;
+  border-radius:3px 3px 0 0;
+  color:#6c5ce7;
+  transition:border-color 0.2s,color 0.2s,transform 0.1s;
+  touch-action:manipulation;
+  margin:0 1px;
+}
+.tap-word:active{transform:scale(0.93)}
+.tap-word.disabled{pointer-events:none;color:#aaa;border-color:#ddd}
+.tap-word.correct{border-color:#4CAF50 !important;color:#2e7d32 !important;animation:popWord 0.4s ease}
+.tap-word.wrong{border-color:#f44336 !important;color:#f44336 !important;animation:shakeWord 0.35s ease}
+.tap-word.reveal{border-color:#FF9800 !important;color:#FF9800 !important}
+.tap-word.hint{border-color:#FFD600 !important;color:#FF8F00 !important;animation:hintPulse 0.8s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,214,0,0.9)}50%{box-shadow:0 0 0 12px rgba(255,214,0,0)}}
+.sep{color:#999;font-weight:700;margin:0 1px}
+.rest-text{color:#333;font-weight:800}
+
+@keyframes popWord{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes shakeWord{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* Bottom */
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);touch-action:manipulation;min-height:44px}
+
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:13px 28px;border-radius:50px;font-size:1.35em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;touch-action:manipulation;min-height:44px}
+
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+
+@media(max-width:768px){.hdr-title{display:none}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 72px}
+  .hdr{padding:8px 12px;margin-bottom:6px}
+  .q-card{padding:14px 12px 18px;gap:14px}
+  .btn-restart{padding:10px 22px;font-size:0.92em}
+}
+@media(max-height:640px){
+  .q-card{gap:12px}
+  .word-row{font-size:clamp(1.1em,3.8vw,1.5em)}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">&#11088; <span id="score-val">0</span> / 6</div>
+    <div class="hdr-title">This, That, These, Those &middot; LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">&#128266;</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 6</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction">&#128072; Look at the picture and tap the correct word!</div>
+  <div class="q-card">
+    <div class="img-wrap">
+      <img class="q-img" id="q-img" src="" alt="">
+    </div>
+    <div class="sentence-area">
+      <div class="word-row" id="word-row"></div>
+    </div>
+  </div>
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">&#128260; &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">&#127942;</div>
+  <div class="end-title">Well Done!</div>
+  <div class="end-sub">You know This, That, These &amp; Those!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 6</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">&#9654; &nbsp;Play Again</button>
+</div>
+
+<script>
+const QUESTIONS = [
+  { answer:'This',  image:'Assets/cat1.png',          rest:' is a cat.',    audio:'This is a cat.' },
+  { answer:'Those', image:'Assets/dogs1.png',          rest:' are dogs.',    audio:'Those are dogs.' },
+  { answer:'Those', image:'Assets/boys1.png',          rest:' are boys.',    audio:'Those are boys.' },
+  { answer:'That',  image:'Assets/tree.jpg',           rest:' is a tree.',   audio:'That is a tree.' },
+  { answer:'These', image:'Assets/birds1.png',         rest:' are birds.',   audio:'These are birds.' },
+  { answer:'That',  image:'Assets/cricket-ball.png',   rest:' is a ball.',   audio:'That is a ball.' },
+];
+const CHOICES = ['This','That','These','Those'];
+
+QUESTIONS.forEach(q=>{const i=new Image();i.src=q.image;});
+
+let curQ=0, score=0, attempts=0, answered=false, muted=false;
+
+const sndWrong=new Audio('Assets/wrong.mp3');
+const sndClaps=new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{})}
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0},3000)}
+
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window)||muted)return;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    window.speechSynthesis.resume();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.75;u.pitch=1.0;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+function loadQuestion(){
+  if(curQ>=QUESTIONS.length){showEnd();return;}
+  answered=false;attempts=0;
+  const q=QUESTIONS[curQ];
+
+  document.getElementById('q-num').textContent=curQ+1;
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('prog-bar').style.width=(curQ/QUESTIONS.length*100)+'%';
+
+  const img=document.getElementById('q-img');
+  img.style.opacity=0;
+  img.onload=()=>{img.style.transition='opacity 0.3s';img.style.opacity=1};
+  img.onerror=()=>{};
+  img.src=q.image;
+  if(img.complete&&img.naturalWidth>0){img.style.transition='';img.style.opacity=1;}
+
+  speak('Look at the picture and tap the correct word!');
+
+  buildWordRow(q);
+}
+
+function buildWordRow(q){
+  const row=document.getElementById('word-row');
+  row.innerHTML='';
+
+  CHOICES.forEach((word,i)=>{
+    const span=document.createElement('span');
+    span.className='tap-word';
+    span.textContent=word;
+    span.dataset.word=word;
+    span.addEventListener('click',()=>handleTap(span,word,q));
+    span.addEventListener('touchend',e=>{e.preventDefault();handleTap(span,word,q)});
+    row.appendChild(span);
+
+    if(i<CHOICES.length-1){
+      const sep=document.createElement('span');
+      sep.className='sep';
+      sep.textContent=' / ';
+      row.appendChild(sep);
+    }
+  });
+
+  const rest=document.createElement('span');
+  rest.className='rest-text';
+  rest.innerHTML='&nbsp;'+escapeHtml(q.rest);
+  row.appendChild(rest);
+}
+
+function escapeHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function handleTap(span,word,q){
+  if(answered)return;
+
+  if(word===q.answer){
+    answered=true;
+    score++;
+    document.getElementById('score-val').textContent=score;
+    document.querySelectorAll('.tap-word').forEach(s=>s.classList.remove('hint'));
+    span.classList.add('correct');
+    disableAll();
+    window.speechSynthesis?.cancel();
+    playClaps();
+    showToast('&#11088; Correct!','#4CAF50');
+    spawnConfetti(['#4CAF50','#81C784','#A5D6A7','#FFD700','#ffffff']);
+    setTimeout(()=>{curQ++;loadQuestion();},3200);
+  } else {
+    attempts++;
+    play(sndWrong);
+    span.classList.add('wrong');
+    setTimeout(()=>span.classList.remove('wrong'),400);
+
+    if(attempts===1){
+      showToast('&#10060; Try again!','#f44336');
+      setTimeout(()=>{
+        const hintSpan=document.querySelector(`.tap-word[data-word="${q.answer}"]`);
+        if(hintSpan)hintSpan.classList.add('hint');
+      },600);
+    } else {
+      answered=true;
+      showToast('&#10060; Wrong!','#f44336');
+      setTimeout(()=>{
+        document.querySelectorAll('.tap-word').forEach(s=>s.classList.remove('hint'));
+        disableAll();
+        const correct=document.querySelector(`.tap-word[data-word="${q.answer}"]`);
+        if(correct)correct.classList.add('reveal');
+        showToast('&#128161; Correct answer!','#FF9800');
+        setTimeout(()=>{curQ++;loadQuestion();},3000);
+      },1000);
+    }
+  }
+}
+
+function disableAll(){
+  document.querySelectorAll('.tap-word').forEach(s=>s.classList.add('disabled'));
+}
+
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;loadQuestion();
+}
+
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;loadQuestion();
+}
+
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.innerHTML=msg;el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+
+function spawnConfetti(colors){
+  for(let i=0;i<60;i++)setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.6}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3200);
+  },i*20);
+}
+if(!document.querySelector('#cf-style')){
+  const s=document.createElement('style');s.id='cf-style';
+  s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';
+  document.head.appendChild(s);
+}
+
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').innerHTML=muted?'&#128263;':'&#128266;';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else speak('Look at the picture and tap the correct word!');
+}
+
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').innerHTML=score>=6?'&#11088;&#11088;&#11088;':score>=4?'&#11088;&#11088;':'&#11088;';
+  window.speechSynthesis?.cancel();
+  playClaps();
+  spawnConfetti(['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC']);
+}
+</script>
+</body>
+</html>
