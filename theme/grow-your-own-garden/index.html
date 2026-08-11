@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Grow Your Own Garden · LY4 · Game 18</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      height: 100vh; height: 100dvh;
+      display: flex; align-items: stretch; justify-content: center;
+      overflow: hidden; user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── INTRO ── */
+    #intro-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);
+      display: flex; align-items: center; justify-content: center;
+      border: 5px solid #FFD700; z-index: 200; cursor: pointer;
+    }
+    #intro-logo { width: 220px; filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5)); animation: logoBounce 2s ease-in-out infinite; }
+    @keyframes logoBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+    /* ── GAME SCREEN — full viewport ── */
+    #game-screen {
+      display: none; flex-direction: column; align-items: center;
+      width: 100%; height: 100%;
+      background: linear-gradient(170deg,#e8f5e9 0%,#c8e6c9 30%,#dcedc8 60%,#f9fbe7 100%);
+      padding: 8px 8px 60px;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.82); backdrop-filter: blur(6px);
+      border-radius: 14px; padding: 6px 12px; margin-bottom: 6px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1); flex-shrink: 0; width: 100%;
+    }
+    .hdr-score { font-size: 1em; font-weight: bold; color: #2e7d32; min-width: 70px; }
+    .hdr-title { font-size: clamp(0.65em,2.2vw,0.9em); color: #2e7d32; font-weight: bold; text-align: center; }
+    .mute-btn  { width:34px; height:34px; border:2px solid #a5d6a7; border-radius:50%; background:white; font-size:0.95em; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    .progress-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; flex-shrink:0; width:100%; }
+    .progress-label { font-size:0.8em; color:#555; white-space:nowrap; }
+    .progress-bar-wrap { flex:1; height:8px; background:rgba(0,0,0,0.1); border-radius:4px; overflow:hidden; }
+    .progress-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#4CAF50,#8BC34A); transition:width 0.4s ease; }
+
+    .instruction { font-size:clamp(0.78em,2.6vw,1em); color:#1b5e20; font-weight:800; margin-bottom:6px; flex-shrink:0; text-align:center; line-height:1.2; }
+
+    /* ── PUZZLE AREA ── */
+    .puzzle-area { display:flex; flex-direction:column; align-items:center; flex:1; min-height:0; gap:0; width:100%; }
+
+    /* ── PUZZLE WRAPPER — contains grid + jigsaw hint overlay ── */
+    #puzzle-wrapper { position:relative; overflow:visible; flex-shrink:0; }
+
+    /* ── TARGET CONTAINER ── */
+    #target-container {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.22);
+    }
+    #outline-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.3; pointer-events: none;
+    }
+    #drop-grid {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+    .drop-zone {
+      border: none;
+      background: transparent; background-repeat: no-repeat;
+      transition: background-color 0.18s;
+    }
+    /* drag-over and wrong-zone are now jigsaw overlays — no rect highlight */
+    .drop-zone.drag-over  { background: transparent; }
+    .drop-zone.wrong-zone { background: transparent; }
+
+    /* drag-over and wrong-zone highlights are SVG paths — no extra CSS needed */
+    @keyframes svgWrongFlash {
+      0%,50% { opacity: 1; }
+      100%   { opacity: 0; }
+    }
+    .svg-wrong-path { animation: svgWrongFlash 0.5s ease forwards; }
+    .drop-zone.filled { border:none; animation:popIn 0.3s ease; }
+    @keyframes popIn { 0%{transform:scale(0.8);opacity:0.4} 70%{transform:scale(1.06)} 100%{transform:scale(1);opacity:1} }
+
+    /* ── JIGSAW-SHAPED HINT OVERLAY ── */
+    .hint-jigsaw {
+      position: absolute; pointer-events: none; z-index: 20;
+      background: rgba(255,165,0,0.55);
+      animation: jigsawHintPulse 0.75s ease-in-out infinite;
+    }
+    @keyframes jigsawHintPulse {
+      0%,100% { opacity: 0.45; }
+      50%      { opacity: 0.92; }
+    }
+
+    /* ── PIECES TRAY — single scrollable row ── */
+    #tray-wrap {
+      width: 100%; flex-shrink: 0;
+      overflow: hidden; /* outer clip */
+      padding-top: 14px;
+    }
+    #pieces-tray {
+      display: flex; flex-wrap: nowrap; gap: 6px;
+      overflow-x: auto; overflow-y: visible;
+      padding: 0 10px 8px;
+      scrollbar-width: none;
+    }
+    #pieces-tray::-webkit-scrollbar { display: none; }
+
+    /* Jigsaw piece */
+    .puzzle-piece {
+      background-repeat: no-repeat; flex-shrink: 0;
+      cursor: grab; touch-action: none;
+      filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.26));
+      transition: filter 0.15s, opacity 0.2s;
+    }
+    .puzzle-piece:active { cursor: grabbing; }
+    .puzzle-piece.dragging { opacity: 0.15; }
+
+    /* ── GHOST ── */
+    #drag-ghost {
+      position: fixed; z-index: 9999; pointer-events: none;
+      background-repeat: no-repeat; display: none;
+      filter: drop-shadow(3px 5px 14px rgba(0,0,0,0.42));
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    /* ── RESTART ── */
+    .btn-restart {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg,#FF9800,#F57C00); color: white;
+      border: none; border-radius: 50px; padding: 10px 28px;
+      font-size: 0.95em; font-family: inherit; font-weight: 800; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,152,0,0.4); z-index: 50;
+      touch-action: manipulation; min-height: 44px; white-space: nowrap;
+    }
+
+    #toast { position:fixed; top:18%; left:50%; transform:translateX(-50%) scale(0); color:white; padding:13px 26px; border-radius:50px; font-size:1.35em; font-weight:800; box-shadow:0 6px 22px rgba(0,0,0,0.25); z-index:600; transition:transform 0.2s,opacity 0.2s; opacity:0; pointer-events:none; white-space:nowrap; }
+    #toast.show { transform:translateX(-50%) scale(1); opacity:1; }
+
+    .confetti-p { position:fixed; top:-10px; pointer-events:none; z-index:9998; border-radius:2px; }
+    @keyframes cfFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
+    /* ── END SCREEN ── */
+    #end-screen { display:none; position:fixed; inset:0; background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc); flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:200; padding:30px; }
+    .end-trophy { font-size:4.5em; animation:trophySpin 1.5s ease-out; }
+    @keyframes trophySpin { from{transform:rotate(-20deg) scale(0)} 60%{transform:rotate(10deg) scale(1.1)} to{transform:rotate(0deg) scale(1)} }
+    .end-title  { color:#FFD700; font-size:clamp(1.5em,5vw,2.2em); font-weight:bold; text-shadow:0 3px 10px rgba(0,0,0,0.3); text-align:center; }
+    .end-sub    { color:rgba(255,255,255,0.9); font-size:1.1em; text-align:center; }
+    .end-score-box { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:14px 36px; color:white; font-size:1.7em; font-weight:bold; }
+    .end-stars  { font-size:2.2em; letter-spacing:4px; }
+    .btn-play-again { background:#FFD700; color:#333; border:none; border-radius:50px; padding:14px 36px; font-size:1.1em; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(255,215,0,0.5); touch-action:manipulation; min-height:44px; }
+
+    @media(max-width:600px){
+      .hdr-title { display:none; }
+      #game-screen { padding: 6px 6px 52px; }
+      .instruction { font-size: clamp(0.72em, 3.5vw, 0.88em); margin-bottom: 4px; }
+      .progress-row { margin-bottom: 4px; }
+      .hdr { padding: 5px 10px; margin-bottom: 4px; }
+    }
+    @media(max-width:380px){
+      #game-screen { padding: 4px 4px 48px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+<div id="drag-ghost"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">🌱 <span id="score-val">0</span> / 12</div>
+    <div class="hdr-title">Grow Your Own Garden · LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Pieces: <span id="placed-val">0</span> / 12</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction">Build the garden — drag each piece to the right spot!</div>
+
+  <div class="puzzle-area">
+    <div id="puzzle-wrapper">
+      <div id="target-container">
+        <img id="outline-img" src="Assets/garden.png" alt="garden">
+        <div id="drop-grid"></div>
+      </div>
+      <!-- jigsaw hint overlays injected here by JS -->
+    </div>
+
+    <div id="tray-wrap">
+      <div id="pieces-tray"></div>
+    </div>
+  </div>
+
+  <button class="btn-restart" onclick="restartGame()">🔄 &nbsp;Restart</button>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">🌳</div>
+  <div class="end-title">Your Garden is Complete!</div>
+  <div class="end-sub">Wonderful! You planted everything perfectly! 🌸🌈</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 12</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">▶ &nbsp;Play Again</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const COLS = 4, ROWS = 3, TOTAL = COLS * ROWS;
+const IMG  = 'Assets/garden.png';
+
+/* ═══════════════════════════════════════
+   METRICS — computed from viewport
+═══════════════════════════════════════ */
+let PS, TAB, SV;
+/* object-fit:cover values — computed once image loads */
+let bgRenderW = 0, bgRenderH = 0, bgOffX = 0, bgOffY = 0;
+let imgReady = false;
+const _img = new Image();
+_img.onload = () => {
+  imgReady = true;
+  _imgNW = _img.naturalWidth;
+  _imgNH = _img.naturalHeight;
+  if (PS) computeImageFit(); /* if initMetrics already ran, recompute now */
+};
+_img.src = IMG;
+let _imgNW = 0, _imgNH = 0;
+
+function computeImageFit() {
+  if (!_imgNW || !_imgNH) return;
+  const W = COLS * PS, H = ROWS * PS;
+  const scale = Math.max(W / _imgNW, H / _imgNH); /* cover = max scale */
+  bgRenderW = _imgNW * scale;
+  bgRenderH = _imgNH * scale;
+  bgOffX = (W - bgRenderW) / 2;
+  bgOffY = (H - bgRenderH) / 2;
+}
+
+function initMetrics() {
+  /* Measure actual puzzle-area element so we never guess header heights */
+  const pa = document.querySelector('.puzzle-area');
+  const rect = pa ? pa.getBoundingClientRect() : null;
+  const availW = rect ? Math.floor(rect.width)  : (window.innerWidth  - 16);
+  const availH = rect ? Math.floor(rect.height) : (window.innerHeight * 0.65);
+
+  /* Touch devices get bigger minimum piece size */
+  const isTouch = window.matchMedia('(pointer:coarse)').matches;
+  const minPS = isTouch ? 68 : 55;
+  const maxPS = 240;
+
+  /* Tray gets 28% of height (enough for one SV row) */
+  const trayRatio = availH < 400 ? 0.32 : 0.26;
+  const trayH   = Math.max(availH * trayRatio, 80);
+  const puzzleH = availH - trayH;
+
+  const byW = Math.floor(availW / COLS);
+  const byH = Math.floor(puzzleH / ROWS);
+
+  PS  = Math.max(minPS, Math.min(byW, byH, maxPS));
+  TAB = Math.round(PS * 0.20);
+  SV  = PS + 2 * TAB;
+  computeImageFit();
+
+  /* Size the target container */
+  const tc = document.getElementById('target-container');
+  tc.style.width  = (COLS * PS) + 'px';
+  tc.style.height = (ROWS * PS) + 'px';
+
+  /* Size the tray row so tabs have room */
+  const tw = document.getElementById('tray-wrap');
+  tw.style.height        = (SV + 20) + 'px';
+  tw.style.paddingTop    = TAB + 'px';
+  tw.style.overflow      = 'visible';
+}
+
+/* ═══════════════════════════════════════
+   JIGSAW EDGE DEFINITIONS
+   Adjacent edges are always complementary.
+═══════════════════════════════════════ */
+function getEdges(col, row) {
+  const i = row * COLS + col;
+  return {
+    top:    row  === 0        ? 'flat' : (i % 2 === 0 ? 'out' : 'in'),
+    right:  col  === COLS - 1 ? 'flat' : ((i + 1) % 2 === 0 ? 'out' : 'in'),
+    bottom: row  === ROWS - 1 ? 'flat' : (((row+1)*COLS+col) % 2 === 0 ? 'in' : 'out'),
+    left:   col  === 0        ? 'flat' : (i % 2 === 0 ? 'in' : 'out'),
+  };
+}
+
+/* SVG path for jigsaw shape inside the SV×SV piece div.
+   Cell body occupies (TAB,TAB)→(TAB+PS, TAB+PS).
+   Tabs protrude into the 0..TAB margin areas. */
+function jigsawPath(col, row) {
+  const x0 = TAB, y0 = TAB, x1 = TAB+PS, y1 = TAB+PS;
+  const mx = (x0+x1)/2, my = (y0+y1)/2;
+  const tw = PS * 0.19, tp = TAB * 0.88;
+  const {top, right, bottom, left} = getEdges(col, row);
+
+  const T = () => top    === 'flat' ? `L ${x1} ${y0}` : (d => `L ${mx-tw} ${y0} C ${mx-tw} ${y0+d*tp} ${mx+tw} ${y0+d*tp} ${mx+tw} ${y0} L ${x1} ${y0}`)(top    ==='out'?-1:1);
+  const R = () => right  === 'flat' ? `L ${x1} ${y1}` : (d => `L ${x1} ${my-tw} C ${x1+d*tp} ${my-tw} ${x1+d*tp} ${my+tw} ${x1} ${my+tw} L ${x1} ${y1}`)(right  ==='out'?1:-1);
+  const B = () => bottom === 'flat' ? `L ${x0} ${y1}` : (d => `L ${mx+tw} ${y1} C ${mx+tw} ${y1+d*tp} ${mx-tw} ${y1+d*tp} ${mx-tw} ${y1} L ${x0} ${y1}`)(bottom==='out'?1:-1);
+  const L = () => left   === 'flat' ? `L ${x0} ${y0}` : (d => `L ${x0} ${my+tw} C ${x0+d*tp} ${my+tw} ${x0+d*tp} ${my-tw} ${x0} ${my-tw} L ${x0} ${y0}`)(left  ==='out'?-1:1);
+
+  return `M ${x0} ${y0} ${T()} ${R()} ${B()} ${L()} Z`;
+}
+
+/* Background-position to show the correct cell inside the SV×SV piece div.
+   Mirrors exactly what object-fit:cover does on #outline-img. */
+function pieceBg(col, row) {
+  return {
+    image:    `url('${IMG}')`,
+    size:     `${bgRenderW}px ${bgRenderH}px`,
+    position: `${TAB + bgOffX - col*PS}px ${TAB + bgOffY - row*PS}px`,
+  };
+}
+
+/* Background for a filled rectangular drop-zone cell */
+function zoneBg(col, row) {
+  return {
+    image:    `url('${IMG}')`,
+    size:     `${bgRenderW}px ${bgRenderH}px`,
+    position: `${bgOffX - col*PS}px ${bgOffY - row*PS}px`,
+  };
+}
+
+/* Apply bg object to an element */
+function applyBg(el, bg) {
+  el.style.backgroundImage    = bg.image;
+  el.style.backgroundSize     = bg.size;
+  el.style.backgroundPosition = bg.position;
+  el.style.backgroundRepeat   = 'no-repeat';
+}
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let muted=false, placedCount=0, score=0;
+let dragPiece=null, dragSrcEl=null;
+
+const ALL_PIECES = [];
+for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) ALL_PIECES.push({col:c,row:r,id:r*COLS+c});
+
+/* ═══════════════════════════════════════
+   SETUP
+═══════════════════════════════════════ */
+function setupPuzzle() {
+  initMetrics();
+  placedCount = 0; score = 0;
+  updateProgress();
+  removeHintOverlay();
+  document.querySelectorAll('.placed-piece').forEach(e=>e.remove());
+  clearDragOver();
+
+  /* Drop zones */
+  const grid = document.getElementById('drop-grid');
+  grid.innerHTML = '';
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+    const z = document.createElement('div');
+    z.className='drop-zone'; z.dataset.id=r*COLS+c; z.dataset.col=c; z.dataset.row=r;
+    grid.appendChild(z);
+  }
+
+  /* Jigsaw outline SVG over the faded garden image */
+  const oldSvg = document.getElementById('jigsaw-outline-svg');
+  if (oldSvg) oldSvg.remove();
+  const W = COLS * PS, H = ROWS * PS;
+  let pathsHtml = '';
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+    const tx = c*PS - TAB, ty = r*PS - TAB;
+    pathsHtml += `<path d="${jigsawPath(c,r)}" transform="translate(${tx} ${ty})"
+      fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  }
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.id = 'jigsaw-outline-svg';
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:6;';
+  svg.innerHTML = pathsHtml;
+  document.getElementById('target-container').appendChild(svg);
+
+  /* Shuffled pieces */
+  const tray = document.getElementById('pieces-tray');
+  tray.innerHTML = '';
+  shuffle([...ALL_PIECES]).forEach(p => {
+    const el = document.createElement('div');
+    el.className='puzzle-piece';
+    el.dataset.id=p.id; el.dataset.col=p.col; el.dataset.row=p.row; el.dataset.wrong=0;
+    el.style.width=SV+'px'; el.style.height=SV+'px';
+    applyBg(el, pieceBg(p.col, p.row));
+    el.style.clipPath = `path("${jigsawPath(p.col, p.row)}")`;
+    tray.appendChild(el);
+  });
+
+  speak('Build the garden! Drag each piece to the right spot!');
+}
+
+function updateProgress() {
+  document.getElementById('placed-val').textContent = placedCount;
+  document.getElementById('score-val').textContent  = score;
+  document.getElementById('prog-bar').style.width   = (placedCount/TOTAL*100)+'%';
+}
+
+/* ═══════════════════════════════════════
+   JIGSAW-SHAPED HINT OVERLAY
+═══════════════════════════════════════ */
+function showJigsawHint(piece) {
+  removeHintOverlay();
+  const ov = document.createElement('div');
+  ov.className = 'hint-jigsaw';
+  ov.id = 'active-hint';
+  ov.style.left   = (piece.col * PS - TAB) + 'px';
+  ov.style.top    = (piece.row * PS - TAB) + 'px';
+  ov.style.width  = SV + 'px';
+  ov.style.height = SV + 'px';
+  ov.style.clipPath = `path("${jigsawPath(piece.col, piece.row)}")`;
+  document.getElementById('puzzle-wrapper').appendChild(ov);
+  setTimeout(removeHintOverlay, 3000);
+}
+
+function removeHintOverlay() {
+  document.querySelectorAll('.hint-jigsaw').forEach(e => e.remove());
+}
+
+/* ═══════════════════════════════════════
+   DRAG
+═══════════════════════════════════════ */
+const ghost = document.getElementById('drag-ghost');
+
+function onDragStart(e) {
+  const el = e.target.closest('.puzzle-piece');
+  if (!el) return;
+  e.preventDefault();
+  const col=+el.dataset.col, row=+el.dataset.row;
+  dragPiece = {id:+el.dataset.id, col, row};
+  dragSrcEl = el;
+  ghost.style.width=SV+'px'; ghost.style.height=SV+'px';
+  applyBg(ghost, pieceBg(col, row));
+  ghost.style.clipPath = `path("${jigsawPath(col, row)}")`;
+  ghost.style.display = 'block';
+  const pt=e.touches?e.touches[0]:e;
+  moveGhost(pt.clientX, pt.clientY);
+  el.classList.add('dragging');
+  clearDragOver();
+}
+function onDragMove(e) {
+  if (!dragSrcEl) return; e.preventDefault();
+  const pt=e.touches?e.touches[0]:e;
+  moveGhost(pt.clientX, pt.clientY);
+  clearDragOver();
+  const z=zoneAt(pt.clientX, pt.clientY);
+  if (z&&!z.classList.contains('filled')) showDragOverlay(z);
+}
+function onDragEnd(e) {
+  if (!dragSrcEl) return;
+  const pt=e.changedTouches?e.changedTouches[0]:e;
+  ghost.style.display='none'; clearDragOver();
+  const zone=zoneAt(pt.clientX, pt.clientY);
+  if (zone&&!zone.classList.contains('filled')) handleDrop(zone);
+  else resetDrag();
+}
+
+document.getElementById('pieces-tray').addEventListener('mousedown',  onDragStart);
+document.getElementById('pieces-tray').addEventListener('touchstart', onDragStart, {passive:false});
+document.getElementById('pieces-tray').addEventListener('touchend',   e=>e.preventDefault(), {passive:false});
+document.addEventListener('mousemove', onDragMove);
+document.addEventListener('mouseup',   onDragEnd);
+document.addEventListener('touchmove', onDragMove, {passive:false});
+document.addEventListener('touchend',  onDragEnd,  {passive:false});
+
+function moveGhost(x,y){ghost.style.left=x+'px';ghost.style.top=y+'px';}
+function zoneAt(x,y){for(const z of document.querySelectorAll('.drop-zone')){const r=z.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return z;}return null;}
+function clearDragOver(){
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+  const p=document.getElementById('svg-drag-over'); if(p) p.remove();
+}
+function resetDrag(){dragSrcEl?.classList.remove('dragging');dragSrcEl=null;dragPiece=null;}
+
+/* Drag-over: draw jigsaw green fill directly into the outline SVG */
+function showDragOverlay(zone) {
+  const p=document.getElementById('svg-drag-over'); if(p) p.remove();
+  const svg=document.getElementById('jigsaw-outline-svg'); if(!svg) return;
+  const col=+zone.dataset.col, row=+zone.dataset.row;
+  const el=document.createElementNS('http://www.w3.org/2000/svg','path');
+  el.id='svg-drag-over';
+  el.setAttribute('d', jigsawPath(col,row));
+  el.setAttribute('transform', `translate(${col*PS-TAB} ${row*PS-TAB})`);
+  el.setAttribute('fill','rgba(76,175,80,0.45)');
+  el.setAttribute('stroke','none');
+  svg.appendChild(el);
+}
+
+/* Wrong flash: red jigsaw shape in SVG, fades out */
+function showWrongFlash(col, row) {
+  document.querySelectorAll('.svg-wrong-path').forEach(e=>e.remove());
+  const svg=document.getElementById('jigsaw-outline-svg'); if(!svg) return;
+  const el=document.createElementNS('http://www.w3.org/2000/svg','path');
+  el.setAttribute('class','svg-wrong-path');
+  el.setAttribute('d', jigsawPath(col,row));
+  el.setAttribute('transform', `translate(${col*PS-TAB} ${row*PS-TAB})`);
+  el.setAttribute('fill','rgba(244,67,54,0.50)');
+  el.setAttribute('stroke','none');
+  svg.appendChild(el);
+  setTimeout(()=>el.remove(), 520);
+}
+
+/* ═══════════════════════════════════════
+   DROP HANDLER
+═══════════════════════════════════════ */
+function snapPiece(zone, piece) {
+  zone.classList.add('filled');
+
+  /* Jigsaw-shaped placed piece inside target-container */
+  const pl = document.createElement('div');
+  pl.className = 'placed-piece';
+  pl.style.cssText = `position:absolute;left:${piece.col*PS-TAB}px;top:${piece.row*PS-TAB}px;width:${SV}px;height:${SV}px;pointer-events:none;z-index:7;`;
+  applyBg(pl, pieceBg(piece.col, piece.row));
+  pl.style.clipPath = `path("${jigsawPath(piece.col, piece.row)}")`;
+  document.getElementById('target-container').appendChild(pl);
+
+  removeHintOverlay();
+  placedCount++; updateProgress();
+  if (placedCount===TOTAL) setTimeout(onComplete, 400);
+}
+
+function handleDrop(zone) {
+  const correct = +zone.dataset.id === dragPiece.id;
+  const srcEl=dragSrcEl, piece=dragPiece;
+  dragSrcEl=null; dragPiece=null;
+  srcEl.classList.remove('dragging');
+
+  if (correct) {
+    score++;
+    snapPiece(zone, piece);
+    srcEl.remove();
+    showToast('⭐ Perfect!','#4CAF50');
+  } else {
+    const attempts = +srcEl.dataset.wrong + 1;
+    srcEl.dataset.wrong = attempts;
+    showWrongFlash(+zone.dataset.col, +zone.dataset.row);
+    play(sndWrong);
+
+    if (attempts === 1) {
+      showToast('❌ Try again!','#f44336');
+      /* Jigsaw-shaped orange hint on correct position */
+      showJigsawHint(piece);
+    } else {
+      showToast('💡 Goes here!','#FF9800');
+      setTimeout(()=>{
+        const cz=document.querySelector(`.drop-zone[data-id="${piece.id}"]:not(.filled)`);
+        if(cz){snapPiece(cz,piece);srcEl.remove();}
+      }, 600);
+    }
+  }
+}
+
+/* ═══════════════════════════════════════
+   COMPLETE
+═══════════════════════════════════════ */
+function onComplete() {
+  window.speechSynthesis?.cancel();
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti,700);
+  speak('Amazing! Your garden is complete! Well done!');
+  setTimeout(showEnd, 3500);
+}
+
+/* ═══════════════════════════════════════
+   GAME FLOW
+═══════════════════════════════════════ */
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  /* Wait one frame so CSS layout is computed, then measure & build */
+  requestAnimationFrame(() => {
+    if (!imgReady) {
+      _img.onload = () => { imgReady=true; _imgNW=_img.naturalWidth; _imgNH=_img.naturalHeight; setupPuzzle(); };
+    } else {
+      setupPuzzle();
+    }
+  });
+}
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  ghost.style.display='none';
+  setupPuzzle();
+}
+function showEnd(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').textContent=score>=11?'⭐⭐⭐':score>=8?'⭐⭐':'⭐';
+  window.speechSynthesis?.cancel();
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti,800);
+}
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').textContent=muted?'🔇':'🔊';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else speak('Build the garden! Drag each piece to the right spot!');
+}
+
+/* ═══════════════════════════════════════
+   AUDIO / TTS
+═══════════════════════════════════════ */
+const sndWrong=new Audio('Assets/wrong.mp3');
+const sndClaps=new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0;});document.removeEventListener('pointerdown',unlockAudio);}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{});}
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0;},3000);}
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window)||muted)return;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.7;u.pitch=1.1;u.volume=1;
+    const vs=window.speechSynthesis.getVoices();
+    const v=vs.find(v=>v.lang.startsWith('en')&&!v.name.includes('Google'))||vs.find(v=>v.lang.startsWith('en'))||vs[0];
+    if(v)u.voice=v;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* Rebuild on resize / orientation change */
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (document.getElementById('game-screen').style.display !== 'none') {
+      requestAnimationFrame(() => setupPuzzle());
+    }
+  }, 250);
+});
+let toastT;
+function showToast(msg,bg){clearTimeout(toastT);const t=document.getElementById('toast');t.textContent=msg;t.style.background=bg;t.classList.add('show');toastT=setTimeout(()=>t.classList.remove('show'),1600);}
+const CC=['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF922B','#cc5de8','#ff6b81'];
+function spawnConfetti(){for(let i=0;i<70;i++){setTimeout(()=>{const el=document.createElement('div');el.className='confetti-p';const sz=6+Math.random()*9;el.style.cssText=`left:${Math.random()*100}vw;width:${sz}px;height:${sz}px;background:${CC[~~(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards;`;document.body.appendChild(el);setTimeout(()=>el.remove(),3500);},i*22);}}
+</script>
+</body>
+</html>
