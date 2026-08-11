@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Odd &amp; Even · LY4 · Game 23</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e8f5e9 50%,#e3f2fd 100%);height:100vh;height:100dvh;display:flex;align-items:stretch;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none}
+
+/* ── INTRO ── */
+#intro-screen{position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);display:flex;align-items:center;justify-content:center;border:5px solid #FFD700;z-index:200;cursor:pointer}
+#intro-logo{width:220px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5));animation:logoBounce 2s ease-in-out infinite}
+@keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ── GAME SCREEN ── */
+#game-screen{display:none;flex-direction:column;width:100%;max-width:860px;height:100%;padding:12px 14px 76px;overflow-y:auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:18px;padding:10px 18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex-shrink:0}
+.hdr-score{font-size:1.1em;font-weight:bold;color:#4CAF50;min-width:70px}
+.hdr-title{font-size:clamp(0.72em,2.4vw,0.95em);color:#6a0dad;font-weight:bold;text-align:center}
+.mute-btn{width:38px;height:38px;border:2px solid #ddd;border-radius:50%;background:white;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-shrink:0}
+.progress-label{font-size:0.85em;color:#777;white-space:nowrap}
+.progress-bar-wrap{flex:1;height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#4CAF50,#8BC34A);transition:width 0.5s ease}
+
+/* ── Q-CARD ── */
+.q-card{background:white;border-radius:24px;padding:20px 16px;box-shadow:0 6px 24px rgba(0,0,0,0.1);display:flex;flex-direction:column;align-items:center;gap:14px;flex:1;min-height:0;overflow:hidden}
+
+.inst-text{font-size:clamp(1em,3.2vw,1.28em);font-weight:800;color:#444;text-align:center;line-height:1.4}
+.odd-col{color:#F9A825}
+.even-col{color:#FF6F00}
+
+/* ── ACTIVITY 1: IDENTIFY ── */
+.count-badge{background:linear-gradient(135deg,#7B1FA2,#AB47BC);color:white;font-size:clamp(1em,3vw,1.2em);font-weight:800;padding:6px 20px;border-radius:30px}
+.group-img{width:auto;max-width:100%;height:clamp(140px,34vw,220px);object-fit:contain;flex-shrink:0}
+
+.oe-buttons{display:flex;gap:16px;width:100%;max-width:380px;justify-content:center}
+.oe-btn{flex:1;padding:16px 10px;border:none;border-radius:22px;font-size:clamp(1.1em,4vw,1.4em);font-weight:800;font-family:inherit;cursor:pointer;touch-action:manipulation;min-height:44px;transition:transform 0.12s,box-shadow 0.12s,border 0.15s;box-shadow:0 5px 16px rgba(0,0,0,0.13);border:4px solid transparent}
+.oe-btn:active{transform:scale(0.94)}
+.odd-btn{background:linear-gradient(135deg,#FFD600,#FFAB00);color:#333}
+.even-btn{background:linear-gradient(135deg,#FF9800,#E65100);color:white}
+.oe-btn.hint{border-color:#FFD600 !important;animation:hintPulse 0.8s ease-in-out infinite}
+.oe-btn.correct{border-color:#4CAF50 !important;background:#E8F5E9 !important;color:#2E7D32 !important;box-shadow:0 0 0 5px rgba(76,175,80,0.2) !important;animation:btnPop 0.4s ease !important}
+.oe-btn.wrong-shake{animation:shakeBtn 0.4s ease}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,214,0,0.9)}50%{box-shadow:0 0 0 14px rgba(255,214,0,0)}}
+@keyframes btnPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shakeBtn{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* ── ACTIVITY 2: COLOR ── */
+.color-inst{font-size:clamp(0.85em,2.6vw,1em);color:#666;font-weight:700;text-align:center}
+
+.pumpkin-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.pumpkin-card{
+  width:80px;height:90px;
+  background:#f5f5f5;
+  border:3px solid #ddd;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.1em;font-weight:800;color:#333;
+  position:relative;cursor:pointer;
+  transition:transform 0.12s,border-color 0.2s,background 0.25s,color 0.25s;
+  touch-action:manipulation;min-height:44px;
+  flex-shrink:0;
+}
+.pumpkin-card::before{
+  content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:8px;height:14px;
+  background:#4CAF50;border-radius:4px 4px 0 0;
+}
+.pumpkin-card:active{transform:scale(0.92)}
+.pumpkin-card.colored-even{background:#FF9800;border-color:#E65100;color:white}
+.pumpkin-card.colored-odd{background:#FFD600;border-color:#F9A825;color:#333}
+.pumpkin-card.done{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,0.35)}
+.pumpkin-card.wrong{animation:shakePump 0.4s ease}
+@keyframes shakePump{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+.mode-row{display:flex;gap:12px;width:100%;max-width:340px;justify-content:center}
+.mode-btn{flex:1;padding:13px 8px;border:4px solid transparent;border-radius:20px;font-size:clamp(1em,3.5vw,1.2em);font-weight:800;font-family:inherit;cursor:pointer;touch-action:manipulation;transition:transform 0.12s,border-color 0.2s,box-shadow 0.2s;box-shadow:0 4px 12px rgba(0,0,0,0.12)}
+.mode-btn:active{transform:scale(0.94)}
+.mode-even{background:linear-gradient(135deg,#FF9800,#E65100);color:white}
+.mode-odd{background:linear-gradient(135deg,#FFD600,#FFAB00);color:#333}
+.mode-btn.selected{border-color:#333;box-shadow:0 0 0 3px rgba(0,0,0,0.25),0 4px 12px rgba(0,0,0,0.15);transform:scale(1.05)}
+.mode-hint-txt{font-size:0.82em;color:#aaa;font-weight:700;text-align:center}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) scale(0.7);padding:13px 28px;border-radius:50px;font-size:1.35em;font-weight:bold;color:white;pointer-events:none;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+#toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.confetti{position:fixed;pointer-events:none;z-index:9998;border-radius:2px}
+
+/* ── BOTTOM ── */
+.bottom-row{display:flex;justify-content:center;position:fixed;bottom:16px;left:0;right:0;z-index:50;pointer-events:none}
+.btn-restart{pointer-events:all;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;padding:12px 30px;border-radius:40px;font-size:1em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 5px 14px rgba(255,152,0,0.4);touch-action:manipulation;min-height:44px}
+
+/* ── END ── */
+#end-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc);flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;text-align:center;padding:30px}
+.end-trophy{font-size:4.5em;animation:trophySpin 1.5s ease-out}
+@keyframes trophySpin{from{transform:rotate(-20deg) scale(0)}60%{transform:rotate(10deg) scale(1.1)}to{transform:rotate(0) scale(1)}}
+.end-title{color:#FFD700;font-size:clamp(1.5em,5vw,2.2em);font-weight:bold;text-shadow:0 3px 10px rgba(0,0,0,0.3)}
+.end-sub{color:rgba(255,255,255,0.9);font-size:1.1em}
+.end-score-box{background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);border-radius:20px;padding:16px 40px;color:white;font-size:1.8em;font-weight:bold}
+.end-stars{font-size:2.2em;letter-spacing:4px}
+.btn-play-again{background:#FFD700;color:#333;border:none;padding:15px 44px;border-radius:40px;font-size:1.2em;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);margin-top:8px;touch-action:manipulation;min-height:44px}
+
+@media(max-width:768px){.hdr-title{display:none}}
+@media(max-width:480px){
+  #game-screen{padding:8px 10px 72px}
+  .hdr{padding:8px 12px;margin-bottom:6px}
+  .q-card{padding:14px 10px;gap:10px}
+  .pumpkin-card{width:68px;height:78px;font-size:1.8em}
+  .pumpkin-row{gap:10px}
+  .oe-btn{padding:13px 8px;font-size:clamp(1em,4.5vw,1.2em)}
+}
+@media(max-height:640px){
+  .q-card{gap:8px;padding:10px 8px}
+  .group-img{height:clamp(100px,22vw,160px)}
+  .oe-buttons{gap:10px}
+  .pumpkin-row{gap:8px}
+  .pumpkin-card{width:60px;height:68px;font-size:1.6em}
+}
+</style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onerror="this.style.display='none'">
+</div>
+<div id="toast"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">⭐ <span id="score-val">0</span> / 8</div>
+    <div class="hdr-title">Odd &amp; Even · LY4</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 8</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="q-card" id="q-card">
+    <!-- filled dynamically -->
+  </div>
+
+  <div class="bottom-row">
+    <button class="btn-restart" onclick="restartGame()">🔄 &nbsp;Restart</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">🏆</div>
+  <div class="end-title">Amazing Work!</div>
+  <div class="end-sub">You know Odd &amp; Even numbers!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 8</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">▶ &nbsp;Play Again</button>
+</div>
+
+<script>
+/* ── Questions ── */
+const QUESTIONS = [
+  { type:'identify', img:'Assets/3%20oranges.png',    count:3, answer:'odd',  tts:'Is this group odd or even?' },
+  { type:'identify', img:'Assets/6pencils.png',        count:6, answer:'even', tts:'Is this group odd or even?' },
+  { type:'identify', img:'Assets/5%20pineapples.png',  count:5, answer:'odd',  tts:'Is this group odd or even?' },
+  { type:'identify', img:'Assets/4books.png',          count:4, answer:'even', tts:'Is this group odd or even?' },
+  { type:'color',    numbers:[2,5,4,1], tts:'Colour even numbers orange and odd numbers yellow!' },
+  { type:'identify', img:'Assets/7books.png',          count:7, answer:'odd',  tts:'Is this group odd or even?' },
+  { type:'identify', img:'Assets/2%20kiwis.png',       count:2, answer:'even', tts:'Is this group odd or even?' },
+  { type:'color',    numbers:[7,9,6,3], tts:'Colour even numbers orange and odd numbers yellow!' },
+];
+
+/* Preload images */
+QUESTIONS.filter(q=>q.img).forEach(q=>{ new Image().src=q.img; });
+
+/* ── Audio ── */
+const sndWrong = new Audio('Assets/wrong.mp3');
+const sndClaps = new Audio('Assets/free_claps.mp3');
+function unlockAudio(){[sndWrong,sndClaps].forEach(s=>{s.play().catch(()=>{});s.pause();s.currentTime=0});document.removeEventListener('pointerdown',unlockAudio)}
+document.addEventListener('pointerdown',unlockAudio);
+function play(s){if(muted)return;s.currentTime=0;s.play().catch(()=>{})}
+function playClaps(){if(muted)return;sndClaps.currentTime=0;sndClaps.play().catch(()=>{});setTimeout(()=>{sndClaps.pause();sndClaps.currentTime=0},3000)}
+
+/* ── TTS ── */
+function speak(text){
+  sndClaps.pause();sndClaps.currentTime=0;
+  if(!('speechSynthesis' in window)||muted)return;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    if(muted)return;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.78;u.pitch=1.05;u.volume=1;
+    const v=window.speechSynthesis.getVoices();
+    const voice=v.find(x=>x.lang.startsWith('en')&&!x.name.includes('Google'))||v.find(x=>x.lang.startsWith('en'))||v[0];
+    if(voice)u.voice=voice;
+    window.speechSynthesis.speak(u);
+  },150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+
+/* ── Toast ── */
+let toastTimer=null;
+function showToast(msg,bg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.background=bg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1400);
+}
+function hideToast(){document.getElementById('toast').classList.remove('show');}
+
+/* ── Confetti ── */
+const CC=['#FFD700','#FF6B6B','#4CAF50','#2196F3','#FF9800','#AB47BC','#26C6DA'];
+function spawnConfetti(){
+  for(let i=0;i<65;i++)setTimeout(()=>{
+    const el=document.createElement('div');el.className='confetti';
+    const sz=6+Math.random()*9;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3500);
+  },i*22);
+}
+if(!document.querySelector('#cf-style')){const s=document.createElement('style');s.id='cf-style';s.textContent='@keyframes cfFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(540deg);opacity:0}}';document.head.appendChild(s);}
+
+/* ── State ── */
+let curQ=0, score=0, attempts=0, answered=false, muted=false;
+let colorMode=null; /* 'odd' | 'even' | null — for color activity */
+let coloredCards={}; /* index → 'odd'|'even' */
+
+/* ══════════════════════════════════════
+   ACTIVITY 1 — IDENTIFY (ODD / EVEN)
+══════════════════════════════════════ */
+function buildIdentify(q){
+  const card=document.getElementById('q-card');
+  card.innerHTML=`
+    <div class="inst-text">Is this group <span class="odd-col">ODD</span> or <span class="even-col">EVEN</span>?</div>
+    <div class="count-badge" id="count-badge">Count: ${q.count}</div>
+    <img id="group-img" class="group-img" src="" alt="group of ${q.count}" loading="lazy" onerror="this.style.opacity=0.2">
+    <div class="oe-buttons">
+      <button class="oe-btn odd-btn" id="btn-odd" onclick="selectAnswer('odd')">🟡 ODD</button>
+      <button class="oe-btn even-btn" id="btn-even" onclick="selectAnswer('even')">🟠 EVEN</button>
+    </div>`;
+  const img=document.getElementById('group-img');
+  img.onload=()=>{img.style.opacity=1;};
+  img.onerror=()=>{img.style.opacity=0.2;};
+  img.src=q.img;
+  if(img.complete&&img.naturalWidth>0) img.style.opacity=1;
+}
+
+function clearBtnStates(){
+  document.querySelectorAll('.oe-btn').forEach(b=>b.classList.remove('hint','correct','wrong-shake'));
+}
+
+function getCorrectBtn(){
+  const q=QUESTIONS[curQ];
+  return document.getElementById(q.answer==='odd'?'btn-odd':'btn-even');
+}
+
+function selectAnswer(choice){
+  if(answered)return;
+  const q=QUESTIONS[curQ];
+  if(choice===q.answer) registerCorrect();
+  else registerWrong(choice);
+}
+
+function registerCorrect(){
+  answered=true;
+  clearBtnStates();
+  const btn=getCorrectBtn();
+  if(btn) btn.classList.add('correct');
+  score++;
+  document.getElementById('score-val').textContent=score;
+  window.speechSynthesis?.cancel();
+  playClaps();
+  showToast('⭐ Correct!','#4CAF50');
+  spawnConfetti();
+  setTimeout(()=>{curQ++;loadQuestion();},3200);
+}
+
+function registerWrong(choice){
+  if(answered)return;
+  attempts++;
+  play(sndWrong);
+  const wrongBtn=document.getElementById(choice==='odd'?'btn-odd':'btn-even');
+  if(wrongBtn){wrongBtn.classList.add('wrong-shake');setTimeout(()=>wrongBtn.classList.remove('wrong-shake'),500);}
+
+  if(attempts===1){
+    showToast('❌ Try again!','#f44336');
+    setTimeout(hideToast,900);
+    setTimeout(()=>{
+      const hintBtn=getCorrectBtn();
+      if(hintBtn) hintBtn.classList.add('hint');
+    },600);
+  } else {
+    answered=true;
+    showToast('❌ Wrong!','#f44336');
+    setTimeout(()=>{
+      clearBtnStates();
+      const correctBtn=getCorrectBtn();
+      if(correctBtn) correctBtn.classList.add('correct');
+      showToast('💡 Correct answer!','#FF9800');
+      setTimeout(()=>{curQ++;loadQuestion();},3000);
+    },1000);
+  }
+}
+
+/* ══════════════════════════════════════
+   ACTIVITY 2 — COLOUR THE NUMBERS
+══════════════════════════════════════ */
+function buildColor(q){
+  colorMode=null;
+  coloredCards={};
+  const card=document.getElementById('q-card');
+  card.innerHTML=`
+    <div class="inst-text">Colour <span class="even-col">EVEN 🟠</span> and <span class="odd-col">ODD 🟡</span> numbers!</div>
+    <div class="color-inst">Select a colour, then tap each number.</div>
+    <div class="pumpkin-row" id="pumpkin-row">
+      ${q.numbers.map((n,i)=>`<div class="pumpkin-card" id="pump-${i}" onclick="tapNumber(${i},${n})">${n}</div>`).join('')}
+    </div>
+    <div class="mode-row">
+      <button class="mode-btn mode-even" id="mode-even" onclick="setMode('even')">🟠 EVEN</button>
+      <button class="mode-btn mode-odd"  id="mode-odd"  onclick="setMode('odd')">🟡 ODD</button>
+    </div>
+    <div class="mode-hint-txt" id="mode-hint">👆 Select ODD or EVEN first</div>`;
+}
+
+function setMode(m){
+  if(answered)return;
+  colorMode=m;
+  document.getElementById('mode-even').classList.toggle('selected', m==='even');
+  document.getElementById('mode-odd').classList.toggle('selected',  m==='odd');
+  document.getElementById('mode-hint').textContent = m==='even'
+    ? '🟠 Now tap the EVEN numbers!'
+    : '🟡 Now tap the ODD numbers!';
+}
+
+function tapNumber(idx, num){
+  if(answered||!colorMode)return;
+  const isOdd = num%2!==0;
+  const correct = (colorMode==='odd' && isOdd) || (colorMode==='even' && !isOdd);
+  const card=document.getElementById(`pump-${idx}`);
+  if(!card||coloredCards[idx])return; /* already correctly colored */
+
+  if(correct){
+    coloredCards[idx]=colorMode;
+    card.classList.add(colorMode==='even'?'colored-even':'colored-odd','done');
+    card.onclick=null;
+    checkAllColored();
+  } else {
+    play(sndWrong);
+    card.classList.add('wrong');
+    setTimeout(()=>card.classList.remove('wrong'),450);
+    showToast('❌ Try again!','#f44336');
+  }
+}
+
+function checkAllColored(){
+  const q=QUESTIONS[curQ];
+  if(Object.keys(coloredCards).length===q.numbers.length){
+    answered=true;
+    score++;
+    document.getElementById('score-val').textContent=score;
+    window.speechSynthesis?.cancel();
+    playClaps();
+    showToast('⭐ Well done!','#4CAF50');
+    spawnConfetti();
+    setTimeout(()=>{curQ++;loadQuestion();},3200);
+  }
+}
+
+/* ══════════════════════════════════════
+   GAME FLOW
+══════════════════════════════════════ */
+function loadQuestion(){
+  if(curQ>=QUESTIONS.length){showEnd();return;}
+  answered=false; attempts=0; colorMode=null; coloredCards={};
+
+  const q=QUESTIONS[curQ];
+  document.getElementById('q-num').textContent=curQ+1;
+  document.getElementById('prog-bar').style.width=((curQ/QUESTIONS.length)*100)+'%';
+  document.getElementById('score-val').textContent=score;
+
+  if(q.type==='identify') buildIdentify(q);
+  else buildColor(q);
+
+  speak(q.tts);
+}
+
+function startGame(){
+  document.getElementById('intro-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;
+  document.getElementById('score-val').textContent=0;
+  loadQuestion();
+}
+
+function restartGame(){
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  curQ=0;score=0;
+  document.getElementById('score-val').textContent=0;
+  loadQuestion();
+}
+
+function toggleMute(){
+  muted=!muted;
+  document.getElementById('mute-btn').textContent=muted?'🔇':'🔊';
+  if(muted){window.speechSynthesis?.cancel();sndClaps.pause();}
+  else speak(QUESTIONS[curQ].tts);
+}
+
+function showEnd(){
+  document.getElementById('prog-bar').style.width='100%';
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('end-screen').style.display='flex';
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('end-stars').textContent=score>=7?'⭐⭐⭐':score>=5?'⭐⭐':'⭐';
+  window.speechSynthesis?.cancel();
+  playClaps();spawnConfetti();setTimeout(spawnConfetti,800);
+}
+</script>
+</body>
+</html>
