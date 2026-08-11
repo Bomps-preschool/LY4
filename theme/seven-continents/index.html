@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Seven Continents · LY4</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --ps: 110px; }
+    @media (max-width: 480px) { :root { --ps: 85px; } }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #e8f5e9 50%, #e3f2fd 100%);
+      height: 100vh; height: 100dvh;
+      display: flex; align-items: stretch; justify-content: center;
+      overflow: hidden; user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── INTRO ── */
+    #intro-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #4a148c, #7b1fa2, #ab47bc);
+      display: flex; align-items: center; justify-content: center;
+      border: 5px solid #FFD700; z-index: 200; cursor: pointer;
+    }
+    #intro-logo { width: 220px; height: auto; filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5)); animation: logoBounce 2s ease-in-out infinite; -webkit-user-drag: none; opacity: 0; transition: opacity 0.3s; }
+    #intro-logo.loaded { opacity: 1; }
+    @keyframes logoBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+    /* ── GAME SCREEN ── */
+    #game-screen {
+      display: none; flex-direction: column;
+      width: 100%; max-width: 860px;
+      height: 100%; padding: 12px 12px 80px; overflow-y: auto;
+    }
+
+    .hdr { display:flex; align-items:center; justify-content:space-between; background:white; border-radius:18px; padding:10px 18px; margin-bottom:10px; box-shadow:0 4px 14px rgba(0,0,0,0.1); flex-shrink:0; }
+    .hdr-score { font-size:1.2em; font-weight:bold; color:#4CAF50; min-width:70px; }
+    .hdr-title { font-size:clamp(0.75em,2.5vw,1em); color:#6a0dad; font-weight:bold; text-align:center; }
+    .mute-btn { width:38px; height:38px; border:2px solid #ddd; border-radius:50%; background:white; font-size:1.1em; cursor:pointer; display:flex; align-items:center; justify-content:center; touch-action: manipulation; min-height: 44px; min-width: 44px; }
+
+    .progress-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-shrink:0; }
+    .progress-label { font-size:0.9em; color:#777; white-space:nowrap; }
+    .progress-bar-wrap { flex:1; height:10px; background:#e0e0e0; border-radius:5px; overflow:hidden; }
+    .progress-bar-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,#4CAF50,#8BC34A); transition:width 0.5s ease; }
+
+    .instruction { text-align:center; font-size:clamp(0.9em,3vw,1.1em); color:#333; font-weight:800; margin-bottom:10px; padding:0 4px; flex-shrink:0; line-height:1.4; }
+
+    /* ── MAIN CARD ── */
+    .q-card {
+      background: white; border-radius: 24px; padding: 14px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      flex-shrink: 0; width: 100%;
+    }
+
+    .continent-name {
+      font-size: clamp(1.3em, 5vw, 1.8em); font-weight: 800;
+      color: #6a0dad; letter-spacing: 1px;
+    }
+
+    /* ── PUZZLE AREA ── */
+    .puzzle-area {
+      display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;
+    }
+
+    /* Target: outline + drop zones */
+    #target-container {
+      position: relative;
+      width: calc(var(--ps) * 2);
+      height: calc(var(--ps) * 2);
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    #outline-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      -webkit-user-drag: none;
+      transition: opacity 0.3s;
+    }
+    #outline-img.loaded { opacity: 0.35; }
+
+    #drop-grid {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .drop-zone {
+      border: none;
+      background: transparent;
+      transition: background 0.2s;
+      background-repeat: no-repeat;
+      background-size: 200% 200%;
+    }
+    .drop-zone.drag-over {
+      background-color: rgba(76,175,80,0.25);
+    }
+    .drop-zone.wrong-zone {
+      background-color: rgba(244,67,54,0.15);
+      animation: shakeZone 0.4s ease;
+    }
+    @keyframes shakeZone { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .drop-zone.hint-zone {
+      border-color: #FF9800; border-style: solid;
+      animation: pulseHint 0.7s ease-in-out infinite;
+    }
+    @keyframes pulseHint {
+      0%,100% { box-shadow: 0 0 8px 3px rgba(255,152,0,0.9), 0 0 24px 8px rgba(255,152,0,0.5); }
+      50%      { box-shadow: 0 0 18px 8px rgba(255,200,0,1),  0 0 40px 15px rgba(255,152,0,0.7); }
+    }
+    .drop-zone.filled {
+      border: none;
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn { 0%{transform:scale(0.8);opacity:0.5} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+
+    /* ── PIECES TRAY ── */
+    #pieces-tray {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: center; padding: 10px 4px 4px;
+      border-top: 2px dashed #eee; width: 100%;
+      min-height: calc(var(--ps) + 24px);
+    }
+
+    .puzzle-piece {
+      width: var(--ps); height: var(--ps);
+      background-repeat: no-repeat;
+      background-size: 200% 200%;
+      border-radius: 10px;
+      border: 2.5px solid #e0e0e0;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      will-change: transform;
+      transition: box-shadow 0.15s, opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .puzzle-piece.dragging { opacity: 0.25; }
+
+    /* ── GHOST ── */
+    #drag-ghost {
+      position: fixed; z-index: 9999; pointer-events: none;
+      width: var(--ps); height: var(--ps);
+      background-repeat: no-repeat;
+      background-size: 200% 200%;
+      border-radius: 12px;
+      border: 2.5px solid #FFD700;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* ── BOTTOM ── */
+    .btn-restart {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg,#FF9800,#F57C00); color: white;
+      border: none; border-radius: 50px; padding: 14px 36px;
+      font-size: 1.05em; font-family: inherit; font-weight: 800; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,152,0,0.4); z-index: 50; white-space: nowrap;
+      touch-action: manipulation; min-height: 44px;
+    }
+
+    #toast { position:fixed; top:20%; left:50%; transform:translateX(-50%) scale(0); color:white; padding:14px 28px; border-radius:50px; font-size:1.5em; font-weight:800; box-shadow:0 6px 24px rgba(0,0,0,0.25); z-index:100; transition:transform 0.2s,opacity 0.2s; opacity:0; pointer-events:none; white-space:nowrap; will-change:transform,opacity; }
+    #toast.show { transform:translateX(-50%) scale(1); opacity:1; }
+
+    .confetti { position:fixed; top:-10px; pointer-events:none; z-index:9998; border-radius:2px; }
+    @keyframes cfFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
+    /* ── END SCREEN ── */
+    #end-screen { display:none; position:fixed; inset:0; background:linear-gradient(160deg,#4a148c,#7b1fa2,#ab47bc); flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:200; padding:30px; }
+    .end-trophy { font-size:4.5em; animation:trophySpin 1.5s ease-out; }
+    @keyframes trophySpin { from{transform:rotate(-20deg) scale(0)} 60%{transform:rotate(10deg) scale(1.1)} to{transform:rotate(0deg) scale(1)} }
+    .end-title  { color:#FFD700; font-size:clamp(1.5em,5vw,2.2em); font-weight:bold; text-shadow:0 3px 10px rgba(0,0,0,0.3); text-align:center; }
+    .end-sub    { color:rgba(255,255,255,0.9); font-size:1.1em; text-align:center; }
+    .end-score-box { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:16px 40px; color:white; font-size:1.8em; font-weight:bold; }
+    .end-stars  { font-size:2.2em; letter-spacing:4px; }
+    .btn-play-again { background:#FFD700; color:#333; border:none; border-radius:50px; padding:14px 36px; font-size:1.1em; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(255,215,0,0.5); touch-action: manipulation; min-height: 44px; }
+
+    @media (max-width: 768px) {
+      #game-screen { padding: 10px 10px 76px; }
+      .hdr-title { display: none; }
+      .q-card { padding: 10px; gap: 10px; }
+    }
+    @media (max-width: 480px) {
+      .instruction { font-size: clamp(0.8em, 3.5vw, 1em); }
+      .continent-name { font-size: clamp(1.1em, 5vw, 1.5em); }
+      .hdr-score { font-size: 1em; }
+      .progress-label { font-size: 0.8em; }
+      .btn-restart { font-size: 0.95em; padding: 12px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="intro-screen" onclick="startGame()">
+  <img id="intro-logo" src="Assets/innovinelogo.png" alt="Innovine" onload="this.classList.add('loaded')" style="-webkit-user-drag:none;">
+</div>
+
+<div id="toast"></div>
+<div id="drag-ghost"></div>
+
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-score">⭐ <span id="score-val">0</span> / 7</div>
+    <div class="hdr-title">Seven Continents</div>
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+  </div>
+  <div class="progress-row">
+    <span class="progress-label">Q <span id="q-num">1</span> / 7</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+  <div class="instruction" id="instruction-txt"></div>
+
+  <div class="q-card">
+    <div class="continent-name" id="continent-name"></div>
+    <div class="puzzle-area">
+      <div id="target-container">
+        <img id="outline-img" src="" alt="continent outline">
+        <div id="drop-grid"></div>
+      </div>
+      <div id="pieces-tray"></div>
+    </div>
+  </div>
+
+  <button class="btn-restart" onclick="restartGame()">🔄 &nbsp;Restart</button>
+</div>
+
+<div id="end-screen">
+  <div class="end-trophy">🏆</div>
+  <div class="end-title">You have done a great job!</div>
+  <div class="end-sub">You completed all 7 continents!</div>
+  <div class="end-score-box">Score: &nbsp;<span id="final-score">0</span> / 7</div>
+  <div class="end-stars" id="end-stars"></div>
+  <button class="btn-play-again" onclick="restartGame()">▶ &nbsp;Play Again</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+   ══════════════════════════════════════ */
+const CONTINENTS = [
+  { id: 'asia',          name: 'Asia',          img: 'Assets/asia.png'          },
+  { id: 'africa',        name: 'Africa',         img: 'Assets/africa.png'        },
+  { id: 'europe',        name: 'Europe',         img: 'Assets/europe.png'        },
+  { id: 'north-america', name: 'North America',  img: 'Assets/north-america.png' },
+  { id: 'south-america', name: 'South America',  img: 'Assets/south-america.png' },
+  { id: 'australia',     name: 'Australia',      img: 'Assets/australia.png'     },
+  { id: 'antarctica',    name: 'Antarctica',     img: 'Assets/antartica.png'     },
+];
+
+/* Background-position per quadrant (0=TL, 1=TR, 2=BL, 3=BR) */
+const POS_PERCENT = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'];
+
+/* Preload all images */
+CONTINENTS.forEach(c => { new Image().src = c.img; });
+
+/* ══════════════════════════════════════
+   STATE
+   ══════════════════════════════════════ */
+let curQ       = 0;
+let score      = 0;
+let muted      = false;
+let questionOK = true;
+let placedCount = 0;
+let dragPos    = null;
+let dragSrcEl  = null;
+
+/* ══════════════════════════════════════
+   AUDIO
+   ══════════════════════════════════════ */
+const sndWrong = new Audio('Assets/wrong.mp3');
+const sndClaps = new Audio('Assets/free_claps.mp3');
+
+function unlockAudio() {
+  [sndWrong, sndClaps].forEach(s => { s.play().catch(()=>{}); s.pause(); s.currentTime = 0; });
+  document.removeEventListener('pointerdown', unlockAudio);
+}
+document.addEventListener('pointerdown', unlockAudio);
+
+function play(s) { if (muted) return; s.currentTime = 0; s.play().catch(()=>{}); }
+function playClaps() {
+  if (muted) return;
+  sndClaps.currentTime = 0; sndClaps.play().catch(()=>{});
+  setTimeout(() => { sndClaps.pause(); sndClaps.currentTime = 0; }, 3000);
+}
+function speak(text) {
+  sndClaps.pause(); sndClaps.currentTime = 0;
+  if (!('speechSynthesis' in window) || muted) return;
+  window.speechSynthesis.cancel();
+  setTimeout(() => {
+    if (muted) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.7; u.pitch = 1.0;
+    const vs = window.speechSynthesis.getVoices();
+    const v  = vs.find(v => v.lang.startsWith('en') && !v.name.includes('Google'))
+            || vs.find(v => v.lang.startsWith('en')) || vs[0];
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  }, 150);
+}
+window.speechSynthesis.getVoices();
+window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
+
+/* ══════════════════════════════════════
+   LOAD QUESTION
+   ══════════════════════════════════════ */
+function loadQuestion() {
+  if (curQ >= CONTINENTS.length) { showEnd(); return; }
+  placedCount = 0; questionOK = true;
+  dragPos = null; dragSrcEl = null;
+  ghost.style.display = 'none';
+
+  const c = CONTINENTS[curQ];
+
+  document.getElementById('q-num').textContent     = curQ + 1;
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('prog-bar').style.width  = (curQ / CONTINENTS.length * 100) + '%';
+  document.getElementById('continent-name').textContent = c.name;
+
+  const instrEl = document.getElementById('instruction-txt');
+  instrEl.textContent = `Arrange the pieces to build the continent!`;
+
+  /* Outline ghost image */
+  const outlineImg = document.getElementById('outline-img');
+  outlineImg.classList.remove('loaded');
+  outlineImg.onload = () => outlineImg.classList.add('loaded');
+  outlineImg.src = c.img;
+
+  /* Build drop zones */
+  const dropGrid = document.getElementById('drop-grid');
+  dropGrid.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const zone = document.createElement('div');
+    zone.className = 'drop-zone';
+    zone.dataset.pos = i;
+    dropGrid.appendChild(zone);
+  }
+
+  /* Build shuffled pieces */
+  const tray = document.getElementById('pieces-tray');
+  tray.innerHTML = '';
+  shuffle([0, 1, 2, 3]).forEach(pos => {
+    const piece = document.createElement('div');
+    piece.className = 'puzzle-piece';
+    piece.dataset.pos   = pos;
+    piece.dataset.wrong = 0;
+    piece.style.backgroundImage    = `url('${c.img}')`;
+    piece.style.backgroundSize     = '200% 200%';
+    piece.style.backgroundPosition = POS_PERCENT[pos];
+    tray.appendChild(piece);
+  });
+
+  speak(`Arrange the pieces to build ${c.name}!`);
+}
+
+/* ══════════════════════════════════════
+   DRAG — ghost element
+   ══════════════════════════════════════ */
+const ghost = document.getElementById('drag-ghost');
+
+function onDragStart(e) {
+  const el = e.target.closest('.puzzle-piece');
+  if (!el) return;
+  e.preventDefault();
+  dragPos   = parseInt(el.dataset.pos);
+  dragSrcEl = el;
+  ghost.style.backgroundImage    = el.style.backgroundImage;
+  ghost.style.backgroundSize     = '200% 200%';
+  ghost.style.backgroundPosition = POS_PERCENT[dragPos];
+  ghost.style.display = 'block';
+  const pt = e.touches ? e.touches[0] : e;
+  moveGhost(pt.clientX, pt.clientY);
+  el.classList.add('dragging');
+  clearZoneHighlight();
+}
+
+function onDragMove(e) {
+  if (!dragSrcEl) return;
+  e.preventDefault();
+  const pt = e.touches ? e.touches[0] : e;
+  moveGhost(pt.clientX, pt.clientY);
+  highlightZone(pt.clientX, pt.clientY);
+}
+
+function onDragEnd(e) {
+  if (!dragSrcEl) return;
+  const pt = e.changedTouches ? e.changedTouches[0] : e;
+  ghost.style.display = 'none';
+  clearZoneHighlight();
+  const zone = getZoneAt(pt.clientX, pt.clientY);
+  if (zone && !zone.classList.contains('filled')) handleDrop(zone);
+  else resetDrag();
+}
+
+const trayEl = document.getElementById('pieces-tray');
+trayEl.addEventListener('mousedown',  onDragStart);
+trayEl.addEventListener('touchstart', onDragStart, { passive: false });
+trayEl.addEventListener('touchend',   e => e.preventDefault(), { passive: false });
+document.addEventListener('mousemove', onDragMove);
+document.addEventListener('mouseup',   onDragEnd);
+document.addEventListener('touchmove', onDragMove, { passive: false });
+document.addEventListener('touchend',  onDragEnd,  { passive: false });
+
+function moveGhost(x, y) {
+  ghost.style.left = x + 'px';
+  ghost.style.top  = y + 'px';
+}
+
+function getZoneAt(x, y) {
+  for (const z of document.querySelectorAll('.drop-zone')) {
+    const r = z.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return z;
+  }
+  return null;
+}
+
+function highlightZone(x, y) {
+  clearZoneHighlight();
+  const z = getZoneAt(x, y);
+  if (z && !z.classList.contains('filled')) z.classList.add('drag-over');
+}
+
+function clearZoneHighlight() {
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+}
+
+function resetDrag() {
+  if (dragSrcEl) dragSrcEl.classList.remove('dragging');
+  dragSrcEl = null; dragPos = null;
+}
+
+/* ══════════════════════════════════════
+   DROP HANDLER
+   ══════════════════════════════════════ */
+function snapPiece(zone, pos) {
+  const c = CONTINENTS[curQ];
+  zone.style.backgroundImage    = `url('${c.img}')`;
+  zone.style.backgroundSize     = '200% 200%';
+  zone.style.backgroundPosition = POS_PERCENT[pos];
+  zone.classList.add('filled');
+  zone.classList.remove('hint-zone');
+  placedCount++;
+  if (placedCount === 4) setTimeout(checkComplete, 300);
+}
+
+function handleDrop(zone) {
+  const correct = parseInt(zone.dataset.pos) === dragPos;
+  const srcEl   = dragSrcEl;
+  const pos     = dragPos;
+  dragSrcEl = null; dragPos = null;
+  srcEl.classList.remove('dragging');
+
+  if (correct) {
+    snapPiece(zone, pos);
+    srcEl.remove();
+  } else {
+    /* Wrong zone */
+    const attempts = parseInt(srcEl.dataset.wrong || '0') + 1;
+    srcEl.dataset.wrong = attempts;
+
+    zone.classList.add('wrong-zone');
+    setTimeout(() => zone.classList.remove('wrong-zone'), 500);
+    play(sndWrong);
+
+    if (attempts === 1) {
+      /* 1st wrong — hint only, score still possible */
+      showToast('❌ Try again!', '#f44336');
+      const correctZone = document.querySelector(`.drop-zone[data-pos="${pos}"]:not(.filled)`);
+      if (correctZone) {
+        correctZone.classList.add('hint-zone');
+        setTimeout(() => correctZone.classList.remove('hint-zone'), 3000);
+      }
+    } else {
+      /* 2nd wrong — auto-place, no score for this continent */
+      questionOK = false;
+      showToast('💡 Goes here!', '#FF9800');
+      setTimeout(() => {
+        const correctZone = document.querySelector(`.drop-zone[data-pos="${pos}"]:not(.filled)`);
+        if (correctZone) { snapPiece(correctZone, pos); srcEl.remove(); }
+      }, 600);
+    }
+  }
+}
+
+/* ══════════════════════════════════════
+   CHECK COMPLETE
+   ══════════════════════════════════════ */
+function checkComplete() {
+  window.speechSynthesis?.cancel();
+  if (questionOK) {
+    score++;
+    document.getElementById('score-val').textContent = score;
+    showToast('⭐ Well done!', '#4CAF50');
+    spawnConfetti();
+  } else {
+    showToast('✅ Good try!', '#FF9800');
+  }
+  playClaps();
+  if (curQ + 1 >= CONTINENTS.length) {
+    setTimeout(() => { playClaps(); spawnConfetti(); setTimeout(spawnConfetti, 700); setTimeout(showEnd, 3200); }, 100);
+  } else {
+    setTimeout(() => { curQ++; loadQuestion(); }, 3000);
+  }
+}
+
+/* ══════════════════════════════════════
+   GAME CONTROL
+   ══════════════════════════════════════ */
+function startGame() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display  = 'flex';
+  curQ = 0; score = 0;
+  loadQuestion();
+}
+
+function restartGame() {
+  window.speechSynthesis?.cancel();
+  document.getElementById('end-screen').style.display  = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+  curQ = 0; score = 0;
+  ghost.style.display = 'none';
+  loadQuestion();
+}
+
+function showEnd() {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('end-screen').style.display  = 'flex';
+  document.getElementById('final-score').textContent   = score;
+  document.getElementById('end-stars').textContent = score >= 6 ? '⭐⭐⭐' : score >= 4 ? '⭐⭐' : '⭐';
+  window.speechSynthesis?.cancel();
+  playClaps(); spawnConfetti(); setTimeout(spawnConfetti, 800);
+}
+
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('mute-btn').textContent = muted ? '🔇' : '🔊';
+  if (muted) { window.speechSynthesis?.cancel(); sndClaps.pause(); }
+  else speak(document.getElementById('instruction-txt').textContent);
+}
+
+/* ══════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let toastTimer;
+function showToast(msg, bg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = bg;
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
+}
+
+const CC = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF922B','#cc5de8','#ff6b81'];
+function spawnConfetti() {
+  for (let i = 0; i < 70; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      const sz = 6 + Math.random() * 9;
+      el.style.cssText = `left:${Math.random()*100}vw;width:${sz}px;height:${sz}px;background:${CC[Math.floor(Math.random()*CC.length)]};border-radius:${Math.random()>.4?'50%':'2px'};animation:cfFall ${1.4+Math.random()*1.8}s linear forwards;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i * 22);
+  }
+}
+</script>
+</body>
+</html>
