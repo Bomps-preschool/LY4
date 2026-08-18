@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Materials and Their Impact</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff8fc;
+  color: #333;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- SPLASH SCREEN ---------- */
+
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+#splash img {
+  width: min(52vw, 240px);
+  height: auto;
+  object-fit: contain;
+}
+
+/* ---------- GAME ---------- */
+
+#game {
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
+}
+
+.game-card {
+  width: min(94vw, 760px);
+  height: min(94vh, 720px);
+  max-height: 94dvh;
+  background: #ffffff;
+  border: 3px solid #e34b9a;
+  border-radius: 26px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(12px, 2vw, 22px);
+  position: relative;
+}
+
+/* ---------- HEADER ---------- */
+
+.header {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(18px, 4vw, 30px);
+  color: #d83e8d;
+  font-weight: 800;
+}
+
+.progress {
+  margin-top: 5px;
+  font-size: clamp(12px, 2.5vw, 16px);
+  color: #777;
+  font-weight: bold;
+}
+
+/* ---------- QUESTION ---------- */
+
+.question-area {
+  flex: 0.8;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+#question {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(21px, 4.5vw, 35px);
+  line-height: 1.2;
+  color: #333;
+  font-weight: 800;
+}
+
+/* ---------- OPTIONS ---------- */
+
+.options {
+  flex: 2.3;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 20px);
+  align-items: stretch;
+}
+
+.option {
+  width: 100%;
+  min-width: 0;
+  border: 3px solid #ef8abc;
+  background: #fff8fc;
+  border-radius: 22px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(5px, 1vh, 10px);
+  padding: 8px;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.option:active {
+  transform: scale(.97);
+}
+
+.option-emoji {
+  font-size: clamp(60px, 13vw, 118px);
+  line-height: 1;
+  display: block;
+}
+
+.option-name {
+  font-size: clamp(18px, 3.5vw, 28px);
+  font-weight: 800;
+  color: #333;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.option.correct {
+  border-color: #35ad5c;
+  background: #eafbed;
+}
+
+.option.wrong {
+  border-color: #e24a4a;
+  background: #fff1f1;
+}
+
+.option.glow {
+  border-color: #2cb75a;
+  background: #effff2;
+  animation: glowCorrect .8s ease-in-out infinite alternate;
+}
+
+@keyframes glowCorrect {
+  from {
+    box-shadow: 0 0 5px rgba(40, 190, 85, .4);
+  }
+  to {
+    box-shadow: 0 0 24px rgba(40, 190, 85, .9);
+    transform: scale(1.025);
+  }
+}
+
+.wiggle {
+  animation: wiggle .38s ease;
+}
+
+@keyframes wiggle {
+  0%   { transform: translateX(0) rotate(0); }
+  20%  { transform: translateX(-8px) rotate(-1deg); }
+  40%  { transform: translateX(8px) rotate(1deg); }
+  60%  { transform: translateX(-6px) rotate(-1deg); }
+  80%  { transform: translateX(6px) rotate(1deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+/* ---------- FEEDBACK ---------- */
+
+.feedback {
+  flex: 0.45;
+  min-height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#feedbackText {
+  font-size: clamp(20px, 4vw, 30px);
+  font-weight: 900;
+  text-align: center;
+  min-height: 34px;
+}
+
+.good {
+  color: #159947;
+}
+
+.try-again {
+  color: #d45a44;
+}
+
+.tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(30px, 6vw, 44px);
+  height: clamp(30px, 6vw, 44px);
+  border-radius: 50%;
+  background: #28b557;
+  color: white;
+  margin-right: 8px;
+  font-size: clamp(20px, 4vw, 30px);
+}
+
+/* ---------- END SCREEN ---------- */
+
+#endScreen {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: #ffffff;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  z-index: 10;
+}
+
+.end-star {
+  font-size: clamp(70px, 16vw, 130px);
+  line-height: 1;
+  animation: bounce 1s ease-in-out infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-8px) scale(1.06); }
+}
+
+#endScreen h1 {
+  margin: 8px 0;
+  color: #d83e8d;
+  font-size: clamp(34px, 8vw, 62px);
+}
+
+#endScreen p {
+  margin: 4px 0 20px;
+  font-size: clamp(18px, 4vw, 27px);
+  font-weight: 700;
+}
+
+#playAgain {
+  border: 0;
+  border-radius: 18px;
+  background: #e34b9a;
+  color: white;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 900;
+  padding: 14px 30px;
+  min-width: 180px;
+  min-height: 58px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #b42e74;
+  touch-action: manipulation;
+}
+
+#playAgain:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #b42e74;
+}
+
+/* ---------- CONFETTI ---------- */
+
+#confettiCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: none;
+}
+
+/* ---------- SMALL / LANDSCAPE PHONES ---------- */
+
+@media (max-height: 520px) {
+  .game-card {
+    width: min(96vw, 760px);
+    height: 96vh;
+    padding: 8px 12px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .progress {
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .question-area {
+    min-height: 46px;
+    padding: 3px;
+  }
+
+  #question {
+    font-size: 19px;
+  }
+
+  .option {
+    border-radius: 15px;
+    padding: 4px;
+  }
+
+  .option-emoji {
+    font-size: clamp(44px, 12vh, 74px);
+  }
+
+  .option-name {
+    font-size: 16px;
+  }
+
+  .feedback {
+    min-height: 30px;
+  }
+
+  #feedbackText {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .game-card {
+    width: 96vw;
+    border-radius: 20px;
+    padding: 12px;
+  }
+
+  .options {
+    gap: 10px;
+  }
+
+  .option {
+    border-width: 2px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <img src="assets/innovine-logo.png" alt="Innovine Logo">
+</div>
+
+<!-- GAME -->
+<main id="game">
+  <section class="game-card">
+
+    <div class="header">
+      <h1 class="title">Materials and Their Impact</h1>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="question-area">
+      <h2 id="question">Which item will break down first in nature?</h2>
+    </div>
+
+    <div class="options">
+      <button class="option" id="option0" type="button"></button>
+      <button class="option" id="option1" type="button"></button>
+    </div>
+
+    <div class="feedback">
+      <div id="feedbackText"></div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="endScreen">
+      <div class="end-star">🌟</div>
+      <h1>Good Job!</h1>
+      <p>You helped nature!</p>
+      <button id="playAgain" type="button">↻ Play Again</button>
+    </div>
+
+  </section>
+</main>
+
+<canvas id="confettiCanvas"></canvas>
+
+<audio id="correctSound" preload="auto">
+  <source src="assets/claps.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="wrongSound" preload="auto">
+  <source src="assets/wrong.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+(function () {
+  "use strict";
+
+  /*
+    correct = item expected to break down first
+  */
+
+  const questions = [
+    {
+      options: [
+        { name: "Banana peel", emoji: "🍌", correct: true },
+        { name: "Plastic bag", emoji: "🛍️", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Newspaper", emoji: "📰", correct: true },
+        { name: "Foam plate", emoji: "🍽️", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Apple core", emoji: "🍎", correct: true },
+        { name: "Glass bottle", emoji: "🍾", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Banana peel", emoji: "🍌", correct: true },
+        { name: "Glass bottle", emoji: "🍾", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Newspaper", emoji: "📰", correct: true },
+        { name: "Plastic bag", emoji: "🛍️", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Apple core", emoji: "🍎", correct: true },
+        { name: "Foam plate", emoji: "🍽️", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Banana peel", emoji: "🍌", correct: true },
+        { name: "Foam plate", emoji: "🍽️", correct: false }
+      ]
+    },
+
+    {
+      options: [
+        { name: "Newspaper", emoji: "📰", correct: true },
+        { name: "Glass bottle", emoji: "🍾", correct: false }
+      ]
+    }
+  ];
+
+  const splash = document.getElementById("splash");
+  const game = document.getElementById("game");
+  const progress = document.getElementById("progress");
+  const feedbackText = document.getElementById("feedbackText");
+
+  const optionButtons = [
+    document.getElementById("option0"),
+    document.getElementById("option1")
+  ];
+
+  const correctSound = document.getElementById("correctSound");
+  const wrongSound = document.getElementById("wrongSound");
+
+  const endScreen = document.getElementById("endScreen");
+  const playAgain = document.getElementById("playAgain");
+
+  let gameQuestions = [];
+  let currentQuestion = 0;
+  let wrongAttempts = 0;
+  let answered = false;
+
+  /* --------------------------------
+     SHUFFLE
+  -------------------------------- */
+
+  function shuffle(array) {
+    const arr = array.slice();
+
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      const temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+
+    return arr;
+  }
+
+  /* --------------------------------
+     START GAME
+  -------------------------------- */
+
+  function startGame() {
+    stopConfetti();
+
+    gameQuestions = shuffle(questions);
+    currentQuestion = 0;
+    wrongAttempts = 0;
+    answered = false;
+
+    endScreen.style.display = "none";
+    feedbackText.innerHTML = "";
+
+    showQuestion();
+  }
+
+  /* --------------------------------
+     DISPLAY QUESTION
+  -------------------------------- */
+
+  function showQuestion() {
+    answered = false;
+    wrongAttempts = 0;
+
+    feedbackText.innerHTML = "";
+    feedbackText.className = "";
+
+    const question = gameQuestions[currentQuestion];
+
+    progress.textContent =
+      "Question " +
+      (currentQuestion + 1) +
+      " of " +
+      gameQuestions.length;
+
+    const shuffledOptions = shuffle(question.options);
+
+    optionButtons.forEach(function(button, index) {
+      const item = shuffledOptions[index];
+
+      button.className = "option";
+      button.disabled = false;
+      button.dataset.correct = item.correct ? "true" : "false";
+
+      button.innerHTML =
+        '<span class="option-emoji">' +
+        item.emoji +
+        '</span>' +
+        '<span class="option-name">' +
+        item.name +
+        '</span>';
+    });
+  }
+
+  /* --------------------------------
+     ANSWER CLICK
+  -------------------------------- */
+
+  optionButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
+
+      if (answered) {
+        return;
+      }
+
+      const isCorrect = button.dataset.correct === "true";
+
+      if (isCorrect) {
+        correctAnswer(button);
+      } else {
+        wrongAnswer(button);
+      }
+    });
+  });
+
+  /* --------------------------------
+     WRONG ANSWER
+  -------------------------------- */
+
+  function wrongAnswer(button) {
+    wrongAttempts++;
+
+    playAudio(wrongSound);
+
+    button.classList.remove("wiggle");
+    button.classList.add("wrong");
+
+    void button.offsetWidth;
+
+    button.classList.add("wiggle");
+
+    setTimeout(function() {
+      button.classList.remove("wiggle");
+      button.classList.remove("wrong");
+    }, 450);
+
+    if (wrongAttempts === 1) {
+      feedbackText.textContent = "Try again!";
+      feedbackText.className = "try-again";
+    }
+
+    if (wrongAttempts >= 2) {
+      feedbackText.textContent = "Look carefully!";
+      feedbackText.className = "try-again";
+
+      highlightCorrectAnswer();
+    }
+  }
+
+  /* --------------------------------
+     CORRECT ANSWER GLOW
+  -------------------------------- */
+
+  function highlightCorrectAnswer() {
+    optionButtons.forEach(function(button) {
+      if (button.dataset.correct === "true") {
+        button.classList.add("glow");
+      }
+    });
+  }
+
+  /* --------------------------------
+     CORRECT ANSWER
+  -------------------------------- */
+
+  function correctAnswer(button) {
+    answered = true;
+
+    optionButtons.forEach(function(btn) {
+      btn.disabled = true;
+      btn.classList.remove("glow");
+    });
+
+    button.classList.add("correct");
+
+    feedbackText.innerHTML =
+      '<span class="tick">✓</span>Good job!';
+
+    feedbackText.className = "good";
+
+    playAudio(correctSound);
+
+    setTimeout(function() {
+      currentQuestion++;
+
+      if (currentQuestion < gameQuestions.length) {
+        showQuestion();
+      } else {
+        finishGame();
+      }
+    }, 1200);
+  }
+
+  /* --------------------------------
+     AUDIO
+  -------------------------------- */
+
+  function playAudio(audio) {
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+
+      const promise = audio.play();
+
+      if (promise !== undefined) {
+        promise.catch(function() {
+          /* Some browsers may block audio until interaction */
+        });
+      }
+    } catch (e) {
+      /* Game should continue even if audio fails */
+    }
+  }
+
+  /* --------------------------------
+     END GAME
+  -------------------------------- */
+
+  function finishGame() {
+    feedbackText.innerHTML = "";
+    endScreen.style.display = "flex";
+
+    playAudio(correctSound);
+    startConfetti();
+  }
+
+  /* --------------------------------
+     PLAY AGAIN
+  -------------------------------- */
+
+  playAgain.addEventListener("click", function() {
+    startGame();
+  });
+
+  /* --------------------------------
+     CONFETTI
+  -------------------------------- */
+
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let pieces = [];
+  let confettiRunning = false;
+  let animationId = null;
+
+  const confettiColors = [
+    "#ef4b9b",
+    "#ffd83d",
+    "#36b86c",
+    "#5da9ff",
+    "#a66cff",
+    "#ff784e"
+  ];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function makeConfetti() {
+    pieces = [];
+
+    const count =
+      window.innerWidth < 500 ? 70 : 110;
+
+    for (let i = 0; i < count; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        size: 5 + Math.random() * 7,
+        speed: 1.5 + Math.random() * 3,
+        drift: -1 + Math.random() * 2,
+        rotation: Math.random() * 360,
+        rotationSpeed: -4 + Math.random() * 8,
+        color:
+          confettiColors[
+            Math.floor(Math.random() * confettiColors.length)
+          ]
+      });
+    }
+  }
+
+  function drawConfetti() {
+    if (!confettiRunning) {
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < pieces.length; i++) {
+      const p = pieces[i];
+
+      p.y += p.speed;
+      p.x += p.drift;
+      p.rotation += p.rotationSpeed;
+
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+
+      ctx.save();
+
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+
+      ctx.fillStyle = p.color;
+
+      ctx.fillRect(
+        -p.size / 2,
+        -p.size / 2,
+        p.size,
+        p.size * 0.65
+      );
+
+      ctx.restore();
+    }
+
+    animationId = requestAnimationFrame(drawConfetti);
+  }
+
+  function startConfetti() {
+    resizeCanvas();
+    makeConfetti();
+
+    canvas.style.display = "block";
+    confettiRunning = true;
+
+    drawConfetti();
+  }
+
+  function stopConfetti() {
+    confettiRunning = false;
+
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+
+    canvas.style.display = "none";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  window.addEventListener("resize", function() {
+    if (confettiRunning) {
+      resizeCanvas();
+      makeConfetti();
+    }
+  });
+
+  /* --------------------------------
+     2-SECOND LOGO SPLASH
+  -------------------------------- */
+
+  setTimeout(function() {
+    splash.style.display = "none";
+    game.style.display = "flex";
+    startGame();
+  }, 2000);
+
+})();
+</script>
+
+</body>
+</html>
