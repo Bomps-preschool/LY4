@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Match Adventure</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- SPLASH SCREEN -->
+
+    <div id="splashScreen" class="screen">
+
+        <img
+            id="logo"
+            src="assets/innovine-logo.png"
+            alt="Innovine Logo">
+
+    </div>
+
+    <!-- INSTRUCTION SCREEN -->
+
+    <div id="instructionScreen" class="screen hidden">
+
+        <div class="instruction-card">
+
+            <h1>Shape Match Adventure</h1>
+
+            <p>
+                Drag the picture to the correct shape.
+            </p>
+
+            <button id="startBtn">
+                Start Game
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- GAME SCREEN -->
+
+    <div id="gameScreen" class="hidden">
+
+        <!-- SCORE -->
+
+        <header>
+
+            <div id="scoreBoard">
+
+                Score:
+                <span id="score">0</span>
+                /
+                <span id="totalScore">12</span>
+
+            </div>
+
+        </header>
+
+        <!-- SHAPE CHOICES -->
+
+        <section id="shapeArea">
+
+            <!-- Pentagon -->
+
+            <div
+                class="shapeCard dropzone"
+                data-shape="pentagon">
+
+                <img
+                    src="assets/pentagonshape.png"
+                    alt="Pentagon">
+
+                <h2>Pentagon</h2>
+
+            </div>
+
+            <!-- Hexagon -->
+
+            <div
+                class="shapeCard dropzone"
+                data-shape="hexagon">
+
+                <img
+                    src="assets/hexagonshape.png"
+                    alt="Hexagon">
+
+                <h2>Hexagon</h2>
+
+            </div>
+
+            <!-- Octagon -->
+
+            <div
+                class="shapeCard dropzone"
+                data-shape="octagon">
+
+                <img
+                    src="assets/octagon.png"
+                    alt="Octagon">
+
+                <h2>Octagon</h2>
+
+            </div>
+
+        </section>
+
+        <!-- OBJECT AREA -->
+
+        <section id="objectArea">
+
+            <div id="feedbackContainer">
+
+                <div
+                    id="tick"
+                    class="hidden">
+
+                    ✓
+
+                </div>
+
+                <div
+                    id="cross"
+                    class="hidden">
+
+                    ✗
+
+                </div>
+
+            </div>
+
+            <img
+                id="currentObject"
+                src=""
+                alt=""
+                draggable="true">
+
+            <button
+                id="tryAgainBtn"
+                class="hidden">
+
+                Try Again
+
+            </button>
+
+        </section>
+
+    </div>
+
+    <!-- COMPLETION SCREEN -->
+
+    <div
+        id="completionScreen"
+        class="screen hidden">
+
+        <div class="completionCard">
+
+            <h1>
+                🎉 Congratulations! 🎉
+            </h1>
+
+            <p>
+                You completed Shape Match Adventure.
+            </p>
+
+            <h2 id="finalScore">
+                Score: 0 / 12
+            </h2>
+
+            <h2 id="percentage">
+                0%
+            </h2>
+
+            <div id="stars">
+
+            </div>
+
+            <button id="playAgainBtn">
+                Play Again
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- AUDIO -->
+
+    <audio id="correctSound">
+        <source
+            src="assets/correct.mp3"
+            type="audio/mpeg">
+    </audio>
+
+    <audio id="wrongSound">
+        <source
+            src="assets/wrong.mp3"
+            type="audio/mpeg">
+    </audio>
+
+    <audio
+        id="bgMusic"
+        loop>
+
+        <source
+            src="assets/backgroundmusic.mp3"
+            type="audio/mpeg">
+
+    </audio>
+
+    <!-- SCRIPT -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
