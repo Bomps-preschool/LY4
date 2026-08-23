@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Number Names Game</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+<!-- SPLASH SCREEN -->
+
+<div id="splashScreen" class="screen active">
+
+    <img
+        src="assets/innovine-logo.png"
+        class="logo"
+        alt="Innovine Logo">
+
+</div>
+
+<!-- INSTRUCTION SCREEN -->
+
+<div id="instructionScreen" class="screen">
+
+    <div class="card">
+
+        <h1>Number Names Game</h1>
+
+        <p>
+            Drag and drop the correct letters in the blanks
+            to form the correct number name.
+        </p>
+
+        <button id="speakBtn">
+            🔊 Hear Instructions
+        </button>
+
+        <button id="startBtn">
+            START
+        </button>
+
+    </div>
+
+</div>
+
+<!-- GAME SCREEN -->
+
+<div id="gameScreen" class="screen">
+
+    <div id="scoreBoard">
+        Score : <span id="score">0</span> / 7
+    </div>
+
+    <button id="muteBtn">
+        🔊
+    </button>
+
+    <div class="gameCard">
+
+        <h2 id="numberDisplay"></h2>
+
+        <div id="wordContainer"></div>
+
+        <div id="feedback"></div>
+
+        <button id="checkBtn">
+            CHECK
+        </button>
+
+    </div>
+
+    <div id="letterBank"></div>
+
+</div>
+
+<!-- END SCREEN -->
+
+<div id="endScreen" class="screen">
+
+    <div class="card">
+
+        <h1>Congratulations!</h1>
+
+        <h2 id="finalScore"></h2>
+
+        <div id="stars"></div>
+
+        <button id="playAgainBtn">
+            PLAY AGAIN
+        </button>
+
+        <button id="exitBtn">
+            EXIT
+        </button>
+
+    </div>
+
+</div>
+
+<audio
+id="correctSound"
+src="assets/correct.mp3"></audio>
+
+<audio
+id="wrongSound"
+src="assets/wrong.mp3"></audio>
+
+<audio
+id="bgMusic"
+src="assets/background music.mp3"
+loop></audio>
+
+<script src="script.js"></script>
+
+</body>
+</html>
