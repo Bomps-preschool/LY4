@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Match the Animal to its Sound</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+LOGO SCREEN
+========================= -->
+
+<div id="logoScreen" class="screen">
+
+<img
+src="assets/innovine-logo.png"
+id="logo"
+alt="Innovine Logo">
+
+</div>
+
+<!-- =========================
+INSTRUCTION SCREEN
+========================= -->
+
+<div id="instructionScreen" class="screen hidden">
+
+<div class="instructionBox">
+
+<h1>🐾 Match the Animal to its Sound</h1>
+
+<p>
+
+Click on a <b>Sound Card</b>.
+
+</p>
+
+<p>
+
+Listen to the sound carefully.
+
+</p>
+
+<p>
+
+Now click the matching animal picture.
+
+</p>
+
+<br>
+
+<p>⭐ Correct = Stars + 👍</p>
+
+<p>❌ Wrong = Try Again</p>
+
+<br>
+
+<button id="startBtn">
+
+Start Game
+
+</button>
+
+</div>
+
+</div>
+
+<!-- =========================
+GAME SCREEN
+========================= -->
+
+<div id="gameScreen" class="hidden">
+
+<header>
+
+<h2>
+
+🐘 Match the Animal to its Sound
+
+</h2>
+
+<div id="scoreBox">
+
+Score :
+
+<span id="score">
+
+0
+
+</span>
+
+/ 8
+
+</div>
+
+</header>
+
+<div class="gameContainer">
+
+<div
+id="animalColumn"
+class="column">
+
+</div>
+
+<div
+id="soundColumn"
+class="column">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
+MESSAGE
+========================= -->
+
+<div id="message"></div>
+
+<!-- =========================
+END SCREEN
+========================= -->
+
+<div
+id="endScreen"
+class="screen hidden">
+
+<div class="instructionBox">
+
+<h1>
+
+🎉 Well Done!
+
+</h1>
+
+<h2 id="finalScore"></h2>
+
+<button onclick="location.reload()">
+
+Play Again
+
+</button>
+
+</div>
+
+</div>
+
+<!-- =========================
+AUDIO
+========================= -->
+
+<audio
+id="correctAudio"
+src="assets/correct.mp3.mp3"
+preload="auto">
+</audio>
+
+<audio
+id="wrongAudio"
+src="assets/wrong.mp3.mp3"
+preload="auto">
+</audio>
+
+<script src="script.js"></script>
+
+</body>
+</html>
