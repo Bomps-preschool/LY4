@@ -1,0 +1,585 @@
+/* ===================================
+   RESET
+=================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* ===================================
+   BODY
+=================================== */
+
+body{
+
+    background:
+    linear-gradient(
+        to bottom,
+        #87CEEB 0%,
+        #BFEFFF 65%,
+        #7ED957 65%,
+        #5CB338 100%
+    );
+
+    position:relative;
+}
+
+/* ===================================
+   COMMON
+=================================== */
+
+.screen{
+
+    width:100%;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.hidden{
+    display:none !important;
+}
+
+/* ===================================
+   SPLASH SCREEN
+=================================== */
+
+#splashScreen{
+    background:white;
+}
+
+#logo{
+
+    width:min(350px,70vw);
+
+    animation:
+    fadeIn 2s ease,
+    fadeOut 2s ease 3s forwards;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:scale(.7);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+@keyframes fadeOut{
+
+    from{
+        opacity:1;
+    }
+
+    to{
+        opacity:0;
+    }
+}
+
+/* ===================================
+   INSTRUCTIONS
+=================================== */
+
+#instructionScreen{
+
+    padding:20px;
+}
+
+.instruction-card{
+
+    background:white;
+
+    width:min(650px,90vw);
+
+    border-radius:25px;
+
+    padding:35px;
+
+    text-align:center;
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,.15);
+}
+
+.instruction-card h1{
+
+    color:#ff6600;
+
+    margin-bottom:20px;
+
+    font-size:
+    clamp(30px,5vw,48px);
+}
+
+.instruction-card p{
+
+    font-size:
+    clamp(18px,3vw,24px);
+
+    color:#444;
+
+    line-height:1.5;
+}
+
+#startBtn{
+
+    margin-top:25px;
+
+    border:none;
+
+    background:#28a745;
+
+    color:white;
+
+    padding:16px 40px;
+
+    font-size:24px;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+#startBtn:hover{
+
+    transform:scale(1.05);
+}
+
+/* ===================================
+   GAME SCREEN
+=================================== */
+
+#gameScreen{
+
+    width:100%;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* ===================================
+   HEADER
+=================================== */
+
+header{
+
+    height:70px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:10px;
+
+    background:rgba(255,255,255,.85);
+
+    backdrop-filter:blur(5px);
+}
+
+#scoreBoard{
+
+    background:#FFD93D;
+
+    padding:10px 20px;
+
+    border-radius:15px;
+
+    font-size:22px;
+
+    font-weight:bold;
+}
+
+/* ===================================
+   SHAPE AREA
+=================================== */
+
+#shapeArea{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    padding:15px;
+
+    height:35%;
+}
+
+.shapeCard{
+
+    flex:1;
+
+    max-width:250px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:15px;
+
+    text-align:center;
+
+    box-shadow:
+    0 4px 10px rgba(0,0,0,.12);
+
+    border:4px dashed #999;
+
+    transition:.3s;
+}
+
+.shapeCard.dragover{
+
+    border-color:#28a745;
+
+    background:#ecffec;
+
+    transform:scale(1.05);
+}
+
+.shapeCard img{
+
+    width:80px;
+    height:80px;
+
+    object-fit:contain;
+}
+
+.shapeCard h2{
+
+    margin-top:10px;
+
+    color:#444;
+
+    font-size:22px;
+}
+
+/* ===================================
+   OBJECT AREA
+=================================== */
+
+#objectArea{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    position:relative;
+}
+
+#currentObject{
+
+    width:min(220px,40vw);
+
+    height:auto;
+
+    object-fit:contain;
+
+    cursor:grab;
+
+    user-select:none;
+
+    touch-action:none;
+
+    animation:
+    slideUp .8s ease;
+}
+
+@keyframes slideUp{
+
+    from{
+        transform:
+        translateY(250px);
+
+        opacity:0;
+    }
+
+    to{
+        transform:
+        translateY(0);
+
+        opacity:1;
+    }
+}
+
+/* ===================================
+   FEEDBACK
+=================================== */
+
+#feedbackContainer{
+
+    position:absolute;
+
+    top:10px;
+}
+
+#tick,
+#cross{
+
+    font-size:110px;
+
+    font-weight:bold;
+
+    animation:pop .5s ease;
+}
+
+#tick{
+    color:#2ECC71;
+}
+
+#cross{
+    color:#E74C3C;
+}
+
+@keyframes pop{
+
+    from{
+        transform:scale(.5);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+/* ===================================
+   TRY AGAIN
+=================================== */
+
+#tryAgainBtn{
+
+    margin-top:20px;
+
+    border:none;
+
+    background:#E74C3C;
+
+    color:white;
+
+    padding:14px 30px;
+
+    border-radius:15px;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+
+/* ===================================
+   COMPLETION SCREEN
+=================================== */
+
+#completionScreen{
+
+    background:
+    linear-gradient(
+        135deg,
+        #FFE066,
+        #FFD43B
+    );
+}
+
+.completionCard{
+
+    background:white;
+
+    width:min(650px,92vw);
+
+    border-radius:25px;
+
+    padding:40px;
+
+    text-align:center;
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.15);
+}
+
+.completionCard h1{
+
+    color:#ff6600;
+
+    margin-bottom:20px;
+}
+
+.completionCard p{
+
+    font-size:22px;
+
+    margin-bottom:20px;
+}
+
+#finalScore,
+#percentage{
+
+    margin:10px 0;
+
+    color:#333;
+}
+
+#stars{
+
+    font-size:60px;
+
+    margin:20px 0;
+}
+
+#playAgainBtn{
+
+    background:#28a745;
+
+    color:white;
+
+    border:none;
+
+    padding:15px 35px;
+
+    border-radius:15px;
+
+    font-size:24px;
+
+    cursor:pointer;
+}
+
+/* ===================================
+   CONFETTI
+=================================== */
+
+.confetti{
+
+    position:fixed;
+
+    width:12px;
+    height:12px;
+
+    background:gold;
+
+    border-radius:50%;
+
+    top:-20px;
+
+    z-index:999;
+
+    animation:
+    fall 4s linear forwards;
+}
+
+@keyframes fall{
+
+    from{
+        transform:
+        translateY(-50px);
+    }
+
+    to{
+        transform:
+        translateY(110vh);
+    }
+}
+
+/* ===================================
+   TABLET
+=================================== */
+
+@media(max-width:900px){
+
+    .shapeCard img{
+
+        width:65px;
+        height:65px;
+    }
+
+    .shapeCard h2{
+
+        font-size:18px;
+    }
+
+    #currentObject{
+
+        width:180px;
+    }
+}
+
+/* ===================================
+   MOBILE
+=================================== */
+
+@media(max-width:600px){
+
+    #shapeArea{
+
+        gap:8px;
+
+        padding:10px;
+    }
+
+    .shapeCard{
+
+        padding:10px;
+    }
+
+    .shapeCard img{
+
+        width:50px;
+        height:50px;
+    }
+
+    .shapeCard h2{
+
+        font-size:14px;
+    }
+
+    #scoreBoard{
+
+        font-size:18px;
+    }
+
+    #currentObject{
+
+        width:130px;
+    }
+
+    #tick,
+    #cross{
+
+        font-size:70px;
+    }
+
+    #stars{
+
+        font-size:40px;
+    }
+
+    .completionCard{
+
+        padding:25px;
+    }
+}
