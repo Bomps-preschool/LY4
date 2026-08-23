@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>OI and OU Sound Detective</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- SPLASH SCREEN -->
+
+<div id="splashScreen">
+
+    <img
+        id="logo"
+        src="assets/innovine-logo.png"
+        alt="Innovine Logo"
+    >
+
+</div>
+
+<!-- LOADING -->
+
+<div id="loadingScreen">
+
+    <div class="loadingBox">
+        Loading...
+    </div>
+
+</div>
+
+<!-- GAME -->
+
+<div id="gameContainer" class="hidden">
+
+    <header>
+
+        <h1>
+            OI and OU Sound Detective
+        </h1>
+
+        <div id="instructions">
+
+            <p>
+                Listen carefully to the word.
+            </p>
+
+            <p>
+                Drag the correct sound into the blank.
+            </p>
+
+            <p>
+                Choose the sound that completes the word.
+            </p>
+
+        </div>
+
+        <div id="topBar">
+
+            <button id="replayInstructionsBtn">
+                🔊 Replay Instructions
+            </button>
+
+            <button id="replayWordBtn">
+                🔈 Hear Word Again
+            </button>
+
+            <div id="scoreBox">
+                Score:
+                <span id="scoreValue">0</span> / 8
+            </div>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <section id="pictureArea">
+
+            <img
+                id="wordImage"
+                src=""
+                alt=""
+            >
+
+        </section>
+
+        <section id="wordArea">
+
+            <div id="wordDisplay">
+
+                <span id="prefix"></span>
+
+                <div id="dropZone">?</div>
+
+                <span id="suffix"></span>
+
+            </div>
+
+        </section>
+
+        <!-- LOWERCASE SOUND TILES -->
+
+        <section id="choices">
+
+            <div
+                class="soundTile"
+                draggable="true"
+                data-sound="oi">
+
+                oi
+
+            </div>
+
+            <div
+                class="soundTile"
+                draggable="true"
+                data-sound="ou">
+
+                ou
+
+            </div>
+
+        </section>
+
+        <!-- FEEDBACK -->
+
+        <div id="feedbackArea">
+
+            <div
+                id="correctFeedback"
+                class="feedback hidden">
+
+                <div class="bigIcon">
+                    ✅
+                </div>
+
+                <div class="feedbackText">
+                    Great Job!
+                </div>
+
+                <div class="claps">
+                    👏 👏 👏
+                </div>
+
+            </div>
+
+            <div
+                id="wrongFeedback"
+                class="feedback hidden">
+
+                <div class="bigIcon">
+                    ❌
+                </div>
+
+                <div class="feedbackText">
+                    Try Again
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- END SCREEN -->
+
+<div id="endScreen" class="hidden">
+
+    <div class="endCard">
+
+        <h1>
+            🎉 Congratulations!
+        </h1>
+
+        <h2>
+            You completed all the words!
+        </h2>
+
+        <div id="finalScore">
+            Final Score: 0 / 8
+        </div>
+
+        <div id="starContainer">
+            ⭐⭐⭐⭐⭐
+        </div>
+
+        <button id="playAgainBtn">
+            Play Again
+        </button>
+
+    </div>
+
+</div>
+
+<!-- AUDIO -->
+
+<audio id="correctSound" preload="auto">
+    <source src="assets/correct.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="wrongSound" preload="auto">
+    <source src="assets/wrong.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="backgroundMusic" preload="auto" loop>
+    <source src="assets/background music.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="oiSound" preload="auto">
+    <source src="assets/oi-sound.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="ouSound" preload="auto">
+    <source src="assets/ou-sound.mp3" type="audio/mpeg">
+</audio>
+
+<script src="script.js"></script>
+
+</body>
+</html>
