@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Event Sequencing Game</title>
+    <style>
+        /* --- Global Reset & Responsive Base Framework --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            user-select: none;
+            font-family: 'Arial', 'Helvetica', sans-serif; /* Print Form Font (Strictly No Cursive) */
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevents all page scrolling */
+            background: linear-gradient(to bottom, #bae6fd 0%, #e0f2fe 40%, #fef3c7 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- Intro Splash Screen (5 Seconds Display) --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .logo-box {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .logo-img {
+            width: 180px;
+            max-width: 70vw;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* --- Main Game Layout Container --- */
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            opacity: 0;
+            z-index: 5;
+            transition: opacity 0.5s ease-in;
+        }
+
+        #game-container.visible { opacity: 1; }
+
+        header {
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 18px;
+            color: #1e3a8a;
+            margin-bottom: 2px;
+        }
+
+        .instructions {
+            font-size: 10px;
+            color: #334155;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1.5px solid #cbd5e1;
+            padding: 4px 8px;
+            border-radius: 10px;
+            line-height: 1.2;
+        }
+
+        /* --- Play Area Layout --- */
+        #play-area {
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        /* Main Sequence Card Display */
+        .sequence-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #93c5fd;
+            border-radius: 16px;
+            padding: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;
+            max-height: 48vh;
+            overflow: hidden;
+        }
+
+        .sequence-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Drop Target Zone Box Area */
+        #target-zones-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 14px;
+            padding: 6px;
+            border: 1.5px solid #cbd5e1;
+        }
+
+        .drop-box {
+            width: 52px;
+            height: 52px;
+            border: 3px dashed #3b82f6;
+            background-color: #f0f9ff;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1d4ed8;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .drop-box.active-hover {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            transform: scale(1.08);
+        }
+
+        .drop-box.completed {
+            border-style: solid;
+            border-color: #16a34a;
+            background-color: #22c55e;
+            color: #ffffff;
+        }
+
+        /* --- Draggable Source Cards Deck --- */
+        #number-deck-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            border: 2px dashed #94a3b8;
+            padding: 6px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+            min-height: 58px;
+        }
+
+        .number-card {
+            width: 46px;
+            height: 46px;
+            background: #ffedd5;
+            border: 3px solid #ea580c;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #c2410c;
+            box-shadow: 0 4px 0 #c2410c;
+            cursor: grab;
+            touch-action: none;
+            position: relative;
+        }
+
+        /* --- Controls & HUD --- */
+        #hud {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .hud-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #1d4ed8;
+        }
+
+        .hud-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        /* --- Feedback Overlays --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .feedback-emoji { font-size: 65px; }
+        .feedback-text { font-size: 22px; font-weight: bold; margin-top: 10px; color: #1e293b; }
+
+        #completion-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #f0fdf4;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            text-align: center;
+            padding: 20px;
+        }
+        .celebration-emojis { font-size: 40px; margin-bottom: 10px; }
+        .completion-message { font-size: 26px; font-weight: bold; color: #166534; margin-bottom: 20px; }
+
+        /* Confetti Canvas Overlay */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 2999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Elements -->
+    <audio id="audio-bg" src="assets/background-music.mp3" loop></audio>
+    <audio id="audio-correct" src="assets/correct.mp3"></audio>
+    <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+
+    <!-- Intro Splash Screen (5 Seconds Timer) -->
+    <div id="intro-screen">
+        <div class="logo-box">
+            <img class="logo-img" src="assets/innovine-logo.png" alt="Innovine Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <h2 style="display:none; color:#2563eb;">Innovine Learning</h2>
+        </div>
+    </div>
+
+    <!-- Main Game View -->
+    <div id="game-container">
+        <header>
+            <h1>Event Sequencing</h1>
+            <div class="instructions" id="instruction-text">Drag the numbers (1, 2, 3) into the correct boxes to sequence the events.</div>
+        </header>
+
+        <div id="play-area">
+            <!-- Sequencing Graphic Display -->
+            <div class="sequence-card">
+                <img src="assets/sequencing-image.png" alt="Sequencing Events" class="sequence-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%23e2e8f0\'/><text x=\'50%\' y=\'50%\' font-size=\'16\' text-anchor=\'middle\' fill=\'%2364748b\'>Sequencing Image Asset</text></svg>'">
+            </div>
+
+            <!-- Target Drop Boxes for 1, 2, 3 -->
+            <div id="target-zones-container">
+                <div class="drop-box" data-step="1">?</div>
+                <div class="drop-box" data-step="2">?</div>
+                <div class="drop-box" data-step="3">?</div>
+            </div>
+        </div>
+
+        <!-- Draggable Source Deck -->
+        <div id="number-deck-container"></div>
+
+        <!-- Controls HUD -->
+        <div id="hud">
+            <button class="hud-btn" id="btn-listen">🔊 Listen</button>
+            <button class="hud-btn" id="btn-restart" style="background:#ef4444; box-shadow:0 3px 0 #dc2626;">Restart</button>
+        </div>
+    </div>
+
+    <!-- Correct/Wrong Feedback Screen -->
+    <div id="feedback-overlay">
+        <div class="feedback-emoji" id="feedback-emoji">👏</div>
+        <div class="feedback-text" id="feedback-text">Great Job!</div>
+    </div>
+
+    <!-- Celebration Screen -->
+    <div id="completion-screen">
+        <div class="celebration-emojis">🎉 ⭐ 👏</div>
+        <div class="completion-message">Fantastic!</div>
+        <button class="hud-btn" id="btn-final-restart">Play Again</button>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // --- Game Setup & Variables ---
+        const totalSteps = 3;
+        let completedCount = 0;
+        let draggedElement = null;
+        let audioStarted = false;
+
+        const encouragingPhrases = ['Great Job!', 'Excellent!', 'Well Done!'];
+
+        // DOM Element References
+        const audioBg = document.getElementById("audio-bg");
+        const audioCorrect = document.getElementById("audio-correct");
+        const audioWrong = document.getElementById("audio-wrong");
+        const introScreen = document.getElementById("intro-screen");
+        const gameContainer = document.getElementById("game-container");
+        const numberDeck = document.getElementById("number-deck-container");
+        const feedbackOverlay = document.getElementById("feedback-overlay");
+        const feedbackEmoji = document.getElementById("feedback-emoji");
+        const feedbackText = document.getElementById("feedback-text");
+        const completionScreen = document.getElementById("completion-screen");
+
+        // --- Audio & Narration Handlers ---
+        function enableAudio() {
+            if (!audioStarted) {
+                audioBg.volume = 0.12;
+                audioBg.play().catch(() => {});
+                audioStarted = true;
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.85;
+                utterance.onstart = () => { if(audioBg) audioBg.volume = 0.03; };
+                utterance.onend = () => { if(audioBg) audioBg.volume = 0.12; };
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Game Initialization ---
+        function initGame() {
+            completedCount = 0;
+            numberDeck.innerHTML = "";
+
+            // Clear drop target boxes
+            document.querySelectorAll(".drop-box").forEach(box => {
+                box.textContent = "?";
+                box.classList.remove("completed", "active-hover");
+            });
+
+            // Randomize Draggable Cards (1, 2, 3)
+            const numbers = [1, 2, 3].sort(() => Math.random() - 0.5);
+
+            numbers.forEach(num => {
+                const cardNode = document.createElement("div");
+                cardNode.classList.add("number-card");
+                cardNode.textContent = num;
+                cardNode.dataset.value = num;
+
+                attachTouchDragHandlers(cardNode);
+                numberDeck.appendChild(cardNode);
+            });
+        }
+
+        // --- Drag and Drop Logic (Touch & Mouse) ---
+        function attachTouchDragHandlers(element) {
+            const onStart = (e) => {
+                enableAudio();
+                draggedElement = element;
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                element.style.transition = 'none';
+                element.style.zIndex = '999';
+                element.style.position = 'fixed';
+                element.style.width = '46px';
+                element.style.height = '46px';
+
+                moveAt(clientX, clientY);
+                speakText(element.dataset.value);
+            };
+
+            const onMove = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                moveAt(clientX, clientY);
+
+                // Highlight target drop zones
+                document.querySelectorAll(".drop-box").forEach(b => b.classList.remove("active-hover"));
+                element.style.visibility = 'hidden';
+                const hoveringTarget = document.elementFromPoint(clientX, clientY);
+                element.style.visibility = 'visible';
+
+                if (hoveringTarget) {
+                    const matchedBox = hoveringTarget.closest('.drop-box');
+                    if (matchedBox && !matchedBox.classList.contains('completed')) {
+                        matchedBox.classList.add('active-hover');
+                    }
+                }
+            };
+
+            function moveAt(nx, ny) {
+                element.style.left = (nx - 23) + 'px';
+                element.style.top = (ny - 23) + 'px';
+            }
+
+            const onEnd = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+
+                const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+                document.querySelectorAll(".drop-box").forEach(b => b.classList.remove("active-hover"));
+                element.style.zIndex = '10';
+                element.style.visibility = 'hidden';
+                const landingTarget = document.elementFromPoint(clientX, clientY);
+                element.style.visibility = 'visible';
+
+                const dropZone = landingTarget ? landingTarget.closest('.drop-box') : null;
+
+                // Validate Placement
+                if (dropZone && !dropZone.classList.contains('completed') && dropZone.dataset.step === element.dataset.value) {
+                    // Correct Move
+                    audioCorrect.currentTime = 0;
+                    audioCorrect.play().catch(() => {});
+
+                    dropZone.textContent = element.dataset.value;
+                    dropZone.classList.add('completed');
+                    element.remove();
+                    completedCount++;
+
+                    const randomPhrase = encouragingPhrases[Math.floor(Math.random() * encouragingPhrases.length)];
+                    feedbackEmoji.textContent = "👏";
+                    feedbackText.textContent = randomPhrase;
+                    feedbackOverlay.style.display = "flex";
+                    speakText(randomPhrase);
+
+                    setTimeout(() => {
+                        feedbackOverlay.style.display = "none";
+                        if (completedCount >= totalSteps) {
+                            showCompletionScreen();
+                        }
+                    }, 1000);
+
+                } else {
+                    // Incorrect Move
+                    audioWrong.currentTime = 0;
+                    audioWrong.play().catch(() => {});
+
+                    feedbackEmoji.textContent = "❌";
+                    feedbackText.textContent = "Try Again!";
+                    feedbackOverlay.style.display = "flex";
+
+                    // Snap card back into source deck
+                    element.style.position = 'relative';
+                    element.style.left = '0px';
+                    element.style.top = '0px';
+                    element.style.width = '46px';
+                    element.style.height = '46px';
+
+                    setTimeout(() => {
+                        feedbackOverlay.style.display = "none";
+                    }, 800);
+                }
+
+                draggedElement = null;
+            };
+
+            // Event Listeners
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            element.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        // --- Celebration Screen & Canvas Animation ---
+        function showCompletionScreen() {
+            completionScreen.style.display = "flex";
+            speakText("Fantastic!");
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById("confetti-canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#eab308', '#a855f7'];
+
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    speed: Math.random() * 3 + 2,
+                    angle: Math.random() * 360
+                });
+            }
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.angle += 2;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+
+                if (particles.some(p => p.y < canvas.height)) {
+                    requestAnimationFrame(render);
+                }
+            }
+            render();
+        }
+
+        // --- Lifecycle & Control Events ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Exactly 5 Seconds Intro Display
+            setTimeout(() => {
+                introScreen.style.opacity = '0';
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                    gameContainer.classList.add('visible');
+                    initGame();
+                    speakText("Drag the numbers 1, 2, 3 into the correct boxes to sequence the events.");
+                }, 500);
+            }, 5000);
+
+            // Listen Control Button
+            document.getElementById('btn-listen').addEventListener('click', () => {
+                speakText("Drag the numbers 1, 2, 3 into the correct boxes to sequence the events.");
+            });
+
+            // Reset Controls
+            document.getElementById('btn-restart').addEventListener('click', initGame);
+            document.getElementById('btn-final-restart').addEventListener('click', () => {
+                completionScreen.style.display = "none";
+                initGame();
+            });
+        });
+    </script>
+</body>
+</html>
