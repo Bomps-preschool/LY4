@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Digraph Path Adventure</title>
+    <style>
+        /* --- CSS Reset & Global Layout Framework --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            user-select: none;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+            background-color: #f0fdf4; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Intro / Splash Screen (5 Seconds) --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .logo-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 180px;
+            height: auto;
+            max-width: 80vw;
+            object-fit: contain;
+        }
+
+        /* --- Main Game Layout Container --- */
+        #game-container {
+            width: 100%;
+            height: 100dvh; 
+            max-width: 480px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 12px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        #game-container.visible {
+            opacity: 1;
+        }
+
+        header {
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #1e3a8a;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .instructions {
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* --- Dynamic Dual-Constraint Board Layout --- */
+        #board-wrapper {
+            position: relative;
+            width: min(88vw, 58vh);
+            height: min(88vw, 58vh);
+            max-width: 400px;
+            max-height: 400px;
+            margin: auto;
+            background: #fef08a; 
+            border: 6px solid #fde047;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+
+        #path-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 6px;
+        }
+
+        /* Path Box Elements */
+        .box {
+            background-color: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            margin: 1.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #334155;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .box span {
+            line-height: 1.1;
+            transition: font-size 0.2s ease;
+        }
+
+        .box.special {
+            background-color: #ef4444;
+            color: white;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .box.finish-box {
+            background-color: #10b981;
+            color: white;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .box.active-target {
+            border: 2.5px dashed #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .box.completed {
+            background-color: #bbf7d0;
+            border-color: #4ade80;
+            color: #1e293b;
+            justify-content: center; 
+        }
+
+        .box.completed span {
+            font-size: 10px; 
+            margin-top: 2px;
+        }
+
+        .box img {
+            display: block;
+            width: 80% !important;
+            height: 55% !important; 
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* --- Structured Center Deck Grid Layout --- */
+        #center-deck {
+            position: absolute;
+            top: 17%;
+            left: 17%;
+            width: 66%;
+            height: 66%;
+            background-color: rgba(248, 250, 252, 0.96);
+            border-radius: 12px;
+            border: 2px dashed #94a3b8;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 4px;
+            padding: 4px; /* Reduced slightly to maximize box growth area */
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Card bounding framework */
+        .card {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border: 2px solid #f97316;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            touch-action: none; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* RECTIFIED: Maximized size up to 90% space parameters while strictly bounded inside the card border */
+        .card img {
+            width: 90%;
+            height: 90%;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* --- Controls HUD Layout --- */
+        #hud {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding-bottom: 8px;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .hud-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hud-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* --- Feedback Layers --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .feedback-emoji {
+            font-size: 75px;
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-text {
+            font-size: 30px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 12px;
+        }
+
+        #completion-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ecfdf5;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .celebration-emojis {
+            font-size: 65px;
+            letter-spacing: 12px;
+            margin-bottom: 20px;
+            animation: bounce 0.8s infinite alternate;
+        }
+
+        .completion-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 35px;
+            max-width: 450px;
+            line-height: 1.4;
+        }
+
+        /* --- Animations --- */
+        @keyframes popUp {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-15px); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: fall var(--d) linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="audio-bg" src="assets/background-music.mp3" loop></audio>
+    <audio id="audio-correct" src="assets/correct.mp3"></audio>
+    <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+
+    <div id="intro-screen">
+        <div class="logo-box">
+            <img class="logo-img" src="assets/innovine-logo.png" alt="Innovine Logo">
+        </div>
+    </div>
+
+    <div id="game-container">
+        <header>
+            <h1>Digraph</h1>
+            <div class="instructions">Begin at the start. Read each digraph in order and drag and drop the matching picture to reach the finish line.</div>
+        </header>
+
+        <div id="board-wrapper">
+            <div id="path-grid"></div>
+            <div id="center-deck"></div>
+        </div>
+
+        <div id="hud">
+            <button class="hud-btn" id="btn-audio">🔊 Repeat Prompt</button>
+            <button class="hud-btn" id="btn-restart" style="background:#ef4444; box-shadow:0 4px 0 #dc2626;">Restart</button>
+        </div>
+    </div>
+
+    <div id="feedback-overlay">
+        <div class="feedback-emoji" id="feedback-emoji">👏</div>
+        <div class="feedback-text" id="feedback-text">Great Job!</div>
+    </div>
+
+    <div id="completion-screen">
+        <div class="celebration-emojis">🎉 ⭐ 👏</div>
+        <div class="completion-message">Fantastic Job! You matched all the pictures to its corresponding digraphs.</div>
+        <button class="hud-btn" id="btn-final-restart" style="font-size:18px; padding:10px 28px;">Play Again</button>
+    </div>
+
+    <script>
+        const sequence = ["Start", "ch", "wh", "sh", "ph", "ch", "th", "ch", "wh", "sh", "wh", "sh", "ch", "ph", "th", "sh", "Finish"];
+        
+        const gridPositions = [
+            {r:1, c:1}, {r:1, c:2}, {r:1, c:3}, {r:1, c:4}, {r:1, c:5}, {r:1, c:6}, 
+            {r:2, c:6}, {r:3, c:6}, {r:4, c:6}, {r:5, c:6}, {r:6, c:6},             
+            {r:6, c:5}, {r:6, c:4}, {r:6, c:3}, {r:6, c:2}, {r:6, c:1},             
+            {r:5, c:1}                                                              
+        ];
+
+        const gameItems = [
+            { digraph: "ch", word: "chair", img: "assets/chair.png" },
+            { digraph: "wh", word: "whale", img: "assets/whale.png" },
+            { digraph: "sh", word: "shoe", img: "assets/shoe.png" },
+            { digraph: "ph", word: "pharmacy", img: "assets/pharmacy.png" },
+            { digraph: "ch", word: "chalks", img: "assets/chalks.png" },
+            { digraph: "th", word: "thumb", img: "assets/thumb.png" },
+            { digraph: "ch", word: "chess", img: "assets/chess.png" },
+            { digraph: "wh", word: "wheel", img: "assets/wheel.png" },
+            { digraph: "sh", word: "ship", img: "assets/ship.png" },
+            { digraph: "wh", word: "whistle", img: "assets/whistle.png" },
+            { digraph: "sh", word: "shark", img: "assets/shark.png" },
+            { digraph: "ch", word: "chick", img: "assets/chick.png" },
+            { digraph: "ph", word: "photo", img: "assets/photo.png" },
+            { digraph: "th", word: "thirty", img: "assets/thirty.png" },
+            { digraph: "sh", word: "shirt", img: "assets/shirt.png" }
+        ];
+
+        let currentStep = 1; 
+        let draggedElement = null;
+        let audioStarted = false;
+
+        const gridContainer = document.getElementById("path-grid");
+        const centerDeck = document.getElementById("center-deck");
+        const introScreen = document.getElementById("intro-screen");
+        const gameContainer = document.getElementById("game-container");
+        const feedbackOverlay = document.getElementById("feedback-overlay");
+        const feedbackEmoji = document.getElementById("feedback-emoji");
+        const feedbackText = document.getElementById("feedback-text");
+        const completionScreen = document.getElementById("completion-screen");
+
+        const audioBg = document.getElementById("audio-bg");
+        const audioCorrect = document.getElementById("audio-correct");
+        const audioWrong = document.getElementById("audio-wrong");
+
+        function forceActivateAudio() {
+            if (!audioStarted) {
+                audioBg.volume = 0.15; 
+                audioBg.play().catch(() => {});
+                audioStarted = true;
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function buildBoard() {
+            gridContainer.innerHTML = "";
+            sequence.forEach((val, index) => {
+                const box = document.createElement("div");
+                box.classList.add("box");
+                box.id = `step-${index}`;
+                
+                if (val === "Start") {
+                    box.classList.add("special");
+                } else if (val === "Finish") {
+                    box.classList.add("finish-box");
+                }
+                
+                const label = document.createElement("span");
+                label.textContent = val;
+                box.appendChild(label);
+
+                const pos = gridPositions[index];
+                if (pos) {
+                    box.style.gridRowStart = pos.r;
+                    box.style.gridColumnStart = pos.c;
+                }
+                gridContainer.appendChild(box);
+            });
+            highlightActiveTarget();
+        }
+
+        function highlightActiveTarget() {
+            document.querySelectorAll(".box").forEach(b => b.classList.remove("active-target"));
+            const activeBox = document.getElementById(`step-${currentStep}`);
+            if (activeBox) {
+                activeBox.classList.add("active-target");
+            }
+        }
+
+        function prepareCards() {
+            centerDeck.innerHTML = "";
+            const cardsData = [...gameItems].sort(() => Math.random() - 0.5);
+
+            cardsData.forEach((item) => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.dataset.digraph = item.digraph;
+                card.dataset.word = item.word;
+                
+                const img = document.createElement("img");
+                img.src = item.img;
+                img.alt = item.word;
+                card.appendChild(img);
+
+                attachPointerControls(card);
+                centerDeck.appendChild(card);
+            });
+        }
+
+        function attachPointerControls(element) {
+            const onStart = (e) => {
+                forceActivateAudio();
+                draggedElement = element;
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                element.style.transition = 'none';
+                element.style.zIndex = '999';
+                element.style.position = 'fixed';
+                element.style.width = '48px';  
+                element.style.height = '48px';
+                
+                moveAt(clientX, clientY);
+                speakText(element.dataset.word);
+            };
+
+            const onMove = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                moveAt(clientX, clientY);
+            };
+
+            function moveAt(nx, ny) {
+                const offsetSize = 24;
+                element.style.left = (nx - offsetSize) + 'px';
+                element.style.top = (ny - offsetSize) + 'px';
+            }
+
+            const onEnd = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+                
+                const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+                element.style.zIndex = '10';
+                element.style.visibility = 'hidden';
+                const landingNode = document.elementFromPoint(clientX, clientY);
+                element.style.visibility = 'visible';
+
+                const targetBox = landingNode ? landingNode.closest('.box') : null;
+                const activeDigraphWord = sequence[currentStep];
+
+                if (targetBox && targetBox.id === `step-${currentStep}` && element.dataset.digraph === activeDigraphWord) {
+                    processEvaluationResult(true, targetBox, element);
+                } else {
+                    processEvaluationResult(false, null, element);
+                }
+
+                draggedElement = null;
+            };
+
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            element.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function processEvaluationResult(isCorrect, targetBox, cardElement) {
+            if (isCorrect) {
+                audioCorrect.currentTime = 0;
+                audioCorrect.play().catch(()=>{});
+                
+                const matchedImg = cardElement.querySelector('img').cloneNode(true);
+                matchedImg.style.width = '80%';
+                matchedImg.style.height = '55%';
+                
+                targetBox.insertBefore(matchedImg, targetBox.firstChild); 
+                targetBox.classList.add('completed');
+                cardElement.remove();
+
+                const congratulations = ['Great Job!', 'Excellent!', 'Well Done!'];
+                const selectedPhrase = congratulations[Math.floor(Math.random() * congratulations.length)];
+                
+                feedbackEmoji.textContent = "👏";
+                feedbackText.textContent = selectedPhrase;
+                feedbackOverlay.style.display = "flex";
+                speakText(selectedPhrase);
+
+                setTimeout(() => {
+                    feedbackOverlay.style.display = "none";
+                    currentStep++;
+                    
+                    if (currentStep >= sequence.length - 1) {
+                        triggerGameCompletion();
+                    } else {
+                        highlightActiveTarget();
+                    }
+                }, 1200);
+
+            } else {
+                audioWrong.currentTime = 0;
+                audioWrong.play().catch(()=>{});
+
+                feedbackEmoji.textContent = "❌";
+                feedbackText.textContent = "Try Again!";
+                feedbackOverlay.style.display = "flex";
+
+                cardElement.style.position = 'relative';
+                cardElement.style.left = '0px';
+                cardElement.style.top = '0px';
+                cardElement.style.width = '100%';
+                cardElement.style.height = '100%';
+
+                setTimeout(() => {
+                    feedbackOverlay.style.display = "none";
+                }, 900);
+            }
+        }
+
+        function triggerGameCompletion() {
+            const finishBox = document.getElementById(`step-${sequence.length - 1}`);
+            if(finishBox) {
+                finishBox.innerHTML = "<span>🎉</span>";
+                finishBox.style.fontSize = "28px";
+            }
+            createConfettiParticles();
+            completionScreen.style.display = "flex";
+            speakText("Fantastic Job! You matched all the pictures to its corresponding digraphs.");
+        }
+
+        function createConfettiParticles() {
+            for (let i = 0; i < 60; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('confetti');
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.setProperty('--d', (Math.random() * 2 + 2) + 's');
+                conf.style.backgroundColor = `hsl(${Math.random() * 360}, 85%, 65%)`;
+                completionScreen.appendChild(conf);
+            }
+        }
+
+        function restartGame() {
+            currentStep = 1;
+            completionScreen.style.display = "none";
+            document.querySelectorAll('.confetti').forEach(c => c.remove());
+            buildBoard();
+            prepareCards();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('touchstart', forceActivateAudio, { once: true });
+            window.addEventListener('mousedown', forceActivateAudio, { once: true });
+
+            setTimeout(() => {
+                introScreen.style.opacity = '0';
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                    gameContainer.classList.add('visible');
+                    
+                    forceActivateAudio();
+                    speakText("Begin at the start. Read each digraph in order and drag and drop the matching picture to reach the finish line.");
+                    
+                    buildBoard();
+                    prepareCards();
+                }, 500);
+            }, 5000);
+
+            document.getElementById('btn-audio').addEventListener('click', () => {
+                speakText("Begin at the start. Read each digraph in order and drag and drop the matching picture to reach the finish line.");
+            });
+            document.getElementById('btn-restart').addEventListener('click', restartGame);
+            document.getElementById('btn-final-restart').addEventListener('click', restartGame);
+        });
+    </script>
+</body>
+</html>
