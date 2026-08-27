@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0">
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Magic Shape Painter</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
@@ -17,9 +19,14 @@
 html,
 body{
     margin:0;
+    padding:0;
+
+    width:100%;
     height:100%;
+
     overflow:hidden;
-    font-family:"Comic Sans MS",sans-serif;
+
+    font-family:"Comic Sans MS", Arial, sans-serif;
 }
 
 button{
@@ -31,13 +38,18 @@ button{
 .screen{
     position:fixed;
     inset:0;
+
     display:none;
+
     align-items:center;
     justify-content:center;
+
     text-align:center;
 }
 
-/* Logo Screen */
+/* =========================
+   LOGO
+========================= */
 
 #logo{
     display:flex;
@@ -49,11 +61,15 @@ button{
     max-width:75%;
 }
 
-/* General Screens */
+
+/* =========================
+   INTRO / END
+========================= */
 
 #intro,
 #game,
 #end{
+
     background:
         linear-gradient(
             #fff2d8,
@@ -65,65 +81,100 @@ button{
 }
 
 .card{
+
     background:white;
+
     border:4px solid #e6a3c2;
+
     border-radius:30px;
+
     padding:30px;
+
     width:90%;
+
     max-width:900px;
 }
 
 .card p{
+
     font-size:22px;
+
     line-height:1.5;
 }
 
-/* Buttons */
+
+/* =========================
+   BUTTONS
+========================= */
 
 .start,
 .action{
+
     background:#7bbf8c;
+
     color:white;
+
     border:none;
+
     border-radius:25px;
+
     padding:12px 30px;
+
     font-size:24px;
+
     margin:8px;
 }
 
 .start:active,
 .action:active,
 .speaker-button:active{
+
     transform:scale(0.95);
 }
 
-/* Header */
+
+/* =========================
+   HEADER
+========================= */
 
 .header{
+
     position:absolute;
+
     top:10px;
     left:10px;
     right:10px;
 
     background:white;
+
     padding:12px 18px;
+
     border-radius:25px;
 
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
 
     color:#51438b;
+
     font-size:20px;
+
+    z-index:20;
 }
 
 .header-left{
+
     display:flex;
+
     align-items:center;
+
     gap:10px;
 }
 
 .speaker-button{
+
     width:45px;
     height:45px;
 
@@ -131,67 +182,197 @@ button{
     margin:0;
 
     border:none;
+
     border-radius:50%;
 
     background:#5dade2;
+
     color:white;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
     font-size:24px;
-    box-shadow:0 3px 8px rgba(0,0,0,0.15);
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.15);
 }
 
-/* Main Game */
+
+/* =========================
+   GAME MAIN
+========================= */
 
 .main{
+
     background:white;
+
     border:4px solid #e6a3c2;
+
     border-radius:30px;
 
-    padding:40px;
+    padding:25px;
 
     display:flex;
+
     gap:30px;
+
     align-items:center;
+
     justify-content:center;
 
-    width:90%;
-    max-width:950px;
+    width:92%;
 
-    margin-top:60px;
+    max-width:1000px;
+
+    margin-top:55px;
+
+    max-height:calc(100vh - 85px);
+
+    overflow:hidden;
 }
+
+
+/* =========================
+   QUESTION
+========================= */
 
 #question{
+
     color:#51438b;
-    min-height:60px;
+
+    min-height:55px;
+
     margin-top:0;
+
+    margin-bottom:10px;
+
+    font-size:clamp(20px,3vw,32px);
 }
+
+
+/* =========================
+   CANVAS WRAPPER
+========================= */
+
+.canvas-wrap{
+
+    position:relative;
+
+    width:350px;
+    height:350px;
+
+    max-width:40vw;
+    max-height:50vh;
+
+    flex-shrink:0;
+}
+
+
+/* =========================
+   CANVAS
+========================= */
 
 #shapeCanvas{
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:100%;
+    height:100%;
+
     border:4px dashed #d84f91;
+
     border-radius:40px;
+
     background:white;
+
     touch-action:none;
-    max-width:100%;
+
+    display:block;
 }
 
-/* Colour Buttons */
+
+/*
+The original picture canvas sits behind
+the transparent colouring canvas.
+*/
+
+#paintCanvas{
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:100%;
+    height:100%;
+
+    border-radius:40px;
+
+    touch-action:none;
+
+    display:block;
+}
+
+
+/* =========================
+   TARGET GUIDE
+========================= */
+
+#targetGuide{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    pointer-events:none;
+
+    display:none;
+
+    color:#d84f91;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    background:rgba(255,255,255,0.85);
+
+    padding:5px 12px;
+
+    border-radius:15px;
+}
+
+
+/* =========================
+   COLOURS
+========================= */
 
 .colors{
+
     display:flex;
+
     flex-wrap:wrap;
+
     justify-content:center;
+
     max-width:260px;
 }
 
 .colors button{
+
     width:65px;
     height:65px;
 
     border-radius:50%;
+
     margin:8px;
 
     border:4px solid white;
@@ -202,7 +383,9 @@ button{
 }
 
 .colors button.selected-colour{
+
     border:5px solid #51438b;
+
     transform:scale(1.12);
 }
 
@@ -226,112 +409,257 @@ button{
     background:#b084f5;
 }
 
-/* Message */
+
+/* =========================
+   MESSAGE
+========================= */
 
 .msg{
+
     position:fixed;
-    bottom:20px;
+
+    bottom:12px;
     left:50%;
+
     transform:translateX(-50%);
 
     min-width:260px;
 
-    font-size:24px;
+    font-size:22px;
+
     color:#d84f91;
 
     background:white;
-    padding:10px 20px;
+
+    padding:9px 20px;
+
     border-radius:20px;
+
+    z-index:50;
 }
 
-/* Responsive */
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:800px){
 
     #intro,
     #game,
     #end{
-        padding:10px;
+
+        padding:8px;
     }
 
     .header{
+
         font-size:16px;
-        padding:9px 12px;
+
+        padding:7px 10px;
     }
 
     .header-left{
+
         gap:6px;
     }
 
     .speaker-button{
-        width:40px;
-        height:40px;
-        font-size:21px;
+
+        width:38px;
+        height:38px;
+
+        font-size:20px;
     }
 
     .main{
+
         flex-direction:column;
-        gap:8px;
 
-        padding:16px;
+        gap:4px;
 
-        margin-top:55px;
+        padding:10px;
 
-        max-height:
-            calc(100vh - 115px);
+        margin-top:50px;
+
+        width:96%;
+
+        max-height:calc(100vh - 100px);
     }
 
     #question{
-        font-size:20px;
+
+        font-size:19px;
+
         min-height:auto;
-        margin:2px 0 8px;
+
+        margin:2px 0 5px;
     }
 
-    #shapeCanvas{
-        width:245px;
-        height:245px;
+    .canvas-wrap{
+
+        width:min(250px,55vw);
+
+        height:min(250px,55vw);
+
+        max-width:none;
+
+        max-height:none;
+    }
+
+    #shapeCanvas,
+    #paintCanvas{
+
+        border-radius:25px;
     }
 
     .colors{
+
         max-width:100%;
+
+        gap:0;
     }
 
     .colors button{
-        width:48px;
-        height:48px;
-        margin:5px;
-    }
 
-    .action{
-        font-size:18px;
-        padding:9px 20px;
+        width:44px;
+        height:44px;
+
         margin:4px;
     }
 
-    .msg{
-        bottom:6px;
+    .action{
+
         font-size:17px;
-        padding:7px 15px;
+
+        padding:8px 18px;
+
+        margin:3px;
     }
+
+    .msg{
+
+        bottom:4px;
+
+        font-size:16px;
+
+        padding:6px 14px;
+
+        min-width:230px;
+    }
+
 }
+
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media(max-width:420px){
+
+    .canvas-wrap{
+
+        width:min(215px,52vw);
+
+        height:min(215px,52vw);
+    }
+
+    .colors button{
+
+        width:40px;
+        height:40px;
+
+        margin:3px;
+    }
+
+    .action{
+
+        font-size:15px;
+
+        padding:7px 14px;
+    }
+
+}
+
+
+/* =========================
+   SHORT SCREENS
+========================= */
 
 @media(max-height:650px){
 
     .main{
+
         transform:scale(0.88);
+
         margin-top:38px;
     }
 
-    .msg{
-        bottom:4px;
-    }
 }
+
+
+/* =========================
+   LANDSCAPE MOBILE
+========================= */
+
+@media(
+    orientation:landscape
+) and (
+    max-height:600px
+){
+
+    .main{
+
+        flex-direction:row;
+
+        gap:15px;
+
+        padding:10px;
+
+        margin-top:42px;
+
+        max-height:calc(100vh - 55px);
+    }
+
+    .canvas-wrap{
+
+        width:min(270px,42vh);
+
+        height:min(270px,42vh);
+    }
+
+    #question{
+
+        font-size:18px;
+    }
+
+    .colors button{
+
+        width:42px;
+        height:42px;
+
+        margin:3px;
+    }
+
+    .action{
+
+        font-size:16px;
+
+        padding:7px 14px;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<!-- Logo Screen -->
+
+<!-- =========================
+     LOGO
+========================= -->
 
 <div
     id="logo"
@@ -343,7 +671,10 @@ button{
 
 </div>
 
-<!-- Introduction Screen -->
+
+<!-- =========================
+     INTRO
+========================= -->
 
 <div
     id="intro"
@@ -356,8 +687,8 @@ button{
         </h1>
 
         <p>
-            Choose a colour and paint the whole,
-            half or quarter.
+            Listen carefully and colour the
+            whole, half or quarter as asked.
         </p>
 
         <button
@@ -372,11 +703,15 @@ button{
 
 </div>
 
-<!-- Game Screen -->
+
+<!-- =========================
+     GAME
+========================= -->
 
 <div
     id="game"
     class="screen">
+
 
     <div class="header">
 
@@ -389,8 +724,7 @@ button{
             <button
                 class="speaker-button"
                 onclick="speakCurrentInstruction()"
-                aria-label="Repeat the instruction"
-                title="Repeat the instruction">
+                aria-label="Repeat instruction">
 
                 🔊
 
@@ -399,31 +733,61 @@ button{
         </div>
 
         <b>
+
             ⭐
-            <span id="score">0</span>/10
+
+            <span id="score">
+                0
+            </span>
+
+            /10
+
         </b>
 
     </div>
 
+
     <div class="main">
+
 
         <div>
 
             <h2 id="question"></h2>
 
-            <canvas
-                id="shapeCanvas"
-                width="350"
-                height="350">
-            </canvas>
+
+            <div class="canvas-wrap">
+
+                <!-- Original object -->
+
+                <canvas
+                    id="shapeCanvas"
+                    width="350"
+                    height="350">
+                </canvas>
+
+
+                <!-- Learner painting -->
+
+                <canvas
+                    id="paintCanvas"
+                    width="350"
+                    height="350">
+                </canvas>
+
+
+                <div id="targetGuide"></div>
+
+            </div>
 
         </div>
+
 
         <div>
 
             <p>
                 Choose Colour
             </p>
+
 
             <div class="colors">
 
@@ -459,6 +823,7 @@ button{
 
             </div>
 
+
             <button
                 class="action"
                 onclick="clearPaint()">
@@ -466,6 +831,7 @@ button{
                 Clear
 
             </button>
+
 
             <button
                 class="action"
@@ -479,6 +845,7 @@ button{
 
     </div>
 
+
     <div
         id="msg"
         class="msg">
@@ -486,7 +853,10 @@ button{
 
 </div>
 
-<!-- End Screen -->
+
+<!-- =========================
+     END
+========================= -->
 
 <div
     id="end"
@@ -512,7 +882,10 @@ button{
 
 </div>
 
-<!-- Sound Effects -->
+
+<!-- =========================
+     AUDIO
+========================= -->
 
 <audio
     id="correct"
@@ -532,9 +905,12 @@ button{
     preload="auto">
 </audio>
 
+
 <script>
 
-/* Questions */
+/* =====================================================
+   QUESTIONS
+===================================================== */
 
 const originalQuestions = [
 
@@ -560,102 +936,170 @@ const originalQuestions = [
 
 ];
 
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
 let questions = [];
 
 let index = 0;
+
 let score = 0;
 
 let selected = "red";
 
-let painted = false;
 let drawing = false;
 
 let currentInstruction = "";
 
 let speechEnabled = false;
 
-/* Elements */
 
-const logoScreen =
-    document.getElementById("logo");
+/* =====================================================
+   CANVAS
+===================================================== */
 
-const introScreen =
-    document.getElementById("intro");
+const shapeCanvas =
+    document.getElementById(
+        "shapeCanvas"
+    );
 
-const gameScreen =
-    document.getElementById("game");
+const paintCanvas =
+    document.getElementById(
+        "paintCanvas"
+    );
 
-const endScreen =
-    document.getElementById("end");
+const shapeCtx =
+    shapeCanvas.getContext(
+        "2d",
+        {
+            willReadFrequently:true
+        }
+    );
 
-const questionText =
-    document.getElementById("question");
+const paintCtx =
+    paintCanvas.getContext(
+        "2d",
+        {
+            willReadFrequently:true
+        }
+    );
 
-const scoreText =
-    document.getElementById("score");
 
-const messageBox =
-    document.getElementById("msg");
-
-const finalText =
-    document.getElementById("final");
-
-const correctAudio =
-    document.getElementById("correct");
-
-const wrongAudio =
-    document.getElementById("wrong");
-
-const clapAudio =
-    document.getElementById("clap");
-
-const canvas =
-    document.getElementById("shapeCanvas");
-
-const ctx =
-    canvas.getContext("2d");
+/* =====================================================
+   IMAGE
+===================================================== */
 
 const img =
     new Image();
 
-/* Logo Timer */
 
-setTimeout(function(){
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-    logoScreen.style.display = "none";
-    introScreen.style.display = "flex";
+const logoScreen =
+    document.getElementById(
+        "logo"
+    );
 
-},5000);
+const introScreen =
+    document.getElementById(
+        "intro"
+    );
 
-/* Shuffle Questions */
+const gameScreen =
+    document.getElementById(
+        "game"
+    );
+
+const endScreen =
+    document.getElementById(
+        "end"
+    );
+
+const questionText =
+    document.getElementById(
+        "question"
+    );
+
+const scoreText =
+    document.getElementById(
+        "score"
+    );
+
+const messageBox =
+    document.getElementById(
+        "msg"
+    );
+
+const finalText =
+    document.getElementById(
+        "final"
+    );
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+logoScreen.style.display =
+    "flex";
+
+
+setTimeout(
+    function(){
+
+        logoScreen.style.display =
+            "none";
+
+        introScreen.style.display =
+            "flex";
+
+    },
+    5000
+);
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
 
 function shuffleQuestions(){
 
     questions =
         originalQuestions.map(
-            function(question){
+            function(item){
 
-                return [...question];
+                return [...item];
 
             }
         );
 
+
     for(
-        let i = questions.length - 1;
+        let i =
+            questions.length - 1;
+
         i > 0;
+
         i--
     ){
 
-        const randomIndex =
+        const j =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
+
 
         [
             questions[i],
-            questions[randomIndex]
-        ] = [
-            questions[randomIndex],
+            questions[j]
+        ] =
+        [
+            questions[j],
             questions[i]
         ];
 
@@ -663,139 +1107,178 @@ function shuffleQuestions(){
 
 }
 
-/* Start Game */
+
+/* =====================================================
+   START
+===================================================== */
 
 function startGame(){
 
-    speechEnabled = true;
+    speechEnabled =
+        true;
+
 
     shuffleQuestions();
 
+
     index = 0;
+
     score = 0;
 
-    introScreen.style.display = "none";
-    endScreen.style.display = "none";
-    gameScreen.style.display = "flex";
+
+    introScreen.style.display =
+        "none";
+
+
+    endScreen.style.display =
+        "none";
+
+
+    gameScreen.style.display =
+        "flex";
+
 
     loadQuestion();
 
 }
 
-/* Load Current Question */
+
+/* =====================================================
+   LOAD QUESTION
+===================================================== */
 
 function loadQuestion(){
 
-    painted = false;
     drawing = false;
 
-    messageBox.textContent = "";
 
-    const part =
+    messageBox.textContent =
+        "";
+
+
+    const type =
         questions[index][1];
 
-    const objectName =
+
+    const object =
         questions[index][2];
+
 
     currentInstruction =
         "Colour the " +
-        part +
+        type +
         " of the " +
-        objectName +
+        object +
         ".";
+
 
     questionText.textContent =
         currentInstruction;
 
+
     scoreText.textContent =
         score;
 
+
     drawImage();
 
-    /*
-    Automatically read every new instruction.
-    A small delay allows the new question to
-    appear before the voice begins.
-    */
 
     if(speechEnabled){
 
-        setTimeout(function(){
+        setTimeout(
+            function(){
 
-            speakCurrentInstruction();
+                speakCurrentInstruction();
 
-        },400);
+            },
+            350
+        );
 
     }
 
 }
 
-/* Speak Current Instruction */
+
+/* =====================================================
+   SPEECH
+===================================================== */
 
 function speakCurrentInstruction(){
 
-    if(!currentInstruction){
+    if(
+        !currentInstruction
+    ){
+
         return;
+
     }
+
 
     if(
         !("speechSynthesis" in window)
     ){
 
-        messageBox.textContent =
-            "Audio instructions are not supported on this device.";
-
         return;
+
     }
 
-    /*
-    Stop any instruction that is already playing.
-    */
 
     window.speechSynthesis.cancel();
+
 
     const speech =
         new SpeechSynthesisUtterance(
             currentInstruction
         );
 
-    /*
-    en-IN gives an Indian English voice when
-    available. The browser will use another
-    English voice when en-IN is unavailable.
-    */
 
-    speech.lang = "en-IN";
-    speech.rate = 0.82;
-    speech.pitch = 1.05;
-    speech.volume = 1;
+    speech.lang =
+        "en-IN";
+
+    speech.rate =
+        0.82;
+
+    speech.pitch =
+        1.05;
+
+    speech.volume =
+        1;
+
 
     const voices =
         window.speechSynthesis.getVoices();
 
-    const preferredVoice =
-        voices.find(
-            function(voice){
 
-                return voice.lang === "en-IN";
+    const voice =
+        voices.find(
+            function(v){
+
+                return (
+                    v.lang ===
+                    "en-IN"
+                );
 
             }
         ) ||
 
         voices.find(
-            function(voice){
+            function(v){
 
-                return voice.lang.startsWith("en");
+                return v.lang.startsWith(
+                    "en"
+                );
 
             }
         );
 
-    if(preferredVoice){
+
+    if(voice){
 
         speech.voice =
-            preferredVoice;
+            voice;
 
     }
+
 
     window.speechSynthesis.speak(
         speech
@@ -803,60 +1286,67 @@ function speakCurrentInstruction(){
 
 }
 
-/*
-Some browsers load available voices after
-the page has already opened.
-*/
 
-if(
-    "speechSynthesis" in window
-){
-
-    window.speechSynthesis.onvoiceschanged =
-        function(){
-
-            window.speechSynthesis.getVoices();
-
-        };
-
-}
-
-/* Draw Image */
+/* =====================================================
+   DRAW ORIGINAL IMAGE
+===================================================== */
 
 function drawImage(){
 
-    ctx.clearRect(
+    shapeCtx.clearRect(
         0,
         0,
-        canvas.width,
-        canvas.height
+        shapeCanvas.width,
+        shapeCanvas.height
     );
 
-    img.onload = function(){
 
-        ctx.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+    paintCtx.clearRect(
+        0,
+        0,
+        paintCanvas.width,
+        paintCanvas.height
+    );
 
-        ctx.drawImage(
-            img,
-            50,
-            50,
-            250,
-            250
-        );
 
-    };
+    img.onload =
+        function(){
 
-    img.onerror = function(){
+            shapeCtx.clearRect(
+                0,
+                0,
+                350,
+                350
+            );
 
-        messageBox.textContent =
-            "The picture could not be loaded.";
 
-    };
+            /*
+            Draw the original object.
+            */
+
+            shapeCtx.drawImage(
+                img,
+                50,
+                50,
+                250,
+                250
+            );
+
+
+            /*
+            Make sure the painting layer
+            starts completely transparent.
+            */
+
+            paintCtx.clearRect(
+                0,
+                0,
+                350,
+                350
+            );
+
+        };
+
 
     img.src =
         "assets/" +
@@ -864,7 +1354,10 @@ function drawImage(){
 
 }
 
-/* Choose Colour */
+
+/* =====================================================
+   SELECT COLOUR
+===================================================== */
 
 function chooseColour(
     colour,
@@ -873,6 +1366,7 @@ function chooseColour(
 
     selected =
         colour;
+
 
     document
         .querySelectorAll(
@@ -888,95 +1382,146 @@ function chooseColour(
             }
         );
 
+
     button.classList.add(
         "selected-colour"
     );
 
 }
 
-/* Paint */
+
+/* =====================================================
+   GET CANVAS POSITION
+===================================================== */
+
+function getCanvasPosition(
+    event
+){
+
+    const rect =
+        paintCanvas.getBoundingClientRect();
+
+
+    return {
+
+        x:
+            (
+                event.clientX -
+                rect.left
+            ) *
+            (
+                paintCanvas.width /
+                rect.width
+            ),
+
+        y:
+            (
+                event.clientY -
+                rect.top
+            ) *
+            (
+                paintCanvas.height /
+                rect.height
+            )
+
+    };
+
+}
+
+
+/* =====================================================
+   PAINT
+===================================================== */
 
 function paint(event){
 
     if(!drawing){
+
         return;
+
     }
 
-    const rectangle =
-        canvas.getBoundingClientRect();
 
-    const x =
-        (
-            event.clientX -
-            rectangle.left
-        ) *
-        (
-            canvas.width /
-            rectangle.width
+    const position =
+        getCanvasPosition(
+            event
         );
 
-    const y =
-        (
-            event.clientY -
-            rectangle.top
-        ) *
-        (
-            canvas.height /
-            rectangle.height
-        );
 
-    ctx.fillStyle =
+    paintCtx.fillStyle =
         selected;
 
-    ctx.beginPath();
 
-    ctx.arc(
-        x,
-        y,
-        18,
+    paintCtx.beginPath();
+
+
+    paintCtx.arc(
+        position.x,
+        position.y,
+        17,
         0,
         Math.PI * 2
     );
 
-    ctx.fill();
 
-    painted = true;
+    paintCtx.fill();
 
 }
 
-/* Pointer Controls */
 
-canvas.addEventListener(
+/* =====================================================
+   POINTER DOWN
+===================================================== */
+
+paintCanvas.addEventListener(
     "pointerdown",
     function(event){
 
+        event.preventDefault();
+
+
         drawing = true;
+
 
         try{
 
-            canvas.setPointerCapture(
+            paintCanvas.setPointerCapture(
                 event.pointerId
             );
 
-        }catch(error){
-
-            console.log(
-                "Pointer capture unavailable."
-            );
+        }
+        catch(error){
 
         }
+
 
         paint(event);
 
     }
 );
 
-canvas.addEventListener(
+
+/* =====================================================
+   POINTER MOVE
+===================================================== */
+
+paintCanvas.addEventListener(
     "pointermove",
-    paint
+    function(event){
+
+        event.preventDefault();
+
+        paint(event);
+
+    }
 );
 
-canvas.addEventListener(
+
+/* =====================================================
+   POINTER UP
+===================================================== */
+
+paintCanvas.addEventListener(
     "pointerup",
     function(){
 
@@ -985,7 +1530,8 @@ canvas.addEventListener(
     }
 );
 
-canvas.addEventListener(
+
+paintCanvas.addEventListener(
     "pointercancel",
     function(){
 
@@ -994,195 +1540,567 @@ canvas.addEventListener(
     }
 );
 
-canvas.addEventListener(
-    "pointerleave",
-    function(){
 
-        drawing = false;
-
-    }
-);
-
-/* Clear */
+/* =====================================================
+   CLEAR
+===================================================== */
 
 function clearPaint(){
 
-    drawImage();
+    paintCtx.clearRect(
+        0,
+        0,
+        paintCanvas.width,
+        paintCanvas.height
+    );
 
-    painted = false;
+
     drawing = false;
 
-    messageBox.textContent = "";
+
+    messageBox.textContent =
+        "";
 
 }
 
-/* Play Sound Effect */
 
-function playSound(audio){
+/* =====================================================
+   FIND OBJECT PIXELS
+===================================================== */
 
-    audio.pause();
-    audio.currentTime = 0;
+function getObjectMask(){
 
-    const soundPromise =
-        audio.play();
-
-    if(soundPromise !== undefined){
-
-        soundPromise.catch(
-            function(error){
-
-                console.log(
-                    "Sound could not play:",
-                    error
-                );
-
-            }
+    const original =
+        shapeCtx.getImageData(
+            0,
+            0,
+            shapeCanvas.width,
+            shapeCanvas.height
         );
 
-    }
+
+    return original.data;
 
 }
 
-/* Submit */
 
-function submitAnswer(){
+/* =====================================================
+   CALCULATE PAINT COVERAGE
+===================================================== */
 
-    window.speechSynthesis.cancel();
+function calculatePaintCoverage(){
 
-    if(!painted){
-
-        messageBox.textContent =
-            "🎨 Please colour the shape first!";
-
-        return;
-
-    }
-
-    const pixels =
-        ctx.getImageData(
+    const original =
+        shapeCtx.getImageData(
             0,
             0,
-            canvas.width,
-            canvas.height
+            shapeCanvas.width,
+            shapeCanvas.height
         ).data;
 
-    let count = 0;
+
+    const paint =
+        paintCtx.getImageData(
+            0,
+            0,
+            paintCanvas.width,
+            paintCanvas.height
+        ).data;
+
+
+    let objectPixels = 0;
+
+    let paintedPixels = 0;
+
+
+    /*
+    Only pixels belonging to the
+    original object are counted.
+    */
 
     for(
         let i = 0;
-        i < pixels.length;
+        i < original.length;
         i += 4
     ){
 
-        const red =
-            pixels[i];
+        const originalAlpha =
+            original[i + 3];
 
-        const green =
-            pixels[i + 1];
-
-        const blue =
-            pixels[i + 2];
-
-        const alpha =
-            pixels[i + 3];
-
-        const visible =
-            alpha > 0;
-
-        const almostWhite =
-            red > 240 &&
-            green > 240 &&
-            blue > 240;
 
         if(
-            visible &&
-            !almostWhite
+            originalAlpha > 30
         ){
 
-            count++;
+            objectPixels++;
+
+
+            const paintAlpha =
+                paint[i + 3];
+
+
+            if(
+                paintAlpha > 30
+            ){
+
+                paintedPixels++;
+
+            }
 
         }
 
     }
 
-    if(count < 3000){
+
+    if(
+        objectPixels === 0
+    ){
+
+        return 0;
+
+    }
+
+
+    return (
+        paintedPixels /
+        objectPixels
+    ) * 100;
+
+}
+
+
+/* =====================================================
+   CHECK WHETHER PAINT IS INSIDE OBJECT
+===================================================== */
+
+function calculateOutsidePaint(){
+
+    const original =
+        shapeCtx.getImageData(
+            0,
+            0,
+            shapeCanvas.width,
+            shapeCanvas.height
+        ).data;
+
+
+    const paint =
+        paintCtx.getImageData(
+            0,
+            0,
+            paintCanvas.width,
+            paintCanvas.height
+        ).data;
+
+
+    let paintedTotal = 0;
+
+    let paintedOutside = 0;
+
+
+    for(
+        let i = 0;
+        i < paint.length;
+        i += 4
+    ){
+
+        const paintAlpha =
+            paint[i + 3];
+
+
+        if(
+            paintAlpha > 30
+        ){
+
+            paintedTotal++;
+
+
+            const originalAlpha =
+                original[i + 3];
+
+
+            if(
+                originalAlpha <= 30
+            ){
+
+                paintedOutside++;
+
+            }
+
+        }
+
+    }
+
+
+    if(
+        paintedTotal === 0
+    ){
+
+        return 100;
+
+    }
+
+
+    return (
+        paintedOutside /
+        paintedTotal
+    ) * 100;
+
+}
+
+
+/* =====================================================
+   VALIDATE ANSWER
+===================================================== */
+
+function validateAnswer(){
+
+    const coverage =
+        calculatePaintCoverage();
+
+
+    const outside =
+        calculateOutsidePaint();
+
+
+    const requested =
+        questions[index][1];
+
+
+    /*
+    Reject if the learner coloured
+    mostly outside the object.
+    */
+
+    if(
+        outside > 18
+    ){
+
+        return false;
+
+    }
+
+
+    /*
+    WHOLE
+
+    Need at least 85%.
+    */
+
+    if(
+        requested ===
+        "whole"
+    ){
+
+        return (
+            coverage >= 85 &&
+            coverage <= 100
+        );
+
+    }
+
+
+    /*
+    HALF
+
+    Accept approximately 40–60%.
+
+    This means colouring the whole
+    object will NOT be accepted.
+    */
+
+    if(
+        requested ===
+        "half"
+    ){
+
+        return (
+            coverage >= 40 &&
+            coverage <= 60
+        );
+
+    }
+
+
+    /*
+    QUARTER
+
+    Accept approximately 15–35%.
+
+    This means colouring half or the
+    whole object will NOT be accepted.
+    */
+
+    if(
+        requested ===
+        "quarter"
+    ){
+
+        return (
+            coverage >= 15 &&
+            coverage <= 35
+        );
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =====================================================
+   SUBMIT ANSWER
+===================================================== */
+
+function submitAnswer(){
+
+    window.speechSynthesis.cancel();
+
+
+    const coverage =
+        calculatePaintCoverage();
+
+
+    /*
+    No colouring.
+    */
+
+    if(
+        coverage < 5
+    ){
 
         messageBox.textContent =
-            "😊 Try colouring the correct part!";
+            "🎨 Please colour the shape first!";
+
 
         playSound(
-            wrongAudio
+            document.getElementById(
+                "wrong"
+            )
         );
+
 
         return;
 
     }
 
-    score++;
 
-    scoreText.textContent =
-        score;
+    const correct =
+        validateAnswer();
 
-    playSound(
-        correctAudio
-    );
 
-    messageBox.textContent =
-        "⭐ Great Painting!";
+    if(correct){
 
-    setTimeout(
-        function(){
+        score++;
 
-            index++;
 
-            if(
-                index >=
-                questions.length
-            ){
+        scoreText.textContent =
+            score;
 
-                finishGame();
 
-            }else{
+        messageBox.textContent =
+            "⭐ Great job!";
 
-                /*
-                loadQuestion automatically reads
-                the next instruction.
-                */
 
-                loadQuestion();
+        playSound(
+            document.getElementById(
+                "correct"
+            )
+        );
 
-            }
 
-        },
-        1100
-    );
+        setTimeout(
+            function(){
+
+                index++;
+
+
+                if(
+                    index >=
+                    questions.length
+                ){
+
+                    finishGame();
+
+                }
+                else{
+
+                    loadQuestion();
+
+                }
+
+            },
+            1100
+        );
+
+    }
+    else{
+
+        /*
+        IMPORTANT:
+        The answer is wrong if the
+        amount coloured does not match
+        whole / half / quarter.
+        */
+
+        messageBox.textContent =
+            getWrongMessage(
+                coverage
+            );
+
+
+        playSound(
+            document.getElementById(
+                "wrong"
+            )
+        );
+
+    }
 
 }
 
-/* End Game */
+
+/* =====================================================
+   WRONG ANSWER MESSAGE
+===================================================== */
+
+function getWrongMessage(
+    coverage
+){
+
+    const requested =
+        questions[index][1];
+
+
+    if(
+        requested ===
+        "half"
+    ){
+
+        if(
+            coverage > 60
+        ){
+
+            return "😊 That is too much. Colour only half.";
+
+        }
+
+
+        return "😊 Colour a little more to make half.";
+
+    }
+
+
+    if(
+        requested ===
+        "quarter"
+    ){
+
+        if(
+            coverage > 35
+        ){
+
+            return "😊 That is too much. Colour only a quarter.";
+
+        }
+
+
+        return "😊 Colour a little more to make a quarter.";
+
+    }
+
+
+    if(
+        requested ===
+        "whole"
+    ){
+
+        return "😊 Colour the whole object.";
+
+    }
+
+
+    return "😊 Try again!";
+
+}
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+function playSound(
+    audio
+){
+
+    if(!audio){
+
+        return;
+
+    }
+
+
+    audio.pause();
+
+    audio.currentTime =
+        0;
+
+
+    const promise =
+        audio.play();
+
+
+    if(
+        promise !== undefined
+    ){
+
+        promise.catch(
+            function(){
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
 
 function finishGame(){
 
     window.speechSynthesis.cancel();
 
+
     gameScreen.style.display =
         "none";
 
+
     endScreen.style.display =
         "flex";
+
 
     finalText.textContent =
         "⭐ Score: " +
         score +
         "/10";
 
+
     playSound(
-        clapAudio
+        document.getElementById(
+            "clap"
+        )
     );
 
 }
 
-/* Play Again */
+
+/* =====================================================
+   RESTART
+===================================================== */
 
 function restartGame(){
 
@@ -1192,13 +2110,18 @@ function restartGame(){
 
 }
 
-/* Stop Voice When Page Is Hidden */
+
+/* =====================================================
+   STOP SPEECH WHEN PAGE HIDDEN
+===================================================== */
 
 document.addEventListener(
     "visibilitychange",
     function(){
 
-        if(document.hidden){
+        if(
+            document.hidden
+        ){
 
             window.speechSynthesis.cancel();
 
