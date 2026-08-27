@@ -2,150 +2,1768 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
 <title>Dinosaur Matching Game</title>
+
 <style>
-body, html {
-    margin:0; padding:0; overflow:hidden; font-family:'Arial', sans-serif; height:100%; width:100%;
+
+/* =========================================================
+   RESET
+========================================================= */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    font-family: Arial, sans-serif;
+
+    background: #ffffff;
+
+    touch-action: none;
 }
-#game-container { width:100%; height:100%; position:relative; overflow:hidden; }
 
-/* Slides */
-.slide { width:100%; height:100%; position:absolute; top:0; left:0; display:none; justify-content:center; align-items:center; flex-direction:column; }
-.visible { display:flex; }
-
-#slide1 img { width:30vw; max-width:250px; height:auto; }
-#instruction { position:absolute; top:2%; width:96%; text-align:center; font-size:4vw; max-font-size:28px; color:#39FF14; text-shadow:1px 1px 2px black; }
-
-/* Dinosaur images */
-.dino { width:18vw; max-width:150px; cursor:grab; transition: transform 0.5s ease; position:absolute; }
-.name-box { width:18vw; max-width:150px; height:15vw; max-height:100px; border:2px dashed #555; display:flex; justify-content:center; align-items:center; margin:1%; font-size:3vw; max-font-size:18px; font-weight:bold; color:#222; position:absolute; }
-img.name-img { max-width:100%; max-height:100%; }
-
-#goodjob { font-size:6vw; color:#39FF14; text-align:center; position:relative; }
-
-@media(max-width:768px){
-    .dino { width:28vw; max-width:120px; }
-    .name-box { width:28vw; max-width:120px; height:22vw; max-height:90px; font-size:4vw; }
-    #instruction { font-size:5vw; }
-    #goodjob { font-size:10vw; }
+* {
+    box-sizing: border-box;
 }
+
+
+/* =========================================================
+   GAME CONTAINER
+========================================================= */
+
+#game-container {
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    height: 100dvh;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   SLIDES
+========================================================= */
+
+.slide {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.slide.visible {
+    display: flex;
+}
+
+
+/* =========================================================
+   LOGO SCREEN
+========================================================= */
+
+#slide1 {
+    background: #ffffff;
+}
+
+#slide1 img {
+
+    width: min(35vw, 280px);
+
+    max-width: 70%;
+    max-height: 55%;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   INSTRUCTION
+========================================================= */
+
+#instruction {
+
+    position: absolute;
+
+    top: clamp(8px, 2vh, 20px);
+
+    left: 2%;
+
+    width: 96%;
+
+    text-align: center;
+
+    font-size: clamp(16px, 3vw, 30px);
+
+    line-height: 1.15;
+
+    color: #ffffff;
+
+    font-weight: bold;
+
+    text-shadow:
+        2px 2px 3px #000000,
+        -1px -1px 2px #000000;
+
+    z-index: 20;
+}
+
+
+/* =========================================================
+   MATCHING GAME AREA
+========================================================= */
+
+#slide2 {
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   DINOSAUR
+========================================================= */
+
+.dino {
+
+    position: absolute;
+
+    width: clamp(70px, 13vw, 150px);
+
+    height: auto;
+
+    max-width: 150px;
+
+    max-height: 24vh;
+
+    object-fit: contain;
+
+    cursor: grab;
+
+    z-index: 10;
+
+    transition:
+        left 0.5s ease,
+        top 0.5s ease,
+        transform 0.3s ease,
+        opacity 0.5s ease;
+
+    touch-action: none;
+}
+
+.dino:active {
+
+    cursor: grabbing;
+
+    transform: scale(1.05);
+}
+
+
+/* =========================================================
+   NAME BOX
+========================================================= */
+
+.name-box {
+
+    position: absolute;
+
+    width: clamp(75px, 13vw, 150px);
+
+    height: clamp(55px, 11vh, 100px);
+
+    border: 2px dashed #444444;
+
+    background: rgba(255, 255, 255, 0.94);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 4px;
+
+    z-index: 5;
+
+    border-radius: 8px;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.name-box:hover {
+
+    transform: scale(1.03);
+
+}
+
+
+img.name-img {
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   DROP TARGET FEEDBACK
+========================================================= */
+
+.name-box.drag-over {
+
+    background: rgba(255, 255, 180, 0.95);
+
+    border-color: #f1b400;
+
+    transform: scale(1.05);
+}
+
+
+/* =========================================================
+   GOOD JOB
+========================================================= */
+
+#slide3 {
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff9d9,
+            #dff8ff,
+            #e8ffd9
+        );
+
+    text-align: center;
+
+    padding: 20px;
+}
+
+#goodjob {
+
+    font-size: clamp(32px, 7vw, 75px);
+
+    color: #22a83f;
+
+    text-align: center;
+
+    font-weight: bold;
+
+    line-height: 1.15;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    #instruction {
+
+        font-size: clamp(17px, 3.5vw, 28px);
+
+    }
+
+    .dino {
+
+        width: clamp(65px, 16vw, 125px);
+
+        max-height: 21vh;
+
+    }
+
+    .name-box {
+
+        width: clamp(70px, 16vw, 125px);
+
+        height: clamp(50px, 10vh, 85px);
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE PORTRAIT
+========================================================= */
+
+@media (max-width: 600px) and (orientation: portrait) {
+
+    #instruction {
+
+        top: 1.5vh;
+
+        font-size: clamp(15px, 4.8vw, 23px);
+
+    }
+
+    .dino {
+
+        width: clamp(65px, 22vw, 110px);
+
+        max-height: 17vh;
+
+    }
+
+    .name-box {
+
+        width: clamp(65px, 22vw, 110px);
+
+        height: clamp(45px, 9vh, 75px);
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+    #instruction {
+
+        font-size: 15px;
+
+        top: 8px;
+
+    }
+
+    .dino {
+
+        width: 62px;
+
+        max-height: 15vh;
+
+    }
+
+    .name-box {
+
+        width: 65px;
+
+        height: 46px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LANDSCAPE MOBILE
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 600px) {
+
+    #instruction {
+
+        top: 5px;
+
+        font-size: clamp(14px, 3vw, 22px);
+
+    }
+
+    .dino {
+
+        width: clamp(60px, 12vw, 105px);
+
+        max-height: 22vh;
+
+    }
+
+    .name-box {
+
+        width: clamp(60px, 12vw, 105px);
+
+        height: clamp(40px, 11vh, 65px);
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SHORT LANDSCAPE
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 450px) {
+
+    #instruction {
+
+        font-size: 14px;
+
+        top: 3px;
+
+    }
+
+    .dino {
+
+        width: 55px;
+
+    }
+
+    .name-box {
+
+        width: 58px;
+
+        height: 38px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LAPTOP / LARGE SCREEN
+========================================================= */
+
+@media (min-width: 1200px) {
+
+    .dino {
+
+        width: min(13vw, 150px);
+
+    }
+
+    .name-box {
+
+        width: min(13vw, 150px);
+
+        height: min(11vh, 100px);
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dino,
+    .name-box {
+
+        transition: none;
+
+    }
+
+}
+
 </style>
 </head>
+
+
 <body>
+
+
 <div id="game-container">
-    <div id="slide1" class="slide visible">
-        <img src="assets/innovine-logo.png" alt="Innovine Logo">
+
+
+    <!-- =================================================
+         SLIDE 1
+    ================================================== -->
+
+    <div
+        id="slide1"
+        class="slide visible"
+    >
+
+        <img
+            src="assets/innovine-logo.png"
+            alt="Innovine Logo"
+        >
+
     </div>
 
-    <div id="slide2" class="slide">
-        <div id="instruction">Match the dinosaurs with their names!</div>
+
+
+    <!-- =================================================
+         SLIDE 2
+    ================================================== -->
+
+    <div
+        id="slide2"
+        class="slide"
+    >
+
+        <div id="instruction">
+            Match the dinosaurs with their names!
+        </div>
+
     </div>
 
-    <div id="slide3" class="slide">
-        <div id="goodjob">Good Job! 🎉</div>
+
+
+    <!-- =================================================
+         SLIDE 3
+    ================================================== -->
+
+    <div
+        id="slide3"
+        class="slide"
+    >
+
+        <div id="goodjob">
+            Good Job! 🎉
+        </div>
+
     </div>
+
+
 </div>
 
-<audio id="correctSound" src="assets/correct.mp3"></audio>
-<audio id="wrongSound" src="assets/wrong.mp3"></audio>
+
+<!-- =====================================================
+     AUDIO
+====================================================== -->
+
+<audio
+    id="correctSound"
+    src="assets/correct.mp3"
+    preload="auto"
+></audio>
+
+<audio
+    id="wrongSound"
+    src="assets/wrong.mp3"
+    preload="auto"
+></audio>
+
 
 <script>
+
+/* =========================================================
+   DINOSAUR DATA
+========================================================= */
+
 const dinosaurs = [
-    {id: 'diplodocus', img: 'assets/diplodocus.png', nameImg: 'assets/diplodocus-name.png'},
-    {id: 'triceratops', img: 'assets/triceratops.png', nameImg: 'assets/triceratops-name.png'},
-    {id: 'tyrannosaurus-rex', img: 'assets/tyrannosaurus-rex.png', nameImg: 'assets/tyrannosaurus-rex-name.png'},
-    {id: 'iguanodon', img: 'assets/iguanodon.png', nameImg: 'assets/iguanodon-name.png'},
-    {id: 'stegosaurus', img: 'assets/stegosaurus.png', nameImg: 'assets/stegosaurus-name.png'},
-    {id: 'brachiosaurus', img: 'assets/brachiosaurus.png', nameImg: 'assets/brachiosaurus-name.png'}
+
+    {
+        id: "diplodocus",
+        img: "assets/diplodocus.png",
+        nameImg: "assets/diplodocus-name.png"
+    },
+
+    {
+        id: "triceratops",
+        img: "assets/triceratops.png",
+        nameImg: "assets/triceratops-name.png"
+    },
+
+    {
+        id: "tyrannosaurus-rex",
+        img: "assets/tyrannosaurus-rex.png",
+        nameImg: "assets/tyrannosaurus-rex-name.png"
+    },
+
+    {
+        id: "iguanodon",
+        img: "assets/iguanodon.png",
+        nameImg: "assets/iguanodon-name.png"
+    },
+
+    {
+        id: "stegosaurus",
+        img: "assets/stegosaurus.png",
+        nameImg: "assets/stegosaurus-name.png"
+    },
+
+    {
+        id: "brachiosaurus",
+        img: "assets/brachiosaurus.png",
+        nameImg: "assets/brachiosaurus-name.png"
+    }
+
 ];
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 let matchesDone = 0;
 
-function shuffleArray(arr) { return arr.sort(()=>Math.random()-0.5); }
-
-function createGame() {
-    const slide2 = document.getElementById('slide2');
-    slide2.style.backgroundImage = "url('assets/background-prehistoric.png')";
-    slide2.style.backgroundSize = "cover";
-
-    const topPositions = [10, 25, 40, 55, 70, 85];
-    const dinoY = 10; // top row %
-    const nameY = 70; // bottom row %
-
-    const shuffledDinos = shuffleArray([...dinosaurs]);
-    const shuffledNames = shuffleArray([...dinosaurs]);
-
-    shuffledDinos.forEach((dino, idx) => {
-        const img = document.createElement('img');
-        img.src = dino.img;
-        img.classList.add('dino');
-        img.style.left = topPositions[idx] + '%';
-        img.style.top = dinoY + '%';
-        img.dataset.id = dino.id;
-        img.draggable = true;
-        img.addEventListener('dragstart', dragStart);
-        slide2.appendChild(img);
-    });
-
-    shuffledNames.forEach((dino, idx) => {
-        const box = document.createElement('div');
-        box.classList.add('name-box');
-        box.style.left = topPositions[idx] + '%';
-        box.style.top = nameY + '%';
-        box.dataset.id = dino.id;
-
-        const nameImg = document.createElement('img');
-        nameImg.src = dino.nameImg;
-        nameImg.classList.add('name-img');
-        box.appendChild(nameImg);
-
-        box.addEventListener('dragover', dragOver);
-        box.addEventListener('drop', dropDino);
-        slide2.appendChild(box);
-    });
-}
-
 let draggedDino = null;
 
-function dragStart(e) { draggedDino = this; }
-function dragOver(e) { e.preventDefault(); }
+let touchDino = null;
 
-function dropDino(e) {
-    const targetBox = this;
-    if(draggedDino.dataset.id === targetBox.dataset.id){
-        document.getElementById('correctSound').play();
-        matchesDone++;
-        draggedDino.style.transition = 'top 0.5s ease, left 0.5s ease, opacity 0.5s ease';
-        draggedDino.style.left = targetBox.offsetLeft + 'px';
-        draggedDino.style.top = targetBox.offsetTop + 'px';
-        setTimeout(()=>{
-            draggedDino.style.display='none';
-            targetBox.style.display='none';
-        },600);
-        if(matchesDone === dinosaurs.length){
-            setTimeout(()=>showSlide(3),800);
-        }
-    } else {
-        document.getElementById('wrongSound').play();
+let touchClone = null;
+
+let touchOffsetX = 0;
+
+let touchOffsetY = 0;
+
+
+/* =========================================================
+   SHUFFLE
+========================================================= */
+
+function shuffleArray(array) {
+
+    const newArray = [...array];
+
+    for (
+        let i = newArray.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [
+            newArray[i],
+            newArray[j]
+        ] = [
+            newArray[j],
+            newArray[i]
+        ];
+
     }
+
+    return newArray;
+
 }
 
-function showSlide(slideNum){
-    document.querySelectorAll('.slide').forEach(s=>s.classList.remove('visible'));
-    document.getElementById('slide'+slideNum).classList.add('visible');
+
+/* =========================================================
+   GET RESPONSIVE POSITIONS
+========================================================= */
+
+function getPositions() {
+
+    const width =
+        window.innerWidth;
+
+    const height =
+        window.innerHeight;
+
+
+    /*
+       Desktop:
+       6 dinosaurs across.
+
+       Tablet / mobile portrait:
+       3 + 3 arrangement.
+
+       Mobile landscape:
+       6 across.
+    */
+
+
+    if (
+        width <= 600 &&
+        height > width
+    ) {
+
+        return {
+
+            top: [
+                8,
+                38,
+                68,
+                8,
+                38,
+                68
+            ],
+
+            dinoTop: [
+                17,
+                17,
+                17,
+                45,
+                45,
+                45
+            ],
+
+            nameTop: [
+                67,
+                67,
+                67,
+                89,
+                89,
+                89
+            ]
+
+        };
+
+    }
+
+
+    if (
+        height < 500
+    ) {
+
+        return {
+
+            top: [
+                8,
+                25,
+                42,
+                59,
+                76,
+                89
+            ],
+
+            dinoTop: 16,
+
+            nameTop: 68
+
+        };
+
+    }
+
+
+    /*
+       Normal desktop/tablet landscape.
+    */
+
+    return {
+
+        top: [
+            4,
+            20,
+            36,
+            52,
+            68,
+            84
+        ],
+
+        dinoTop: 16,
+
+        nameTop: 68
+
+    };
+
 }
 
-function startGame(){
+
+/* =========================================================
+   CREATE GAME
+========================================================= */
+
+function createGame() {
+
+    const slide2 =
+        document.getElementById(
+            "slide2"
+        );
+
+
+    /*
+       Background
+    */
+
+    slide2.style.backgroundImage =
+        "url('assets/background-prehistoric.png')";
+
+
+    slide2.style.backgroundSize =
+        "cover";
+
+
+    slide2.style.backgroundPosition =
+        "center center";
+
+
+    slide2.style.backgroundRepeat =
+        "no-repeat";
+
+
+    /*
+       Remove old cards
+       before recreating.
+    */
+
+    slide2
+        .querySelectorAll(
+            ".dino, .name-box"
+        )
+        .forEach(
+            element =>
+                element.remove()
+        );
+
+
+    matchesDone = 0;
+
+
+    const positions =
+        getPositions();
+
+
+    const shuffledDinos =
+        shuffleArray(
+            dinosaurs
+        );
+
+
+    const shuffledNames =
+        shuffleArray(
+            dinosaurs
+        );
+
+
+    /* =====================================================
+       CREATE DINOSAURS
+    ===================================================== */
+
+    shuffledDinos.forEach(
+        function (dino, index) {
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+
+            img.src =
+                dino.img;
+
+
+            img.alt =
+                dino.id;
+
+
+            img.className =
+                "dino";
+
+
+            img.dataset.id =
+                dino.id;
+
+
+            img.draggable =
+                true;
+
+
+            /*
+               Desktop / landscape
+            */
+
+            if (
+                !Array.isArray(
+                    positions.dinoTop
+                )
+            ) {
+
+                img.style.left =
+                    positions.top[index] +
+                    "%";
+
+                img.style.top =
+                    positions.dinoTop +
+                    "%";
+
+            }
+
+            /*
+               Mobile portrait
+            */
+
+            else {
+
+                img.style.left =
+                    positions.top[index] +
+                    "%";
+
+                img.style.top =
+                    positions.dinoTop[index] +
+                    "%";
+
+            }
+
+
+            /*
+               Desktop drag
+            */
+
+            img.addEventListener(
+                "dragstart",
+                dragStart
+            );
+
+
+            /*
+               Mobile touch
+            */
+
+            img.addEventListener(
+                "touchstart",
+                touchStart,
+                {
+                    passive: false
+                }
+            );
+
+
+            slide2.appendChild(
+                img
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       CREATE NAME BOXES
+    ===================================================== */
+
+    shuffledNames.forEach(
+        function (dino, index) {
+
+            const box =
+                document.createElement(
+                    "div"
+                );
+
+
+            box.className =
+                "name-box";
+
+
+            box.dataset.id =
+                dino.id;
+
+
+            if (
+                !Array.isArray(
+                    positions.nameTop
+                )
+            ) {
+
+                box.style.left =
+                    positions.top[index] +
+                    "%";
+
+                box.style.top =
+                    positions.nameTop +
+                    "%";
+
+            }
+
+            else {
+
+                box.style.left =
+                    positions.top[index] +
+                    "%";
+
+                box.style.top =
+                    positions.nameTop[index] +
+                    "%";
+
+            }
+
+
+            const nameImage =
+                document.createElement(
+                    "img"
+                );
+
+
+            nameImage.src =
+                dino.nameImg;
+
+
+            nameImage.alt =
+                dino.id +
+                " name";
+
+
+            nameImage.className =
+                "name-img";
+
+
+            box.appendChild(
+                nameImage
+            );
+
+
+            /*
+               Desktop drag/drop
+            */
+
+            box.addEventListener(
+                "dragover",
+                dragOver
+            );
+
+
+            box.addEventListener(
+                "dragenter",
+                function () {
+
+                    this.classList.add(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            box.addEventListener(
+                "dragleave",
+                function () {
+
+                    this.classList.remove(
+                        "drag-over"
+                    );
+
+                }
+            );
+
+
+            box.addEventListener(
+                "drop",
+                dropDino
+            );
+
+
+            slide2.appendChild(
+                box
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DESKTOP DRAG START
+========================================================= */
+
+function dragStart(event) {
+
+    draggedDino =
+        event.currentTarget;
+
+}
+
+
+/* =========================================================
+   DRAG OVER
+========================================================= */
+
+function dragOver(event) {
+
+    event.preventDefault();
+
+}
+
+
+/* =========================================================
+   DROP
+========================================================= */
+
+function dropDino(event) {
+
+    event.preventDefault();
+
+
+    const targetBox =
+        event.currentTarget;
+
+
+    targetBox.classList.remove(
+        "drag-over"
+    );
+
+
+    if (
+        !draggedDino
+    ) {
+
+        return;
+
+    }
+
+
+    checkMatch(
+        draggedDino,
+        targetBox
+    );
+
+
+    draggedDino = null;
+
+}
+
+
+/* =========================================================
+   TOUCH START
+========================================================= */
+
+function touchStart(event) {
+
+    event.preventDefault();
+
+
+    if (
+        matchesDone >=
+        dinosaurs.length
+    ) {
+
+        return;
+
+    }
+
+
+    touchDino =
+        event.currentTarget;
+
+
+    const touch =
+        event.touches[0];
+
+
+    const rect =
+        touchDino.getBoundingClientRect();
+
+
+    touchOffsetX =
+        touch.clientX -
+        rect.left;
+
+
+    touchOffsetY =
+        touch.clientY -
+        rect.top;
+
+
+    /*
+       Clone the dinosaur so
+       the original position remains
+       visually stable until dropped.
+    */
+
+    touchClone =
+        touchDino.cloneNode(true);
+
+
+    touchClone.style.position =
+        "fixed";
+
+
+    touchClone.style.left =
+        rect.left + "px";
+
+
+    touchClone.style.top =
+        rect.top + "px";
+
+
+    touchClone.style.width =
+        rect.width + "px";
+
+
+    touchClone.style.height =
+        rect.height + "px";
+
+
+    touchClone.style.zIndex =
+        "1000";
+
+
+    touchClone.style.pointerEvents =
+        "none";
+
+
+    touchClone.style.transition =
+        "none";
+
+
+    document.body.appendChild(
+        touchClone
+    );
+
+
+    touchDino.style.opacity =
+        "0.35";
+
+
+    document.addEventListener(
+        "touchmove",
+        touchMove,
+        {
+            passive: false
+        }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        touchEnd,
+        {
+            passive: false
+        }
+    );
+
+}
+
+
+/* =========================================================
+   TOUCH MOVE
+========================================================= */
+
+function touchMove(event) {
+
+    event.preventDefault();
+
+
+    if (
+        !touchClone
+    ) {
+
+        return;
+
+    }
+
+
+    const touch =
+        event.touches[0];
+
+
+    touchClone.style.left =
+        (
+            touch.clientX -
+            touchOffsetX
+        ) +
+        "px";
+
+
+    touchClone.style.top =
+        (
+            touch.clientY -
+            touchOffsetY
+        ) +
+        "px";
+
+
+    /*
+       Highlight the name box
+       underneath the dinosaur.
+    */
+
+    const element =
+        document.elementFromPoint(
+            touch.clientX,
+            touch.clientY
+        );
+
+
+    document
+        .querySelectorAll(
+            ".name-box"
+        )
+        .forEach(
+            box =>
+                box.classList.remove(
+                    "drag-over"
+                )
+        );
+
+
+    const box =
+        element &&
+        element.closest(
+            ".name-box"
+        );
+
+
+    if (box) {
+
+        box.classList.add(
+            "drag-over"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TOUCH END
+========================================================= */
+
+function touchEnd(event) {
+
+    event.preventDefault();
+
+
+    if (
+        !touchDino
+    ) {
+
+        cleanupTouch();
+
+        return;
+
+    }
+
+
+    const touch =
+        event.changedTouches[0];
+
+
+    const element =
+        document.elementFromPoint(
+            touch.clientX,
+            touch.clientY
+        );
+
+
+    const targetBox =
+        element &&
+        element.closest(
+            ".name-box"
+        );
+
+
+    document
+        .querySelectorAll(
+            ".name-box"
+        )
+        .forEach(
+            box =>
+                box.classList.remove(
+                    "drag-over"
+                )
+        );
+
+
+    if (
+        targetBox
+    ) {
+
+        checkMatch(
+            touchDino,
+            targetBox
+        );
+
+    }
+
+
+    cleanupTouch();
+
+}
+
+
+/* =========================================================
+   CLEAN TOUCH
+========================================================= */
+
+function cleanupTouch() {
+
+    if (
+        touchDino
+    ) {
+
+        touchDino.style.opacity =
+            "1";
+
+    }
+
+
+    if (
+        touchClone
+    ) {
+
+        touchClone.remove();
+
+    }
+
+
+    touchDino = null;
+
+    touchClone = null;
+
+
+    document.removeEventListener(
+        "touchmove",
+        touchMove
+    );
+
+
+    document.removeEventListener(
+        "touchend",
+        touchEnd
+    );
+
+}
+
+
+/* =========================================================
+   CHECK MATCH
+========================================================= */
+
+function checkMatch(
+    dino,
+    targetBox
+) {
+
+    if (
+        !dino ||
+        !targetBox
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       CORRECT
+    */
+
+    if (
+        dino.dataset.id ===
+        targetBox.dataset.id
+    ) {
+
+        playCorrectSound();
+
+
+        matchesDone++;
+
+
+        /*
+           Move the dinosaur
+           visually towards the box.
+        */
+
+        const dinoRect =
+            dino.getBoundingClientRect();
+
+
+        const boxRect =
+            targetBox.getBoundingClientRect();
+
+
+        dino.style.position =
+            "fixed";
+
+
+        dino.style.left =
+            boxRect.left +
+            (
+                boxRect.width -
+                dinoRect.width
+            ) /
+            2 +
+            "px";
+
+
+        dino.style.top =
+            boxRect.top +
+            (
+                boxRect.height -
+                dinoRect.height
+            ) /
+            2 +
+            "px";
+
+
+        dino.style.zIndex =
+            "30";
+
+
+        dino.style.transform =
+            "scale(0.75)";
+
+
+        targetBox.style.background =
+            "rgba(190,255,200,0.95)";
+
+
+        targetBox.style.borderColor =
+            "#25a84a";
+
+
+        setTimeout(
+            function () {
+
+                dino.style.opacity =
+                    "0";
+
+
+                targetBox.style.opacity =
+                    "0";
+
+
+            },
+            550
+        );
+
+
+        /*
+           All matches complete
+        */
+
+        if (
+            matchesDone ===
+            dinosaurs.length
+        ) {
+
+            setTimeout(
+                function () {
+
+                    showSlide(3);
+
+                },
+                1000
+            );
+
+        }
+
+    }
+
+    /*
+       WRONG
+    */
+
+    else {
+
+        playWrongSound();
+
+
+        dino.animate(
+            [
+                {
+                    transform:
+                        "translateX(0)"
+                },
+                {
+                    transform:
+                        "translateX(-10px)"
+                },
+                {
+                    transform:
+                        "translateX(10px)"
+                },
+                {
+                    transform:
+                        "translateX(-7px)"
+                },
+                {
+                    transform:
+                        "translateX(7px)"
+                },
+                {
+                    transform:
+                        "translateX(0)"
+                }
+            ],
+            {
+                duration: 400
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+function playCorrectSound() {
+
+    const sound =
+        document.getElementById(
+            "correctSound"
+        );
+
+
+    sound.currentTime =
+        0;
+
+
+    sound.play().catch(
+        function () {}
+    );
+
+}
+
+
+function playWrongSound() {
+
+    const sound =
+        document.getElementById(
+            "wrongSound"
+        );
+
+
+    sound.currentTime =
+        0;
+
+
+    sound.play().catch(
+        function () {}
+    );
+
+}
+
+
+/* =========================================================
+   SHOW SLIDE
+========================================================= */
+
+function showSlide(
+    slideNumber
+) {
+
+    document
+        .querySelectorAll(
+            ".slide"
+        )
+        .forEach(
+            slide =>
+                slide.classList.remove(
+                    "visible"
+                )
+        );
+
+
+    document
+        .getElementById(
+            "slide" +
+            slideNumber
+        )
+        .classList.add(
+            "visible"
+        );
+
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame() {
+
     showSlide(1);
-    setTimeout(()=>{
-        document.getElementById('slide1').classList.remove('visible');
-        document.getElementById('slide2').classList.add('visible');
-        createGame();
-    },3000);
+
+
+    /*
+       Innovine logo for 5 seconds.
+    */
+
+    setTimeout(
+        function () {
+
+            showSlide(2);
+
+            createGame();
+
+        },
+        5000
+    );
+
 }
 
-window.onload = startGame;
+
+/* =========================================================
+   REBUILD ON ORIENTATION CHANGE
+========================================================= */
+
+let resizeTimer;
+
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        clearTimeout(
+            resizeTimer
+        );
+
+
+        resizeTimer =
+            setTimeout(
+                function () {
+
+                    /*
+                       Do not rebuild if
+                       game is not visible.
+                    */
+
+                    const slide2 =
+                        document.getElementById(
+                            "slide2"
+                        );
+
+
+                    if (
+                        slide2.classList.contains(
+                            "visible"
+                        ) &&
+                        matchesDone === 0
+                    ) {
+
+                        createGame();
+
+                    }
+
+                },
+                200
+            );
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+window.addEventListener(
+    "load",
+    startGame
+);
+
 </script>
+
 </body>
 </html>
