@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>2D or 3D Shapes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="splash"><img src="assets/innovine-logo.png" alt="Innovine Solutions"></div>
+
+<div id="startScreen" class="screen">
+  <div class="card">
+    <div class="bigIcon">🔷</div>
+    <h1>2D or 3D Shapes</h1>
+    <p>Look at the shape and its name.</p>
+    <p>Tap <b>2D</b> or <b>3D</b>.</p>
+    <button id="startBtn" type="button">▶ Start Game</button>
+  </div>
+</div>
+
+<div id="game" class="hidden">
+  <header>
+    <h1>2D or 3D?</h1>
+    <div class="topRow">
+      <button id="hearBtn" type="button">🔊 Hear</button>
+      <div id="progress">1 / 10</div>
+      <div id="score">⭐ 0</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="shapeArea">
+      <div id="shapeCard" class="shapeCard">
+        <img id="shapeImage" src="" alt="">
+        <div id="shapeName"></div>
+      </div>
+
+      <p id="instruction">Is this shape 2D or 3D?</p>
+
+      <div class="sortButtons">
+        <button class="sortBtn twoD" data-answer="2D" type="button">2D</button>
+        <button class="sortBtn threeD" data-answer="3D" type="button">3D</button>
+      </div>
+    </section>
+
+    <div id="feedback" class="hidden"></div>
+    <div id="confetti"></div>
+  </main>
+</div>
+
+<div id="endScreen" class="screen hidden">
+  <div class="card">
+    <div class="bigIcon">🏆</div>
+    <h1>Great Job!</h1>
+    <p id="finalScore"></p>
+    <p>🎉 You sorted the shapes!</p>
+    <button id="againBtn" type="button">🔄 Play Again</button>
+  </div>
+</div>
+
+<audio id="music" loop preload="auto"><source src="assets/background-music.mp3" type="audio/mpeg"></audio>
+<audio id="correctSound" preload="auto"><source src="assets/correct.mp3" type="audio/mpeg"></audio>
+<audio id="wrongSound" preload="auto"><source src="assets/wrong.mp3" type="audio/mpeg"></audio>
+
+<script src="speech.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
